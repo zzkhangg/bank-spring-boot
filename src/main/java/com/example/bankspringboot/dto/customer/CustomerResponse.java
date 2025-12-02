@@ -14,4 +14,30 @@ public class CustomerResponse {
         this.phone = phone;
         this.id = id;
     }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+
+    public String getPhone() {
+        return phone;
+    }
+
+
+    public Long getId() {
+        return id;
+    }
 }

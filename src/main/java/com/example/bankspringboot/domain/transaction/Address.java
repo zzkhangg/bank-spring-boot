@@ -1,4 +1,4 @@
-package com.example.bankspringboot.domain;
+package com.example.bankspringboot.domain.transaction;
 
 import jakarta.persistence.Embeddable;
 

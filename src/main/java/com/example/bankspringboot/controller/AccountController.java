@@ -1,7 +1,7 @@
 package com.example.bankspringboot.controller;
 
 
-import com.example.bankspringboot.domain.Account;
+import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.dto.account.CreateAccountRequest;
 import com.example.bankspringboot.service.AccountService;
 import org.springframework.web.bind.annotation.*;

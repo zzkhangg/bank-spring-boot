@@ -1,4 +1,4 @@
-package com.example.bankspringboot.domain;
+package com.example.bankspringboot.domain.account;
 
 public enum AccountType {
     DEBIT,

@@ -1,6 +1,8 @@
-package com.example.bankspringboot.domain;
+package com.example.bankspringboot.domain.account;
 
 
+import com.example.bankspringboot.domain.customer.Customer;
+import com.example.bankspringboot.domain.transaction.Transaction;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

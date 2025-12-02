@@ -1,9 +1,12 @@
-package com.example.bankspringboot.domain;
+package com.example.bankspringboot.domain.customer;
 
 import java.util.List;
 import java.util.Objects;
 
+import com.example.bankspringboot.domain.account.Account;
+import com.example.bankspringboot.domain.transaction.Transaction;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
@@ -13,9 +16,9 @@ public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String fname;
-    private String lname;
+    
+    private String firstName;
+    private String lastName;
     private String email;
     private String phone;
     private LocalDate birthdate;
@@ -27,14 +30,16 @@ public class Customer {
     @OneToMany(mappedBy = "customer")
     private List<Transaction> transactions;
 
-    public Customer() {}
+    public Customer() {
+    }
 
-    public Customer(String fname, String lname, String email, String phone, LocalDate birthdate) {
-        this.fname = fname;
-        this.lname = lname;
+    public Customer(String firstName, String lastName, String email, String phone, LocalDate birthdate, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.phone = phone;
         this.birthdate = birthdate;
+        this.password = this.password;
     }
 
     /* Getters */
@@ -42,11 +47,12 @@ public class Customer {
         return this.id;
     }
 
-    public String getFname() {
-        return this.fname;
+    public String getFirstName() {
+        return this.firstName;
     }
-    public String getLname() {
-        return this.lname;
+
+    public String getLastName() {
+        return this.lastName;
     }
 
     public LocalDate getBirthdate() {
@@ -74,11 +80,12 @@ public class Customer {
         this.id = id;
     }
 
-    public void setLname(String lname) {
-        this.lname = lname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
-    public void setFname(String fname) {
-        this.fname = fname;
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public void setEmail(String email) {
@@ -107,6 +114,6 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer{" + "id=" + this.id + ", name='" + this.lname + this.fname + '\'' + '}';
+        return "Customer{" + "id=" + this.id + ", name='" + this.lastName + this.firstName + '\'' + '}';
     }
 }

@@ -1,5 +1,7 @@
-package com.example.bankspringboot.domain;
+package com.example.bankspringboot.domain.transaction;
 
+import com.example.bankspringboot.domain.customer.Customer;
+import com.example.bankspringboot.domain.account.Account;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

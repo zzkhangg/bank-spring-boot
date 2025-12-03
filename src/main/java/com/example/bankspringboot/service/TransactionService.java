@@ -8,6 +8,7 @@ import com.example.bankspringboot.domain.transaction.TransactionStatus;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
+import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
 import com.example.bankspringboot.service.exceptions.BusinessException;
@@ -23,7 +24,6 @@ import java.util.Optional;
 public class TransactionService {
     final private TransactionRepository transactionRepository;
     final private AccountRepository accountRepository;
-    private final AccountService accountService;
     final private BigDecimal FEE_PERCENTAGE = BigDecimal.valueOf(0.01);
     ModelMapper modelMapper;
 
@@ -31,7 +31,6 @@ public class TransactionService {
                               AccountService accountService, ModelMapper modelMapper) {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
-        this.accountService = accountService;
         this.modelMapper = modelMapper;
     }
 
@@ -65,6 +64,7 @@ public class TransactionService {
         transaction.setType(TransactionType.DEPOSIT);
         transaction.setAccount(account);
         transaction.setCustomer(account.getCustomer());
+        transaction.setChannel(depositRequest.getDepositChannel());
 
 
         // Save transaction after updating balance
@@ -76,4 +76,48 @@ public class TransactionService {
                 transaction.getAddress(), transaction.getType());
     }
 
+    @Transactional
+    public TransactionResponse withdraw(WithdrawalRequest req) {
+        Long accountId = req.getAccountId();
+        BigDecimal amount = req.getAmount();
+        Account account = accountRepository.findByIdWithLock(accountId).orElseThrow(
+                () -> new IdInvalidException("Account with id " + accountId + " not found"));
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be positive");
+        }
+
+        if (account.getStatus() != AccountStatus.ACTIVE) {
+            throw new BusinessException("Account is not active");
+        }
+
+        BigDecimal fee = FEE_PERCENTAGE.multiply(amount);
+
+        BigDecimal totalDeduction = amount.add(fee);
+        if (account.getBalance().compareTo(totalDeduction) <= 0) {
+            throw new BusinessException("Insufficient funds");
+        }
+
+        // Update balance
+        account.setBalance(account.getBalance().subtract(totalDeduction));
+
+        // Build transaction
+        Transaction transaction = new Transaction();
+        transaction.setAmount(amount);
+        transaction.setFee(fee);
+        transaction.setType(TransactionType.WITHDRAW);
+        transaction.setAccount(account);
+        transaction.setCustomer(account.getCustomer());
+        transaction.setChannel(req.getWithdrawalChannel());
+        transaction.setAddress(req.getAddress());
+        transaction.setDescription(req.getDescription());
+        transaction.setStatus(TransactionStatus.COMPLETED);
+
+        // Save transaction after updating balance
+        transactionRepository.save(transaction);
+        return new TransactionResponse(transaction.getId(), transaction.getAccount().getId(),
+                transaction.getAccount().getCustomer().getId(), transaction.getAmount(), transaction.getStatus(),
+                transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
+                transaction.getAddress(), transaction.getType());
+    }
 }

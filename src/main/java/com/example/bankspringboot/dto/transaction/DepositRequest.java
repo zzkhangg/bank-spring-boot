@@ -2,6 +2,9 @@ package com.example.bankspringboot.dto.transaction;
 
 import java.math.BigDecimal;
 
+import com.example.bankspringboot.domain.transaction.Address;
+import com.example.bankspringboot.domain.transaction.TransactionChannel;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -36,4 +39,17 @@ public class DepositRequest {
      */
     @Size(max = 255, message = "Reference note cannot exceed 255 characters.")
     private String description;
+
+    /**
+     * Address
+     */
+    @Valid
+    private Address address;
+
+    /**
+     * The channel through which the deposit is being performed (e.g., "ATM", "Online").
+     */
+    @NotBlank(message = "Channel is mandatory.")
+    @NotNull
+    private TransactionChannel depositChannel;
 }

@@ -43,6 +43,9 @@ public class Transaction {
 
     private String currency;
 
+    @Enumerated(EnumType.STRING)
+    private TransactionChannel channel;
+
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();

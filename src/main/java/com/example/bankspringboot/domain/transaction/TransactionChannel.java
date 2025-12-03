@@ -1,0 +1,7 @@
+package com.example.bankspringboot.domain.transaction;
+
+public enum TransactionChannel {
+    ATM,
+    ONLINE,
+    BRANCH
+}

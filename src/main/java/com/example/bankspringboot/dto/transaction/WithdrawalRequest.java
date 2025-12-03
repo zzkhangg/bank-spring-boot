@@ -34,13 +34,20 @@ public class WithdrawalRequest {
      */
     @NotBlank(message = "Channel is mandatory.")
     @NotNull
-    private TransactionChannel withdrawalChannel;
+    private TransactionChannel channel;
 
     /**
      * An optional note or reference from the client.
      */
     @Size(max = 255, message = "Reference note cannot exceed 255 characters.")
     private String description;
+
+    /**
+     * The currency code (e.g., "USD", "EUR").
+     */
+    @NotBlank(message = "Currency is mandatory.")
+    @Size(min = 3, max = 3, message = "Currency must be a 3-letter code (e.g., USD).")
+    private String currency;
 
     /**
      * Address

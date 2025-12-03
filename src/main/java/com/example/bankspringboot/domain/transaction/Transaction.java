@@ -3,6 +3,8 @@ package com.example.bankspringboot.domain.transaction;
 import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.domain.account.Account;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +43,8 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionType type;
 
+    @NotBlank(message = "Currency is mandatory.")
+    @Size(min = 3, max = 3, message = "Currency must be a 3-letter code (e.g., USD).")
     private String currency;
 
     @Enumerated(EnumType.STRING)

@@ -2,6 +2,7 @@ package com.example.bankspringboot.controller;
 
 import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
+import com.example.bankspringboot.dto.transaction.TransferRequest;
 import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
 import com.example.bankspringboot.service.TransactionService;
 import org.springframework.web.bind.annotation.*;
@@ -25,5 +26,10 @@ public class TransactionController {
     @PostMapping("/withdraw")
     public TransactionResponse withdraw(@PathVariable Long accountId, @RequestBody WithdrawalRequest withdrawalRequest) {
         return transactionService.withdraw(withdrawalRequest);
+    }
+
+    @PostMapping("/transfer")
+    public TransactionResponse transfer(@PathVariable Long accountId, @RequestBody TransferRequest transferRequest) {
+        return transactionService.transfer(transferRequest);
     }
 }

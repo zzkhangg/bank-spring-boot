@@ -64,6 +64,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(res);
     }
 
+    @ExceptionHandler(BusinessException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleException(BusinessException e) {
+        ErrorResponse res = new ErrorResponse();
+        res.setMessage("Bad Request");
+        res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+        res.setError(e.getMessage());
+
+        return ResponseEntity.badRequest().body(res);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> handleException(Exception e) {

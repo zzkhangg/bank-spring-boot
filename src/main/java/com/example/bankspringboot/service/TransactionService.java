@@ -8,6 +8,7 @@ import com.example.bankspringboot.domain.transaction.TransactionStatus;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
+import com.example.bankspringboot.dto.transaction.TransferRequest;
 import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
@@ -26,6 +27,7 @@ public class TransactionService {
     final private AccountRepository accountRepository;
     final private BigDecimal FEE_PERCENTAGE = BigDecimal.valueOf(0.01);
     ModelMapper modelMapper;
+    final private BigDecimal TRANSACTION_LIMIT = BigDecimal.valueOf(500);
 
     public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository,
                               AccountService accountService, ModelMapper modelMapper) {
@@ -46,7 +48,7 @@ public class TransactionService {
         }
 
         Account account = accountRepository.findByIdWithLock(accountId)
-                .orElseThrow(() -> new IdInvalidException("Account with id " + accountId + " not found"));
+                .orElseThrow(() -> new BusinessException("Account with id " + accountId + " not found"));
 
         if (account.getStatus() != AccountStatus.ACTIVE) {
             throw new BusinessException("Account is not active");
@@ -64,8 +66,8 @@ public class TransactionService {
         transaction.setType(TransactionType.DEPOSIT);
         transaction.setAccount(account);
         transaction.setCustomer(account.getCustomer());
-        transaction.setChannel(depositRequest.getDepositChannel());
-
+        transaction.setChannel(depositRequest.getChannel());
+        transaction.setCurrency(depositRequest.getCurrency());
 
         // Save transaction after updating balance
         transaction.setStatus(TransactionStatus.COMPLETED);
@@ -84,7 +86,11 @@ public class TransactionService {
                 () -> new IdInvalidException("Account with id " + accountId + " not found"));
 
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Deposit amount must be positive");
+            throw new BusinessException("Deposit amount must be positive");
+        }
+
+        if (amount.compareTo(TRANSACTION_LIMIT) > 0) {
+            throw new BusinessException("Withdrawal amount must be less than or equal to TRANSACTION_LIMIT");
         }
 
         if (account.getStatus() != AccountStatus.ACTIVE) {
@@ -108,10 +114,11 @@ public class TransactionService {
         transaction.setType(TransactionType.WITHDRAW);
         transaction.setAccount(account);
         transaction.setCustomer(account.getCustomer());
-        transaction.setChannel(req.getWithdrawalChannel());
+        transaction.setChannel(req.getChannel());
         transaction.setAddress(req.getAddress());
         transaction.setDescription(req.getDescription());
         transaction.setStatus(TransactionStatus.COMPLETED);
+        transaction.setCurrency(req.getCurrency());
 
         // Save transaction after updating balance
         transactionRepository.save(transaction);
@@ -119,5 +126,84 @@ public class TransactionService {
                 transaction.getAccount().getCustomer().getId(), transaction.getAmount(), transaction.getStatus(),
                 transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
                 transaction.getAddress(), transaction.getType());
+    }
+
+    @Transactional
+    public TransactionResponse transfer(TransferRequest req) {
+        Long fromId = req.getSourceAccountId();
+        Long toId = req.getDestinationAccountId();
+        BigDecimal amount = req.getAmount();
+        Account fromAccount = accountRepository.findByIdWithLock(fromId).orElseThrow(
+                () -> new IdInvalidException("Account with id " + fromId + " not found"));
+        Account toAccount = accountRepository.findByIdWithLock(toId).orElseThrow(
+                () -> new IdInvalidException("Account with id " + toId + " not found"));
+
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Deposit amount must be positive");
+        }
+
+        if (amount.compareTo(TRANSACTION_LIMIT) > 0) {
+            throw new BusinessException("Transfer amount must be less than or equal to TRANSACTION_LIMIT");
+        }
+
+        if (fromAccount.getStatus() != AccountStatus.ACTIVE) {
+            throw new BusinessException("Account is not active");
+        }
+
+        BigDecimal fee = FEE_PERCENTAGE.multiply(amount);
+
+        BigDecimal totalDeduction = amount.add(fee);
+        if (fromAccount.getBalance().compareTo(totalDeduction) <= 0) {
+            throw new BusinessException("Insufficient funds");
+        }
+
+        // Update balance for source customer
+        fromAccount.setBalance(fromAccount.getBalance().subtract(totalDeduction));
+
+        // Update balance for destination customer
+        toAccount.setBalance(toAccount.getBalance().add(amount));
+
+        // Transaction for source
+        Transaction txSource = new Transaction();
+        txSource.setAmount(amount);
+        txSource.setFee(fee);
+        txSource.setType(TransactionType.TRANSFER_OUT);
+        txSource.setAccount(fromAccount);
+        txSource.setCustomer(fromAccount.getCustomer());
+        txSource.setChannel(req.getChannel());
+        txSource.setAddress(req.getAddress());
+        txSource.setDescription(req.getDescription());
+        txSource.setStatus(TransactionStatus.COMPLETED);
+        txSource.setCurrency(req.getCurrency());
+
+        // Transaction for destination
+        Transaction txDest = new Transaction();
+        txDest.setAmount(amount);
+        txDest.setFee(BigDecimal.ZERO);
+        txDest.setType(TransactionType.TRANSFER_IN);
+        txDest.setAccount(toAccount);
+        txDest.setCustomer(toAccount.getCustomer());
+        txDest.setChannel(req.getChannel());
+        txDest.setAddress(req.getAddress());
+        txDest.setDescription(req.getDescription());
+        txDest.setStatus(TransactionStatus.COMPLETED);
+        txDest.setCurrency(req.getCurrency());
+
+        // Save both
+        transactionRepository.save(txSource);
+        transactionRepository.save(txDest);
+
+        return new TransactionResponse(
+                txSource.getId(),
+                txSource.getAccount().getId(),
+                txSource.getCustomer().getId(),
+                txSource.getAmount(),
+                txSource.getStatus(),
+                txSource.getCreatedAt(),
+                txSource.getDescription(),
+                txSource.getFee(),
+                txSource.getAddress(),
+                txSource.getType()
+        );
     }
 }

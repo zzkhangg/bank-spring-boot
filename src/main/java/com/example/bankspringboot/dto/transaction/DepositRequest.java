@@ -41,6 +41,13 @@ public class DepositRequest {
     private String description;
 
     /**
+     * The currency code (e.g., "USD", "EUR").
+     */
+    @NotBlank(message = "Currency is mandatory.")
+    @Size(min = 3, max = 3, message = "Currency must be a 3-letter code (e.g., USD).")
+    private String currency;
+
+    /**
      * Address
      */
     @Valid
@@ -51,5 +58,5 @@ public class DepositRequest {
      */
     @NotBlank(message = "Channel is mandatory.")
     @NotNull
-    private TransactionChannel depositChannel;
+    private TransactionChannel channel;
 }

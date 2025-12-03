@@ -2,8 +2,12 @@ package com.example.bankspringboot.controller;
 
 
 import com.example.bankspringboot.domain.account.Account;
+import com.example.bankspringboot.dto.account.AccountResponse;
 import com.example.bankspringboot.dto.account.CreateAccountRequest;
+import com.example.bankspringboot.dto.account.UpdateAccountRequest;
 import com.example.bankspringboot.service.AccountService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,13 +21,23 @@ public class AccountController {
     }
 
     @GetMapping("/{id}")
-    public Account getAccountById(@PathVariable Long id) {
-        return null;
+    public AccountResponse getAccount(@PathVariable Long id) {
+        return accountService.getAccount(id);
     }
 
-    @PostMapping()
-    public Account createAccount(@RequestBody CreateAccountRequest req) {
-        // return accountService.createAccount(req);
-        return null;
+    @PostMapping("/")
+    public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest req) {
+        return accountService.createAccount(req);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
+        accountService.deleteAccount(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    public AccountResponse updateAccount(@PathVariable Long id, @Valid @RequestBody UpdateAccountRequest req) {
+        return accountService.updateAccount(id, req);
     }
 }

@@ -35,7 +35,7 @@ public class AccountController {
         accountService.deleteAccount(id);
         return ResponseEntity.noContent().build();
     }
-    
+
     @PutMapping("/{id}")
     public AccountResponse updateAccountStatus(@PathVariable Long id, @Valid @RequestBody UpdateAccountRequest req) {
         return accountService.updateAccountStatus(id, req);

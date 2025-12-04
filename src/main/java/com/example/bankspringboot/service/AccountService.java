@@ -41,24 +41,17 @@ public class AccountService {
     }
 
     public AccountResponse getAccount(Long id) {
-        Optional<Account> optionalAccount = accountRepository.findById(id);
-        if (optionalAccount.isEmpty()) {
-            throw new IdInvalidException("Id not found");
-        }
+        Account account = accountRepository.findById(id).orElseThrow(
+                () -> new IdInvalidException("No account with id " + id));
 
-        Account account = optionalAccount.get();
         return new AccountResponse(account.getId(), account.getAccountNumber(), account.getAccountType(),
                 account.getBalance(), account.getTransactionLimit(), account.getStatus(), account.getCreatedAt());
     }
 
     public AccountResponse createAccount(CreateAccountRequest req) {
         Account account = new Account();
-        Optional<Customer> optionalCustomer = customerRepository.findById(req.getCustomerId());
-        if (optionalCustomer.isEmpty()) {
-            throw new IdInvalidException("Customer Id not found");
-        }
-
-        Customer customer = optionalCustomer.get();
+        Customer customer = customerRepository.findById(req.getCustomerId()).orElseThrow(
+                () -> new IdInvalidException("No Customer found with id " + req.getCustomerId()));
         account.setCustomer(customer);
         String accountNumber = generateAccountNumber();
         account.setAccountNumber(accountNumber);
@@ -80,18 +73,14 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
-    public AccountResponse updateAccount(Long id, UpdateAccountRequest req) {
-        Account saved = updateAccountStatus(id, req.getStatus());
-        return new AccountResponse(saved.getId(), saved.getAccountNumber(), saved.getAccountType(), saved.getBalance(), saved.getTransactionLimit(), saved.getStatus(), saved.getCreatedAt());
-    }
+    public AccountResponse updateAccountStatus(Long id, UpdateAccountRequest req) {
+        Account account = new Account();
+        Customer customer = customerRepository.findById(id).orElseThrow(
+                () -> new IdInvalidException("No Customer found with id " + id));
 
-    public Account updateAccountStatus(Long id, AccountStatus status) {
-        Optional<Account> optionalAccount = accountRepository.findById(id);
-        if (optionalAccount.isEmpty()) {
-            throw new IdInvalidException("Id not found");
-        }
-        Account account = optionalAccount.get();
-        account.setStatus(status);
-        return accountRepository.save(account);
+        account.setStatus(req.getStatus());
+        Account saved = accountRepository.save(account);
+        return new AccountResponse(saved.getId(), saved.getAccountNumber(), saved.getAccountType(),
+                saved.getBalance(), saved.getTransactionLimit(), saved.getStatus(), saved.getCreatedAt());
     }
 }

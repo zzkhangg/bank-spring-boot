@@ -1,6 +1,6 @@
 package com.example.bankspringboot.dto.transaction;
 
-import com.example.bankspringboot.domain.transaction.Address;
+import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.TransactionStatus;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import lombok.Getter;

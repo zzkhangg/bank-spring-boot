@@ -1,5 +1,6 @@
 package com.example.bankspringboot.domain.transaction;
 
+import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.domain.account.Account;
 import jakarta.persistence.*;

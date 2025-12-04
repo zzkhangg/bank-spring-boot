@@ -1,10 +1,16 @@
 package com.example.bankspringboot.dto.customer;
 
+import com.example.bankspringboot.domain.common.Address;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Setter
+@Getter
 public class CreateCustomerRequest {
     @NotBlank(message = "First name is required")
     private String firstName;
@@ -29,31 +35,6 @@ public class CreateCustomerRequest {
     @Size(min = 8, max = 30, message = "Enter password from 8 up to 30 characters")
     private String password;
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFirstName() {
-        return this.firstName;
-    }
-
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    public LocalDate getBirthdate() {
-        return this.birthdate;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public String getPhone() {
-        return this.phone;
-    }
+    @Valid
+    private Address address;
 }

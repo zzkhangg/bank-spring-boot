@@ -9,6 +9,7 @@ import com.example.bankspringboot.dto.account.UpdateAccountRequest;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class AccountService {
                 account.getBalance(), account.getTransactionLimit(), account.getStatus(), account.getCreatedAt());
     }
 
+    @Transactional
     public AccountResponse createAccount(CreateAccountRequest req) {
         Account account = new Account();
         Customer customer = customerRepository.findById(req.getCustomerId()).orElseThrow(
@@ -64,6 +66,7 @@ public class AccountService {
                 saved.getBalance(), saved.getTransactionLimit(), saved.getStatus(), saved.getCreatedAt());
     }
 
+    @Transactional
     public void deleteAccount(Long id) {
         Optional<Account> optionalAccount = accountRepository.findById(id);
         if (optionalAccount.isEmpty()) {
@@ -73,11 +76,11 @@ public class AccountService {
         accountRepository.delete(account);
     }
 
+    @Transactional
     public AccountResponse updateAccountStatus(Long id, UpdateAccountRequest req) {
         Account account = new Account();
         Customer customer = customerRepository.findById(id).orElseThrow(
                 () -> new IdInvalidException("No Customer found with id " + id));
-
         account.setStatus(req.getStatus());
         Account saved = accountRepository.save(account);
         return new AccountResponse(saved.getId(), saved.getAccountNumber(), saved.getAccountType(),

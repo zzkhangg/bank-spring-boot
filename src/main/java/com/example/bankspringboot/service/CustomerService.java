@@ -6,11 +6,10 @@ import com.example.bankspringboot.dto.customer.CustomerResponse;
 import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
 import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import jakarta.transaction.Transactional;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,7 @@ public class CustomerService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public CustomerResponse createCustomer(CreateCustomerRequest req) {
         Customer cus = new Customer(req.getFirstName(), req.getLastName(), req.getEmail(), req.getPhone(),
                 req.getBirthdate(), this.passwordEncoder.encode(req.getPassword()), req.getAddress());
@@ -48,7 +48,8 @@ public class CustomerService {
         return customerResponseList;
     }
 
-    public CustomerResponse updateCustomer(@PathVariable Long id, @RequestBody UpdateCustomerRequest req) {
+    @Transactional
+    public CustomerResponse updateCustomer(Long id, UpdateCustomerRequest req) {
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
         if (optionalCustomer.isEmpty()) {
             throw new IdInvalidException("Id not found");
@@ -67,7 +68,8 @@ public class CustomerService {
         return customerRepository.existsById(id);
     }
 
-    public void deleteCustomer(@PathVariable Long id) {
+    @Transactional
+    public void deleteCustomer(Long id) {
         try {
             customerRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {

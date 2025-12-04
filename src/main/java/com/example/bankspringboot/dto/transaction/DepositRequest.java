@@ -2,7 +2,7 @@ package com.example.bankspringboot.dto.transaction;
 
 import java.math.BigDecimal;
 
-import com.example.bankspringboot.domain.transaction.Address;
+import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.TransactionChannel;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;

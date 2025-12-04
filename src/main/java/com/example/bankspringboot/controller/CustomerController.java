@@ -1,5 +1,6 @@
 package com.example.bankspringboot.controller;
 
+import com.example.bankspringboot.dto.account.AccountResponse;
 import com.example.bankspringboot.dto.customer.CreateCustomerRequest;
 import com.example.bankspringboot.dto.customer.CustomerResponse;
 import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
@@ -41,7 +42,7 @@ public class CustomerController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
-        return ResponseEntity.ok(customerService.getAllCustomers());
+    public List<CustomerResponse> getAllCustomers() {
+        return customerService.getAllCustomers();
     }
 }

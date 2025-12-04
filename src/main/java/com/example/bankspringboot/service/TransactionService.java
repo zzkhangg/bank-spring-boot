@@ -2,7 +2,6 @@ package com.example.bankspringboot.service;
 
 import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.account.AccountStatus;
-import com.example.bankspringboot.domain.transaction.Address;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import com.example.bankspringboot.domain.transaction.TransactionStatus;
 import com.example.bankspringboot.domain.transaction.TransactionType;
@@ -19,7 +18,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 @Service
 public class TransactionService {
@@ -27,7 +25,7 @@ public class TransactionService {
     final private AccountRepository accountRepository;
     final private BigDecimal FEE_PERCENTAGE = BigDecimal.valueOf(0.01);
     ModelMapper modelMapper;
-    final private BigDecimal TRANSACTION_LIMIT = BigDecimal.valueOf(500);
+    final private BigDecimal TRANSACTION_LIMIT = BigDecimal.valueOf(2000);
 
     public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository,
                               AccountService accountService, ModelMapper modelMapper) {
@@ -68,6 +66,7 @@ public class TransactionService {
         transaction.setCustomer(account.getCustomer());
         transaction.setChannel(depositRequest.getChannel());
         transaction.setCurrency(depositRequest.getCurrency());
+        transaction.setAddress(depositRequest.getAddress());
 
         // Save transaction after updating balance
         transaction.setStatus(TransactionStatus.COMPLETED);

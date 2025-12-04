@@ -27,31 +27,30 @@ public class CustomerService {
     }
 
     public CustomerResponse createCustomer(CreateCustomerRequest req) {
-        Customer cus = new Customer(req.getFirstName(), req.getLastName(), req.getEmail(), req.getPhone(), req.getBirthdate(), this.passwordEncoder.encode(req.getPassword()));
+        Customer cus = new Customer(req.getFirstName(), req.getLastName(), req.getEmail(), req.getPhone(),
+                req.getBirthdate(), this.passwordEncoder.encode(req.getPassword()), req.getAddress());
         Customer saved = customerRepository.save(cus);
-        return new CustomerResponse(saved.getId(), saved.getFirstName(), saved.getLastName(), saved.getEmail(), saved.getPhone());
+        return new CustomerResponse(saved.getId(), saved.getFirstName(), saved.getLastName(), saved.getEmail(), saved.getPhone(), saved.getAddress());
     }
 
     public CustomerResponse getCustomer(Long id) {
-        Customer cus = customerRepository.findById(id).isPresent() ? customerRepository.findById(id).get() : null;
-        if (cus == null) {
-
-        }
-        return new CustomerResponse(cus.getId(), cus.getFirstName(), cus.getLastName(), cus.getEmail(), cus.getPhone());
+        Customer cus = customerRepository.findById(id).orElseThrow(() -> new IdInvalidException("Customer with id " + id + " not found"));
+        return new CustomerResponse(cus.getId(), cus.getFirstName(), cus.getLastName(), cus.getEmail(), cus.getPhone(), cus.getAddress());
     }
 
     public List<CustomerResponse> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
         List<CustomerResponse> customerResponseList = new ArrayList<>();
         customers.forEach(customer -> {
-            customerResponseList.add(new CustomerResponse(customer.getId(), customer.getFirstName(), customer.getLastName(), customer.getEmail(), customer.getPhone()));
+            customerResponseList.add(new CustomerResponse(customer.getId(), customer.getFirstName(),
+                    customer.getLastName(), customer.getEmail(), customer.getPhone(), customer.getAddress()));
         });
         return customerResponseList;
     }
 
     public CustomerResponse updateCustomer(@PathVariable Long id, @RequestBody UpdateCustomerRequest req) {
         Optional<Customer> optionalCustomer = customerRepository.findById(id);
-        if (!optionalCustomer.isPresent()) {
+        if (optionalCustomer.isEmpty()) {
             throw new IdInvalidException("Id not found");
         }
         Customer customer = optionalCustomer.get();
@@ -60,7 +59,8 @@ public class CustomerService {
         customer.setEmail(req.getEmail());
         customer.setPhone(req.getPhone());
         customerRepository.save(customer);
-        return new CustomerResponse(customer.getId(), customer.getFirstName(), customer.getLastName(), customer.getEmail(), customer.getPhone());
+        return new CustomerResponse(customer.getId(), customer.getFirstName(), customer.getLastName(),
+                customer.getEmail(), customer.getPhone(), customer.getAddress());
     }
 
     public boolean existsCustomer(Long id) {

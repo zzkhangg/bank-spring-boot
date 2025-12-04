@@ -1,8 +1,12 @@
 package com.example.bankspringboot.dto.customer;
 
+import com.example.bankspringboot.domain.common.Address;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
 
+@Getter
 public class UpdateCustomerRequest {
 
     @NotBlank(message = "First name is required")
@@ -18,19 +22,6 @@ public class UpdateCustomerRequest {
     @NotBlank(message = "Phone is required")
     private String phone;
 
-    public String getFirstName() {
-        return this.firstName;
-    }
-
-    public String getLastName() {
-        return this.lastName;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public String getPhone() {
-        return this.phone;
-    }
+    @Valid
+    private Address address;
 }

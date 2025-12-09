@@ -9,6 +9,7 @@ import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import com.example.bankspringboot.dto.transaction.TransferRequest;
 import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
+import com.example.bankspringboot.mapper.TransactionMapper;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
 import com.example.bankspringboot.service.exceptions.BusinessException;
@@ -28,24 +29,20 @@ public class TransactionService {
   final private AccountRepository accountRepository;
   final private BigDecimal FEE_PERCENTAGE = BigDecimal.valueOf(0.01);
   final private BigDecimal TRANSACTION_LIMIT = BigDecimal.valueOf(2000);
+  private final TransactionMapper transactionMapper;
 
   public TransactionService(TransactionRepository transactionRepository,
       AccountRepository accountRepository,
-      AccountService accountService) {
+      AccountService accountService, TransactionMapper transactionMapper) {
     this.transactionRepository = transactionRepository;
     this.accountRepository = accountRepository;
+    this.transactionMapper = transactionMapper;
   }
 
 
   @Transactional
   public TransactionResponse deposit(DepositRequest depositRequest) {
     Long accountId = depositRequest.getAccountId();
-    String description = depositRequest.getDescription();
-    BigDecimal amount = depositRequest.getAmount();
-
-    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new IllegalArgumentException("Deposit amount must be positive");
-    }
 
     Account account = accountRepository.findByIdWithLock(accountId)
         .orElseThrow(() -> new BusinessException("Account with id " + accountId + " not found"));
@@ -55,29 +52,23 @@ public class TransactionService {
     }
 
     // Update balance
-    BigDecimal newBalance = account.getBalance().add(amount);
+    BigDecimal newBalance = account.getBalance().add(depositRequest.getAmount());
     account.setBalance(newBalance);
 
+
+
     // Build transaction
-    Transaction transaction = new Transaction();
-    transaction.setDescription(description);
-    transaction.setAmount(amount);
+    Transaction transaction = transactionMapper.depositReqToTransaction(depositRequest);
     transaction.setFee(BigDecimal.ZERO);
     transaction.setType(TransactionType.DEPOSIT);
     transaction.setAccount(account);
     transaction.setCustomer(account.getCustomer());
-    transaction.setChannel(depositRequest.getChannel());
-    transaction.setCurrency(depositRequest.getCurrency());
-    transaction.setAddress(depositRequest.getAddress());
 
     // Save transaction after updating balance
     transaction.setStatus(TransactionStatus.COMPLETED);
-    transactionRepository.save(transaction);
-    return new TransactionResponse(transaction.getId(), transaction.getAccount().getId(),
-        transaction.getAccount().getCustomer().getId(), transaction.getAmount(),
-        transaction.getStatus(),
-        transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
-        transaction.getAddress(), transaction.getType(), transaction.getCurrency());
+    accountRepository.save(account);
+    Transaction saved = transactionRepository.save(transaction);
+    return transactionMapper.toResponse(saved);
   }
 
   @Transactional
@@ -86,10 +77,6 @@ public class TransactionService {
     BigDecimal amount = req.getAmount();
     Account account = accountRepository.findByIdWithLock(accountId).orElseThrow(
         () -> new IdInvalidException("Account with id " + accountId + " not found"));
-
-    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new BusinessException("Deposit amount must be positive");
-    }
 
     if (amount.compareTo(TRANSACTION_LIMIT) > 0) {
       throw new BusinessException(
@@ -111,26 +98,17 @@ public class TransactionService {
     account.setBalance(account.getBalance().subtract(totalDeduction));
 
     // Build transaction
-    Transaction transaction = new Transaction();
-    transaction.setAmount(amount);
+    Transaction transaction = transactionMapper.withdrawalReqToTransaction(req);
     transaction.setFee(fee);
     transaction.setType(TransactionType.WITHDRAW);
     transaction.setAccount(account);
     transaction.setCustomer(account.getCustomer());
-    transaction.setChannel(req.getChannel());
-    transaction.setAddress(req.getAddress());
-    transaction.setDescription(req.getDescription());
     transaction.setStatus(TransactionStatus.COMPLETED);
-    transaction.setCurrency(req.getCurrency());
 
     // Save transaction after updating balance
+    accountRepository.save(account);
     transactionRepository.save(transaction);
-    return new TransactionResponse(transaction.getId(), transaction.getAccount().getId(),
-        transaction.getAccount().getCustomer().getId(), transaction.getAmount(),
-        transaction.getStatus(),
-        transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
-        transaction.getAddress(), transaction.getType(),
-        transaction.getCurrency());
+    return transactionMapper.toResponse(transaction);
   }
 
   @Transactional
@@ -138,14 +116,15 @@ public class TransactionService {
     Long fromId = req.getSourceAccountId();
     Long toId = req.getDestinationAccountId();
     BigDecimal amount = req.getAmount();
+
+    if (fromId.equals(toId)) {
+      throw new BusinessException("Cannot transfer funds to the same account.");
+    }
+
     Account fromAccount = accountRepository.findByIdWithLock(fromId).orElseThrow(
         () -> new IdInvalidException("Account with id " + fromId + " not found"));
     Account toAccount = accountRepository.findByIdWithLock(toId).orElseThrow(
         () -> new IdInvalidException("Account with id " + toId + " not found"));
-
-    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new BusinessException("Deposit amount must be positive");
-    }
 
     if (amount.compareTo(TRANSACTION_LIMIT) > 0) {
       throw new BusinessException(
@@ -170,48 +149,30 @@ public class TransactionService {
     toAccount.setBalance(toAccount.getBalance().add(amount));
 
     // Transaction for source
-    Transaction txSource = new Transaction();
-    txSource.setAmount(amount);
+    Transaction txSource = transactionMapper.transferReqToTransaction(req);
     txSource.setFee(fee);
     txSource.setType(TransactionType.TRANSFER_OUT);
     txSource.setAccount(fromAccount);
     txSource.setCustomer(fromAccount.getCustomer());
-    txSource.setChannel(req.getChannel());
-    txSource.setAddress(req.getAddress());
-    txSource.setDescription(req.getDescription());
     txSource.setStatus(TransactionStatus.COMPLETED);
-    txSource.setCurrency(req.getCurrency());
 
     // Transaction for destination
-    Transaction txDest = new Transaction();
-    txDest.setAmount(amount);
+    // 1. Create a NEW instance instead of using the mapper.
+    Transaction txDest = transactionMapper.transferReqToTransaction(req);
+    txDest.setAmount(req.getAmount()); // Copies the amount
     txDest.setFee(BigDecimal.ZERO);
     txDest.setType(TransactionType.TRANSFER_IN);
-    txDest.setAccount(toAccount);
+    txDest.setAccount(toAccount); // Receiver's account
     txDest.setCustomer(toAccount.getCustomer());
-    txDest.setChannel(req.getChannel());
-    txDest.setAddress(req.getAddress());
-    txDest.setDescription(req.getDescription());
     txDest.setStatus(TransactionStatus.COMPLETED);
-    txDest.setCurrency(req.getCurrency());
 
-    // Save both
+    // Save to database
+    accountRepository.save(fromAccount);
+    accountRepository.save(toAccount);
     transactionRepository.save(txSource);
     transactionRepository.save(txDest);
 
-    return new TransactionResponse(
-        txSource.getId(),
-        txSource.getAccount().getId(),
-        txSource.getCustomer().getId(),
-        txSource.getAmount(),
-        txSource.getStatus(),
-        txSource.getCreatedAt(),
-        txSource.getDescription(),
-        txSource.getFee(),
-        txSource.getAddress(),
-        txSource.getType(),
-        txSource.getCurrency()
-    );
+    return transactionMapper.toResponse(txSource);
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -219,28 +180,23 @@ public class TransactionService {
     Account account = accountRepository.findById(accountId)
         .orElseThrow(() -> new IdInvalidException("Account with id " + accountId + " not found"));
     List<Transaction> transactionList = transactionRepository.findByAccount(account);
-    List<TransactionResponse> transactionResponseList = new ArrayList<>();
+    List<TransactionResponse> transactionResponses = new ArrayList<>();
     transactionList.forEach(transaction -> {
-      transactionResponseList.add(
-          new TransactionResponse(transaction.getId(), transaction.getAccount().getId(),
-              transaction.getAccount().getCustomer().getId(), transaction.getAmount(),
-              transaction.getStatus(),
-              transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
-              transaction.getAddress(), transaction.getType(),
-              transaction.getCurrency()));
+      TransactionResponse transactionResponse = transactionMapper.toResponse(transaction);
+      transactionResponse.setCustomerId(transaction.getCustomer().getId());
+      transactionResponse.setAccountId(transaction.getAccount().getId());
+      transactionResponses.add(transactionResponse);
     });
-    return transactionResponseList;
+    return transactionResponses;
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public TransactionResponse getTransaction(Long transactionId) {
     Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
         () -> new IdInvalidException("Transaction with id " + transactionId + " not found"));
-    return new TransactionResponse(transaction.getId(), transaction.getAccount().getId(),
-        transaction.getAccount().getCustomer().getId(), transaction.getAmount(),
-        transaction.getStatus(),
-        transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
-        transaction.getAddress(), transaction.getType(),
-        transaction.getCurrency());
+    TransactionResponse transactionResponse = transactionMapper.toResponse(transaction);
+    transactionResponse.setCustomerId(transaction.getCustomer().getId());
+    transactionResponse.setAccountId(transaction.getAccount().getId());
+    return transactionResponse;
   }
 }

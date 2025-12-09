@@ -6,7 +6,11 @@ import com.example.bankspringboot.domain.account.AccountType;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class AccountResponse {
 
   private Long accountId;      // UUID or String
@@ -20,44 +24,4 @@ public class AccountResponse {
   private AccountStatus status;         // ACTIVE, FROZEN, CLOSED
 
   private LocalDateTime createdAt;
-
-  public AccountResponse(Long accountId, String accountNumber, AccountType accountType,
-      BigDecimal balance, BigDecimal transactionLimit, AccountStatus status,
-      LocalDateTime createdAt) {
-    this.accountId = accountId;
-    this.accountNumber = accountNumber;
-    this.accountType = accountType;
-    this.balance = balance;
-    this.transactionLimit = transactionLimit;
-    this.status = status;
-    this.createdAt = createdAt;
-  }
-
-  public Long getAccountId() {
-    return accountId;
-  }
-
-  public String getAccountNumber() {
-    return accountNumber;
-  }
-
-  public AccountType getAccountType() {
-    return accountType;
-  }
-
-  public BigDecimal getBalance() {
-    return balance;
-  }
-
-  public BigDecimal getTransactionLimit() {
-    return transactionLimit;
-  }
-
-  public AccountStatus getStatus() {
-    return status;
-  }
-
-  public LocalDateTime getCreatedAt() {
-    return createdAt;
-  }
 }

@@ -11,11 +11,9 @@ import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -68,11 +66,8 @@ public class AccountService {
 
     @Transactional
     public void deleteAccount(Long id) {
-        Optional<Account> optionalAccount = accountRepository.findById(id);
-        if (optionalAccount.isEmpty()) {
-            throw new IdInvalidException("Id not found");
-        }
-        Account account = optionalAccount.get();
+        Account account = accountRepository.findById(id).orElseThrow(
+                () -> new IdInvalidException("No account with id " + id));
         accountRepository.delete(account);
     }
 

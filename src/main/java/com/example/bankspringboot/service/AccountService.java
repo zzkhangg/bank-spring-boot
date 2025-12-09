@@ -14,7 +14,6 @@ import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

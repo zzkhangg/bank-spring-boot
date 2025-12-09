@@ -8,6 +8,10 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.EntityListeners;
@@ -20,6 +24,9 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Setter
 @Getter
+@SQLDelete(sql = "UPDATE account SET deleted = true WHERE id=?")
+@FilterDef(name = "deletedAccountFilter", parameters = @ParamDef(name = "isDeleted", type = boolean.class))
+@Filter(name = "deletedAccountFilter", condition = "deleted = :isDeleted")
 public class Account {
 
   @Id
@@ -32,6 +39,7 @@ public class Account {
 
   private BigDecimal balance;
   private BigDecimal transactionLimit;
+  private boolean deleted = Boolean.FALSE;
 
   @CreatedDate
   private LocalDateTime createdAt;

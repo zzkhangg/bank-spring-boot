@@ -7,16 +7,22 @@ import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
 
 
 @Entity
 @Getter
 @Setter
+@SQLDelete(sql = "UPDATE customer SET deleted = true WHERE id=?")
+@FilterDef(name = "deletedCustomerFilter", parameters = @ParamDef(name = "isDeleted", type = boolean.class))
+@Filter(name = "deletedCustomerFilter", condition = "deleted = :isDeleted")
 public class Customer {
 
   @Id
@@ -29,6 +35,7 @@ public class Customer {
   private String phone;
   private LocalDate birthdate;
   private String password;
+  private boolean deleted = Boolean.FALSE;
 
   @Embedded
   private Address address;

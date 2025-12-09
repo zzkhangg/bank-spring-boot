@@ -21,10 +21,11 @@ public class TransactionResponse {
   private BigDecimal fee;
   private Address address;
   private TransactionType transactionType;
+  private String currency;
 
   public TransactionResponse(Long transactionId, Long accountId, Long customerId, BigDecimal amount,
       TransactionStatus status, LocalDateTime createdAt, String description, BigDecimal fee,
-      Address address, TransactionType transactionType) {
+      Address address, TransactionType transactionType, String currency) {
     this.transactionId = transactionId;
     this.accountId = accountId;
     this.customerId = customerId;
@@ -35,5 +36,6 @@ public class TransactionResponse {
     this.fee = fee;
     this.address = address;
     this.transactionType = transactionType;
+    this.currency = currency;
   }
 }

@@ -6,6 +6,7 @@ import com.example.bankspringboot.dto.transaction.TransferRequest;
 import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
 import com.example.bankspringboot.service.TransactionService;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -44,5 +45,15 @@ public class TransactionController {
       throw new IdInvalidException("Bad account id!");
     }
     return transactionService.transfer(req);
+  }
+
+  @GetMapping("/transactions")
+  public List<TransactionResponse> getTransactions(@PathVariable Long accountId) {
+    return transactionService.getTransactions(accountId);
+  }
+
+  @GetMapping("/transactions/{transactionId}")
+  public TransactionResponse getTransaction(@PathVariable Long transactionId) {
+    return transactionService.getTransaction(transactionId);
   }
 }

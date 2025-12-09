@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StatisticsService {
@@ -25,6 +27,7 @@ public class StatisticsService {
     this.customerRepository = customerRepository;
   }
 
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<AccountStatisticsDto> getNumOfAccountsAndTransactionsByBalance() {
     List<AccountStatisticsDto> accountStatisticsDtoList = new ArrayList<>();
     for (AccountBalanceType accountBalanceType : AccountBalanceType.values()) {
@@ -39,6 +42,7 @@ public class StatisticsService {
     return accountStatisticsDtoList;
   }
 
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<AdressStatisticsDto> getNumOfCustomersByCity() {
     return customerRepository.countCustomersByCity();
   }

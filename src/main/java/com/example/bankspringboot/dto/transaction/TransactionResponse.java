@@ -7,8 +7,10 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class TransactionResponse {
 
   private Long transactionId;

@@ -4,6 +4,7 @@ package com.example.bankspringboot.domain.account;
 import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +29,6 @@ public class Account {
   @Column(name = "account_number", nullable = false, unique = true)
   @Size(min = 10, max = 10)
   private String accountNumber;
-
 
   private BigDecimal balance;
   private BigDecimal transactionLimit;

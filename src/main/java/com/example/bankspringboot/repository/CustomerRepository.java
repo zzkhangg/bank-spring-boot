@@ -9,10 +9,10 @@ import java.util.List;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
 
-    @Query("""
-            SELECT c.address.city, count(c)
-            from Customer c
-            GROUP BY c.address.city
-            """)
-    List<AdressStatisticsDto> countCustomersByCity();
+  @Query("""
+      SELECT c.address.city, count(c)
+      from Customer c
+      GROUP BY c.address.city
+      """)
+  List<AdressStatisticsDto> countCustomersByCity();
 }

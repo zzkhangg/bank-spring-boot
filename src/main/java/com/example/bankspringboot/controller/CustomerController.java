@@ -14,35 +14,37 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
-    final private CustomerService customerService;
 
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
-    }
+  final private CustomerService customerService;
 
-    @PostMapping("/")
-    public CustomerResponse createCustomer(@Valid @RequestBody CreateCustomerRequest req) {
-        return customerService.createCustomer(req);
-    }
+  public CustomerController(CustomerService customerService) {
+    this.customerService = customerService;
+  }
 
-    @GetMapping("/{id}")
-    public CustomerResponse getCustomer(@PathVariable Long id) {
-        return customerService.getCustomer(id);
-    }
+  @PostMapping("/")
+  public CustomerResponse createCustomer(@Valid @RequestBody CreateCustomerRequest req) {
+    return customerService.createCustomer(req);
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
-        customerService.deleteCustomer(id);
-        return ResponseEntity.noContent().build();
-    }
+  @GetMapping("/{id}")
+  public CustomerResponse getCustomer(@PathVariable Long id) {
+    return customerService.getCustomer(id);
+  }
 
-    @PutMapping("/{id}")
-    public CustomerResponse updateCustomer(@PathVariable Long id, @Valid @RequestBody UpdateCustomerRequest req) {
-        return customerService.updateCustomer(id, req);
-    }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+    customerService.deleteCustomer(id);
+    return ResponseEntity.noContent().build();
+  }
 
-    @GetMapping("/")
-    public List<CustomerResponse> getAllCustomers() {
-        return customerService.getAllCustomers();
-    }
+  @PutMapping("/{id}")
+  public CustomerResponse updateCustomer(@PathVariable Long id,
+      @Valid @RequestBody UpdateCustomerRequest req) {
+    return customerService.updateCustomer(id, req);
+  }
+
+  @GetMapping("/")
+  public List<CustomerResponse> getAllCustomers() {
+    return customerService.getAllCustomers();
+  }
 }

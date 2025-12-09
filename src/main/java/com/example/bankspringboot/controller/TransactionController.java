@@ -11,35 +11,38 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/accounts/{accountId}/")
 public class TransactionController {
-    final private TransactionService transactionService;
+
+  final private TransactionService transactionService;
 
 
-    public TransactionController(TransactionService transactionService) {
-        this.transactionService = transactionService;
+  public TransactionController(TransactionService transactionService) {
+    this.transactionService = transactionService;
+  }
+
+  @PostMapping("/deposit")
+  public TransactionResponse deposit(@PathVariable Long accountId,
+      @RequestBody DepositRequest req) {
+    if (!accountId.equals(req.getAccountId())) {
+      throw new IdInvalidException("Bad account id!");
     }
+    return transactionService.deposit(req);
+  }
 
-    @PostMapping("/deposit")
-    public TransactionResponse deposit(@PathVariable Long accountId,
-                                       @RequestBody DepositRequest req) {
-        if (!accountId.equals(req.getAccountId())) {
-            throw new IdInvalidException("Bad account id!");
-        }
-        return transactionService.deposit(req);
+  @PostMapping("/withdraw")
+  public TransactionResponse withdraw(@PathVariable Long accountId,
+      @RequestBody WithdrawalRequest req) {
+    if (!accountId.equals(req.getAccountId())) {
+      throw new IdInvalidException("Bad account id!");
     }
+    return transactionService.withdraw(req);
+  }
 
-    @PostMapping("/withdraw")
-    public TransactionResponse withdraw(@PathVariable Long accountId, @RequestBody WithdrawalRequest req) {
-        if (!accountId.equals(req.getAccountId())) {
-            throw new IdInvalidException("Bad account id!");
-        }
-        return transactionService.withdraw(req);
+  @PostMapping("/transfer")
+  public TransactionResponse transfer(@PathVariable Long accountId,
+      @RequestBody TransferRequest req) {
+    if (!accountId.equals(req.getSourceAccountId())) {
+      throw new IdInvalidException("Bad account id!");
     }
-
-    @PostMapping("/transfer")
-    public TransactionResponse transfer(@PathVariable Long accountId, @RequestBody TransferRequest req) {
-        if (!accountId.equals(req.getSourceAccountId())) {
-            throw new IdInvalidException("Bad account id!");
-        }
-        return transactionService.transfer(req);
-    }
+    return transactionService.transfer(req);
+  }
 }

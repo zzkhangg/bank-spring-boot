@@ -13,28 +13,33 @@ import java.util.List;
 
 @Service
 public class StatisticsService {
-    final private AccountRepository accountRepository;
-    final private TransactionRepository transactionRepository;
-    private final CustomerRepository customerRepository;
 
-    public StatisticsService(AccountRepository accountRepository, TransactionRepository transactionRepository, CustomerRepository customerRepository) {
-        this.accountRepository = accountRepository;
-        this.transactionRepository = transactionRepository;
-        this.customerRepository = customerRepository;
+  final private AccountRepository accountRepository;
+  final private TransactionRepository transactionRepository;
+  private final CustomerRepository customerRepository;
+
+  public StatisticsService(AccountRepository accountRepository,
+      TransactionRepository transactionRepository, CustomerRepository customerRepository) {
+    this.accountRepository = accountRepository;
+    this.transactionRepository = transactionRepository;
+    this.customerRepository = customerRepository;
+  }
+
+  public List<AccountStatisticsDto> getNumOfAccountsAndTransactionsByBalance() {
+    List<AccountStatisticsDto> accountStatisticsDtoList = new ArrayList<>();
+    for (AccountBalanceType accountBalanceType : AccountBalanceType.values()) {
+      Long accountNum = accountRepository.countAccountsInRange(accountBalanceType.getMin(),
+          accountBalanceType.getMax());
+      Long transactionNum = transactionRepository.countTransactionsInRange(
+          accountBalanceType.getMin(), accountBalanceType.getMax());
+      accountStatisticsDtoList.add(
+          new AccountStatisticsDto(accountBalanceType.toString(), accountNum, transactionNum));
     }
 
-    public List<AccountStatisticsDto> getNumOfAccountsAndTransactionsByBalance() {
-        List<AccountStatisticsDto> accountStatisticsDtoList = new ArrayList<>();
-        for (AccountBalanceType accountBalanceType : AccountBalanceType.values()) {
-            Long accountNum = accountRepository.countAccountsInRange(accountBalanceType.getMin(), accountBalanceType.getMax());
-            Long transactionNum = transactionRepository.countTransactionsInRange(accountBalanceType.getMin(), accountBalanceType.getMax());
-            accountStatisticsDtoList.add(new AccountStatisticsDto(accountBalanceType.toString(), accountNum, transactionNum));
-        }
+    return accountStatisticsDtoList;
+  }
 
-        return accountStatisticsDtoList;
-    }
-
-    public List<AdressStatisticsDto> getNumOfCustomersByCity() {
-        return customerRepository.countCustomersByCity();
-    }
+  public List<AdressStatisticsDto> getNumOfCustomersByCity() {
+    return customerRepository.countCustomersByCity();
+  }
 }

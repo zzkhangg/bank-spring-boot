@@ -12,29 +12,30 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class CreateCustomerRequest {
-    @NotBlank(message = "First name is required")
-    private String firstName;
 
-    @NotBlank(message = "Last name is required")
-    private String lastName;
+  @NotBlank(message = "First name is required")
+  private String firstName;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
-    private String email;
+  @NotBlank(message = "Last name is required")
+  private String lastName;
 
-    @NotBlank(message = "Phone is required")
-    @Size(min = 10, max = 10, message = "Phone Number must include exact 10 digits")
-    private String phone;
+  @NotBlank(message = "Email is required")
+  @Email(message = "Email should be valid")
+  private String email;
 
-    @NotNull(message = "Birthdate is required")
-    @Past(message = "Birthdate must be in the past")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate birthdate;
+  @NotBlank(message = "Phone is required")
+  @Size(min = 10, max = 10, message = "Phone Number must include exact 10 digits")
+  private String phone;
 
-    @NotNull
-    @Size(min = 8, max = 30, message = "Enter password from 8 up to 30 characters")
-    private String password;
+  @NotNull(message = "Birthdate is required")
+  @Past(message = "Birthdate must be in the past")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  private LocalDate birthdate;
 
-    @Valid
-    private Address address;
+  @NotNull
+  @Size(min = 8, max = 30, message = "Enter password from 8 up to 30 characters")
+  private String password;
+
+  @Valid
+  private Address address;
 }

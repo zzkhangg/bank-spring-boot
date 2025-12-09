@@ -18,57 +18,61 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class Customer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phone;
-    private LocalDate birthdate;
-    private String password;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Embedded
-    private Address address;
+  private String firstName;
+  private String lastName;
+  private String email;
+  private String phone;
+  private LocalDate birthdate;
+  private String password;
 
-    @OneToMany(mappedBy = "customer")
-    private List<Account> accounts;
+  @Embedded
+  private Address address;
 
-    @OneToMany(mappedBy = "customer")
-    private List<Transaction> transactions;
+  @OneToMany(mappedBy = "customer")
+  private List<Account> accounts;
 
-    public Customer() {
+  @OneToMany(mappedBy = "customer")
+  private List<Transaction> transactions;
+
+  public Customer() {
+  }
+
+  public Customer(String firstName, String lastName, String email, String phone,
+      LocalDate birthdate, String password, Address address) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.birthdate = birthdate;
+    this.password = this.password;
+    this.address = address;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+
+    if (this == o) {
+      return true;
     }
-
-    public Customer(String firstName, String lastName, String email, String phone, LocalDate birthdate, String password, Address address) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.phone = phone;
-        this.birthdate = birthdate;
-        this.password = this.password;
-        this.address = address;
+    if (!(o instanceof Customer)) {
+      return false;
     }
+    Customer customer = (Customer) o;
+    return Objects.equals(this.id, customer.id);
+  }
 
-    @Override
-    public boolean equals(Object o) {
+  @Override
+  public int hashCode() {
+    return Objects.hash(this.id);
+  }
 
-        if (this == o)
-            return true;
-        if (!(o instanceof Customer))
-            return false;
-        Customer customer = (Customer) o;
-        return Objects.equals(this.id, customer.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.id);
-    }
-
-    @Override
-    public String toString() {
-        return "Customer{" + "id=" + this.id + ", name='" + this.lastName + this.firstName + '\'' + '}';
-    }
+  @Override
+  public String toString() {
+    return "Customer{" + "id=" + this.id + ", name='" + this.lastName + this.firstName + '\'' + '}';
+  }
 }

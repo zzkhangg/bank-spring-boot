@@ -6,23 +6,24 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public class CreateAccountRequest {
-    @NotNull
-    private Long customerId;
 
-    @NotNull
-    private AccountType accountType;
+  @NotNull
+  private Long customerId;
 
-    private BigDecimal initialDeposit;
+  @NotNull
+  private AccountType accountType;
 
-    public Long getCustomerId() {
-        return customerId;
-    }
+  private BigDecimal initialDeposit;
 
-    public AccountType getAccountType() {
-        return accountType;
-    }
+  public Long getCustomerId() {
+    return customerId;
+  }
 
-    public BigDecimal getInitialDeposit() {
-        return initialDeposit;
-    }
+  public AccountType getAccountType() {
+    return accountType;
+  }
+
+  public BigDecimal getInitialDeposit() {
+    return initialDeposit;
+  }
 }

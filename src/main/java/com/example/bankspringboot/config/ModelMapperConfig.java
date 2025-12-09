@@ -7,12 +7,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ModelMapperConfig {
-    @Bean
-    public ModelMapper modelMapper() {
-        // Create instance and config
-        ModelMapper modelMapper = new ModelMapper();
-        modelMapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper;
-    }
+
+  @Bean
+  public ModelMapper modelMapper() {
+    // Create instance and config
+    ModelMapper modelMapper = new ModelMapper();
+    modelMapper.getConfiguration()
+        .setMatchingStrategy(MatchingStrategies.STRICT);
+    return modelMapper;
+  }
 }

@@ -20,31 +20,32 @@ import java.util.List;
 @Setter
 @Getter
 public class Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(name = "account_number", nullable = false, unique = true)
-    @Size(min = 10, max = 10)
-    private String accountNumber;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @Column(name = "account_number", nullable = false, unique = true)
+  @Size(min = 10, max = 10)
+  private String accountNumber;
 
 
-    private BigDecimal balance;
-    private BigDecimal transactionLimit;
+  private BigDecimal balance;
+  private BigDecimal transactionLimit;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
+  @CreatedDate
+  private LocalDateTime createdAt;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+  @ManyToOne
+  @JoinColumn(name = "customer_id")
+  private Customer customer;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private List<Transaction> transactions;
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+  private List<Transaction> transactions;
 
-    @Enumerated(EnumType.STRING)
-    private AccountStatus status;
+  @Enumerated(EnumType.STRING)
+  private AccountStatus status;
 
-    @Enumerated(EnumType.STRING)
-    private AccountType accountType;
+  @Enumerated(EnumType.STRING)
+  private AccountType accountType;
 }

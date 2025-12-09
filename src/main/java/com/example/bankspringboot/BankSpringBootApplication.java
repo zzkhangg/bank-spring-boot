@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableJpaAuditing
 public class BankSpringBootApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(BankSpringBootApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(BankSpringBootApplication.class, args);
+  }
 }

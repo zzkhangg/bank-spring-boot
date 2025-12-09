@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 
 public class UpdateAccountRequest {
 
-    private AccountStatus status; // ACTIVE, FROZEN, CLOSED
+  private AccountStatus status; // ACTIVE, FROZEN, CLOSED
 
-    public AccountStatus getStatus() {
-        return status;
-    }
+  public AccountStatus getStatus() {
+    return status;
+  }
 }

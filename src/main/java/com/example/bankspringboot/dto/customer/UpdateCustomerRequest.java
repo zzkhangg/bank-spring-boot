@@ -9,19 +9,19 @@ import lombok.Getter;
 @Getter
 public class UpdateCustomerRequest {
 
-    @NotBlank(message = "First name is required")
-    private String firstName;
+  @NotBlank(message = "First name is required")
+  private String firstName;
 
-    @NotBlank(message = "Last name is required")
-    private String lastName;
+  @NotBlank(message = "Last name is required")
+  private String lastName;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
-    private String email;
+  @NotBlank(message = "Email is required")
+  @Email(message = "Email should be valid")
+  private String email;
 
-    @NotBlank(message = "Phone is required")
-    private String phone;
+  @NotBlank(message = "Phone is required")
+  private String phone;
 
-    @Valid
-    private Address address;
+  @Valid
+  private Address address;
 }

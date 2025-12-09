@@ -19,33 +19,35 @@ import java.net.http.HttpResponse;
 @ControllerAdvice
 public class FormatRestResponse implements ResponseBodyAdvice<Object> {
 
-    @Override
-    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        return true;
+  @Override
+  public boolean supports(MethodParameter returnType,
+      Class<? extends HttpMessageConverter<?>> converterType) {
+    return true;
+  }
+
+  @Override
+  public Object beforeBodyWrite(Object body, MethodParameter returnType,
+      MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType,
+      ServerHttpRequest request, ServerHttpResponse response) {
+    HttpServletResponse httpServletResponse = ((ServletServerHttpResponse) response).getServletResponse();
+
+    if (body == null && httpServletResponse.getStatus() == HttpStatus.NO_CONTENT.value()) {
+      return null; // keep 204 No Content
     }
 
-    @Override
-    public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        HttpServletResponse httpServletResponse = ((ServletServerHttpResponse) response).getServletResponse();
-
-        if (body == null && httpServletResponse.getStatus() == HttpStatus.NO_CONTENT.value()) {
-            return null; // keep 204 No Content
-        }
-
-        if (body instanceof String) {
-            return body;
-        }
-
-
-        int statusCode = httpServletResponse.getStatus();
-        if (statusCode >= 400) {
-            return body;
-        }
-
-        RestResponse<Object> restResponse = new RestResponse<>();
-        restResponse.setStatusCode(statusCode);
-        restResponse.setMessage("Success");
-        restResponse.setData(body);
-        return restResponse;
+    if (body instanceof String) {
+      return body;
     }
+
+    int statusCode = httpServletResponse.getStatus();
+    if (statusCode >= 400) {
+      return body;
+    }
+
+    RestResponse<Object> restResponse = new RestResponse<>();
+    restResponse.setStatusCode(statusCode);
+    restResponse.setMessage("Success");
+    restResponse.setData(body);
+    return restResponse;
+  }
 }

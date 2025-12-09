@@ -14,30 +14,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/accounts")
 public class AccountController {
 
-    final private AccountService accountService;
+  final private AccountService accountService;
 
-    public AccountController(AccountService accountService) {
-        this.accountService = accountService;
-    }
+  public AccountController(AccountService accountService) {
+    this.accountService = accountService;
+  }
 
-    @GetMapping("/{id}")
-    public AccountResponse getAccount(@PathVariable Long id) {
-        return accountService.getAccount(id);
-    }
+  @GetMapping("/{id}")
+  public AccountResponse getAccount(@PathVariable Long id) {
+    return accountService.getAccount(id);
+  }
 
-    @PostMapping("/")
-    public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest req) {
-        return accountService.createAccount(req);
-    }
+  @PostMapping("/")
+  public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest req) {
+    return accountService.createAccount(req);
+  }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
-        accountService.deleteAccount(id);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
+    accountService.deleteAccount(id);
+    return ResponseEntity.noContent().build();
+  }
 
-    @PutMapping("/{id}")
-    public AccountResponse updateAccountStatus(@PathVariable Long id, @Valid @RequestBody UpdateAccountRequest req) {
-        return accountService.updateAccountStatus(id, req);
-    }
+  @PutMapping("/{id}")
+  public AccountResponse updateAccountStatus(@PathVariable Long id,
+      @Valid @RequestBody UpdateAccountRequest req) {
+    return accountService.updateAccountStatus(id, req);
+  }
 }

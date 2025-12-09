@@ -13,14 +13,15 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT a FROM Account a WHERE a.id = :id")
-    Optional<Account> findByIdWithLock(@Param("id") Long id);
 
-    @Query("""
-            SELECT count(a)
-            FROM Account a
-            WHERE a.balance >= :min AND (:max IS NULL OR a.balance < :max)
-            """)
-    Long countAccountsInRange(BigDecimal min, BigDecimal max);
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT a FROM Account a WHERE a.id = :id")
+  Optional<Account> findByIdWithLock(@Param("id") Long id);
+
+  @Query("""
+      SELECT count(a)
+      FROM Account a
+      WHERE a.balance >= :min AND (:max IS NULL OR a.balance < :max)
+      """)
+  Long countAccountsInRange(BigDecimal min, BigDecimal max);
 }

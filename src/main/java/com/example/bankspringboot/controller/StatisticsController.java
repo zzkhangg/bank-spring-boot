@@ -12,19 +12,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/statistics")
 public class StatisticsController {
-    final private StatisticsService statisticsService;
 
-    public StatisticsController(StatisticsService statisticsService) {
-        this.statisticsService = statisticsService;
-    }
+  final private StatisticsService statisticsService;
 
-    @GetMapping("/account-transactions-by-balance")
-    public List<AccountStatisticsDto> getNumOfAccountsAndTransactionsByBalance() {
-        return statisticsService.getNumOfAccountsAndTransactionsByBalance();
-    }
+  public StatisticsController(StatisticsService statisticsService) {
+    this.statisticsService = statisticsService;
+  }
 
-    @GetMapping("customers-by-city")
-    public List<AdressStatisticsDto> getNumOfCustomersByCity() {
-        return statisticsService.getNumOfCustomersByCity();
-    }
+  @GetMapping("/account-transactions-by-balance")
+  public List<AccountStatisticsDto> getNumOfAccountsAndTransactionsByBalance() {
+    return statisticsService.getNumOfAccountsAndTransactionsByBalance();
+  }
+
+  @GetMapping("customers-by-city")
+  public List<AdressStatisticsDto> getNumOfCustomersByCity() {
+    return statisticsService.getNumOfCustomersByCity();
+  }
 }

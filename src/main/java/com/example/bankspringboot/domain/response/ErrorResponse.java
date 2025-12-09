@@ -1,31 +1,32 @@
 package com.example.bankspringboot.domain.response;
 
 public class ErrorResponse {
-    private String message;
-    private int statusCode;
-    private Object errors;
 
-    public String getMessage() {
-        return message;
-    }
+  private String message;
+  private int statusCode;
+  private Object errors;
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+  public String getMessage() {
+    return message;
+  }
 
-    public int getStatusCode() {
-        return statusCode;
-    }
+  public void setMessage(String message) {
+    this.message = message;
+  }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
+  public int getStatusCode() {
+    return statusCode;
+  }
 
-    public Object getError() {
-        return errors;
-    }
+  public void setStatusCode(int statusCode) {
+    this.statusCode = statusCode;
+  }
 
-    public void setError(Object errors) {
-        this.errors = errors;
-    }
+  public Object getError() {
+    return errors;
+  }
+
+  public void setError(Object errors) {
+    this.errors = errors;
+  }
 }

@@ -17,42 +17,43 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class Transaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    private BigDecimal amount;
-    private BigDecimal fee;
-    private LocalDateTime createdAt;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    private String description;
+  private BigDecimal amount;
+  private BigDecimal fee;
+  private LocalDateTime createdAt;
 
-    @Embedded
-    private Address address;
+  private String description;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionStatus status;
+  @Embedded
+  private Address address;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private Account account;
+  @Enumerated(EnumType.STRING)
+  private TransactionStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+  @ManyToOne
+  @JoinColumn(name = "account_id")
+  private Account account;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionType type;
+  @ManyToOne
+  @JoinColumn(name = "customer_id")
+  private Customer customer;
 
-    @NotBlank(message = "Currency is mandatory.")
-    @Size(min = 3, max = 3, message = "Currency must be a 3-letter code (e.g., USD).")
-    private String currency;
+  @Enumerated(EnumType.STRING)
+  private TransactionType type;
 
-    @Enumerated(EnumType.STRING)
-    private TransactionChannel channel;
+  @NotBlank(message = "Currency is mandatory.")
+  @Size(min = 3, max = 3, message = "Currency must be a 3-letter code (e.g., USD).")
+  private String currency;
 
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+  @Enumerated(EnumType.STRING)
+  private TransactionChannel channel;
+
+  @PrePersist
+  public void onCreate() {
+    this.createdAt = LocalDateTime.now();
+  }
 }

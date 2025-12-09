@@ -9,10 +9,10 @@ import java.math.BigDecimal;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    @Query("""
-            SELECT count(t)
-            from Transaction t
-            WHERE t.account.balance >= :min AND (:max IS NULL OR t.account.balance < :max)
-            """)
-    Long countTransactionsInRange(BigDecimal min, BigDecimal max);
+  @Query("""
+      SELECT count(t)
+      from Transaction t
+      WHERE t.account.balance >= :min AND (:max IS NULL OR t.account.balance < :max)
+      """)
+  Long countTransactionsInRange(BigDecimal min, BigDecimal max);
 }

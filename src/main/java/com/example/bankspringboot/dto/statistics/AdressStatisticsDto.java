@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 public class AdressStatisticsDto {
-    private String city;
-    private BigDecimal customerNum;
+
+  private String city;
+  private BigDecimal customerNum;
 }

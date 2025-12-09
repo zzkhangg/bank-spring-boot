@@ -13,11 +13,13 @@ import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
 import com.example.bankspringboot.service.exceptions.BusinessException;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
-import jakarta.transaction.Transactional;
-import org.modelmapper.ModelMapper;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TransactionService {
@@ -25,15 +27,13 @@ public class TransactionService {
   final private TransactionRepository transactionRepository;
   final private AccountRepository accountRepository;
   final private BigDecimal FEE_PERCENTAGE = BigDecimal.valueOf(0.01);
-  ModelMapper modelMapper;
   final private BigDecimal TRANSACTION_LIMIT = BigDecimal.valueOf(2000);
 
   public TransactionService(TransactionRepository transactionRepository,
       AccountRepository accountRepository,
-      AccountService accountService, ModelMapper modelMapper) {
+      AccountService accountService) {
     this.transactionRepository = transactionRepository;
     this.accountRepository = accountRepository;
-    this.modelMapper = modelMapper;
   }
 
 
@@ -77,7 +77,7 @@ public class TransactionService {
         transaction.getAccount().getCustomer().getId(), transaction.getAmount(),
         transaction.getStatus(),
         transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
-        transaction.getAddress(), transaction.getType());
+        transaction.getAddress(), transaction.getType(), transaction.getCurrency());
   }
 
   @Transactional
@@ -129,7 +129,8 @@ public class TransactionService {
         transaction.getAccount().getCustomer().getId(), transaction.getAmount(),
         transaction.getStatus(),
         transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
-        transaction.getAddress(), transaction.getType());
+        transaction.getAddress(), transaction.getType(),
+        transaction.getCurrency());
   }
 
   @Transactional
@@ -208,7 +209,38 @@ public class TransactionService {
         txSource.getDescription(),
         txSource.getFee(),
         txSource.getAddress(),
-        txSource.getType()
+        txSource.getType(),
+        txSource.getCurrency()
     );
+  }
+
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public List<TransactionResponse> getTransactions(Long accountId) {
+    Account account = accountRepository.findById(accountId)
+        .orElseThrow(() -> new IdInvalidException("Account with id " + accountId + " not found"));
+    List<Transaction> transactionList = transactionRepository.findByAccount(account);
+    List<TransactionResponse> transactionResponseList = new ArrayList<>();
+    transactionList.forEach(transaction -> {
+      transactionResponseList.add(
+          new TransactionResponse(transaction.getId(), transaction.getAccount().getId(),
+              transaction.getAccount().getCustomer().getId(), transaction.getAmount(),
+              transaction.getStatus(),
+              transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
+              transaction.getAddress(), transaction.getType(),
+              transaction.getCurrency()));
+    });
+    return transactionResponseList;
+  }
+
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public TransactionResponse getTransaction(Long transactionId) {
+    Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
+        () -> new IdInvalidException("Transaction with id " + transactionId + " not found"));
+    return new TransactionResponse(transaction.getId(), transaction.getAccount().getId(),
+        transaction.getAccount().getCustomer().getId(), transaction.getAmount(),
+        transaction.getStatus(),
+        transaction.getCreatedAt(), transaction.getDescription(), transaction.getFee(),
+        transaction.getAddress(), transaction.getType(),
+        transaction.getCurrency());
   }
 }

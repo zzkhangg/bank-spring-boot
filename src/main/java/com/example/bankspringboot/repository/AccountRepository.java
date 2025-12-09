@@ -24,4 +24,5 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
       WHERE a.balance >= :min AND (:max IS NULL OR a.balance < :max)
       """)
   Long countAccountsInRange(BigDecimal min, BigDecimal max);
+  boolean existsByAccountNumber(@Param("accountNumber") String accountNumber);
 }

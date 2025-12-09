@@ -6,13 +6,15 @@ import com.example.bankspringboot.dto.customer.CustomerResponse;
 import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
 import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
-import jakarta.transaction.Transactional;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CustomerService {
@@ -35,6 +37,7 @@ public class CustomerService {
         saved.getEmail(), saved.getPhone(), saved.getAddress());
   }
 
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public CustomerResponse getCustomer(Long id) {
     Customer cus = customerRepository.findById(id)
         .orElseThrow(() -> new IdInvalidException("Customer with id " + id + " not found"));
@@ -42,6 +45,7 @@ public class CustomerService {
         cus.getPhone(), cus.getAddress());
   }
 
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<CustomerResponse> getAllCustomers() {
     List<Customer> customers = customerRepository.findAll();
     List<CustomerResponse> customerResponseList = new ArrayList<>();

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CustomerService {
@@ -50,11 +49,9 @@ public class CustomerService {
 
     @Transactional
     public CustomerResponse updateCustomer(Long id, UpdateCustomerRequest req) {
-        Optional<Customer> optionalCustomer = customerRepository.findById(id);
-        if (optionalCustomer.isEmpty()) {
-            throw new IdInvalidException("Id not found");
-        }
-        Customer customer = optionalCustomer.get();
+        Customer customer = customerRepository.findById(id).orElseThrow(
+                () -> new IdInvalidException("Customer with id " + id + " not found"));
+
         customer.setFirstName(req.getFirstName());
         customer.setLastName(req.getLastName());
         customer.setEmail(req.getEmail());

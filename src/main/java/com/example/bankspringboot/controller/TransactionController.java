@@ -1,12 +1,16 @@
 package com.example.bankspringboot.controller;
 
+import com.example.bankspringboot.domain.transaction.TransactionType;
 import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import com.example.bankspringboot.dto.transaction.TransferRequest;
 import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
 import com.example.bankspringboot.service.TransactionService;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -48,8 +52,19 @@ public class TransactionController {
   }
 
   @GetMapping("/transactions")
-  public List<TransactionResponse> getTransactions(@PathVariable Long accountId) {
-    return transactionService.getTransactions(accountId);
+  public List<TransactionResponse> getTransactions(@PathVariable Long accountId,
+      @RequestParam(name = "page", defaultValue = "1") int pageNumber,
+      @RequestParam(name = "min-price", required = false) BigDecimal minPrice,
+      @RequestParam(name = "max-price", required = false) BigDecimal maxPrice,
+      @RequestParam(name = "transaction-type", required = false) TransactionType transactionType,
+      @RequestParam(name = "created-before", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+      LocalDate createdBefore,
+      @RequestParam(name = "created-after", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+      LocalDate createdAfter
+  ) {
+
+    return transactionService.getTransactions(accountId, pageNumber, minPrice, maxPrice,
+        transactionType, createdBefore, createdAfter);
   }
 
   @GetMapping("/transactions/{transactionId}")

@@ -2,6 +2,7 @@ package com.example.bankspringboot.repository;
 
 import com.example.bankspringboot.domain.account.Account;
 import jakarta.persistence.LockModeType;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;

@@ -14,8 +14,13 @@ import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
 import com.example.bankspringboot.service.exceptions.BusinessException;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import com.example.bankspringboot.service.specifications.TransactionSpecs;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,8 +37,7 @@ public class TransactionService {
   private final TransactionMapper transactionMapper;
 
   public TransactionService(TransactionRepository transactionRepository,
-      AccountRepository accountRepository,
-      AccountService accountService, TransactionMapper transactionMapper) {
+      AccountRepository accountRepository, TransactionMapper transactionMapper) {
     this.transactionRepository = transactionRepository;
     this.accountRepository = accountRepository;
     this.transactionMapper = transactionMapper;
@@ -55,8 +59,6 @@ public class TransactionService {
     BigDecimal newBalance = account.getBalance().add(depositRequest.getAmount());
     account.setBalance(newBalance);
 
-
-
     // Build transaction
     Transaction transaction = transactionMapper.depositReqToTransaction(depositRequest);
     transaction.setFee(BigDecimal.ZERO);
@@ -68,7 +70,10 @@ public class TransactionService {
     transaction.setStatus(TransactionStatus.COMPLETED);
     accountRepository.save(account);
     Transaction saved = transactionRepository.save(transaction);
-    return transactionMapper.toResponse(saved);
+    TransactionResponse response = transactionMapper.toResponse(saved);
+    response.setCustomerId(transaction.getCustomer().getId());
+    response.setAccountId(accountId);
+    return response;
   }
 
   @Transactional
@@ -176,12 +181,36 @@ public class TransactionService {
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public List<TransactionResponse> getTransactions(Long accountId) {
-    Account account = accountRepository.findById(accountId)
-        .orElseThrow(() -> new IdInvalidException("Account with id " + accountId + " not found"));
-    List<Transaction> transactionList = transactionRepository.findByAccount(account);
+  public List<TransactionResponse> getTransactions(Long accountId, int pageNumber
+      , BigDecimal minPrice, BigDecimal maxPrice, TransactionType type, LocalDate createdBefore,
+      LocalDate createdAfter) {
+    pageNumber = Math.max(1, pageNumber);
+    accountRepository.findById(accountId)
+        .orElseThrow(() -> new IdInvalidException("Account not found"));
+
+    Specification<Transaction> spec = TransactionSpecs.belongsToAccount(accountId);
+    if (minPrice != null) {
+      spec = spec.and(TransactionSpecs.priceGreaterThanOrEqualTo(minPrice));
+    }
+    if (maxPrice != null) {
+      spec = spec.and(TransactionSpecs.priceLessThanOrEqualTo(maxPrice));
+    }
+    if (type != null) {
+      spec = spec.and(TransactionSpecs.inTransactionType(type));
+    }
+    if (createdBefore != null) {
+      spec = spec.and(TransactionSpecs.createdDateBefore(createdBefore));
+    }
+    if (createdAfter != null) {
+      spec = spec.and(TransactionSpecs.createdDateAfter(createdAfter));
+    }
+
+    Page<Transaction> transactionPage = transactionRepository.findAll(spec,
+        PageRequest.of(pageNumber - 1, 10));
+    List<Transaction> transactions = transactionPage.getContent();
+
     List<TransactionResponse> transactionResponses = new ArrayList<>();
-    transactionList.forEach(transaction -> {
+    transactions.forEach(transaction -> {
       TransactionResponse transactionResponse = transactionMapper.toResponse(transaction);
       transactionResponse.setCustomerId(transaction.getCustomer().getId());
       transactionResponse.setAccountId(transaction.getAccount().getId());

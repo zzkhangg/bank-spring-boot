@@ -27,7 +27,7 @@ public class TransactionSpecs {
         -> criteriaBuilder.lessThanOrEqualTo(root.get(Transaction_.AMOUNT), price);
   }
 
-  public static Specification<Transaction> inTransactionType(TransactionType type) {
+  public static Specification<Transaction> hasTransactionType(TransactionType type) {
     return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(Transaction_.type),
         type);
   }

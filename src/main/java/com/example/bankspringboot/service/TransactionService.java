@@ -5,6 +5,7 @@ import com.example.bankspringboot.domain.account.AccountStatus;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import com.example.bankspringboot.domain.transaction.TransactionStatus;
 import com.example.bankspringboot.domain.transaction.TransactionType;
+import com.example.bankspringboot.domain.transaction.Transaction_;
 import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import com.example.bankspringboot.dto.transaction.TransferRequest;
@@ -16,15 +17,14 @@ import com.example.bankspringboot.service.exceptions.BusinessException;
 import com.example.bankspringboot.service.exceptions.IdInvalidException;
 import com.example.bankspringboot.service.specifications.TransactionSpecs;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -180,15 +180,15 @@ public class TransactionService {
     return transactionMapper.toResponse(txSource);
   }
 
-  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public List<TransactionResponse> getTransactions(Long accountId, int pageNumber
-      , BigDecimal minPrice, BigDecimal maxPrice, TransactionType type, LocalDate createdBefore,
-      LocalDate createdAfter) {
+  @Transactional(readOnly = true)
+  public List<TransactionResponse> getTransactions(Long accountId,
+      int pageNumber, BigDecimal minPrice, BigDecimal maxPrice, TransactionType type, LocalDate createdBefore, LocalDate createdAfter, String sortStr) {
     pageNumber = Math.max(1, pageNumber);
     accountRepository.findById(accountId)
         .orElseThrow(() -> new IdInvalidException("Account not found"));
 
-    Specification<Transaction> spec = TransactionSpecs.belongsToAccount(accountId);
+    Specification<Transaction> spec = Specification.where(
+        TransactionSpecs.belongsToAccount(accountId));
     if (minPrice != null) {
       spec = spec.and(TransactionSpecs.priceGreaterThanOrEqualTo(minPrice));
     }
@@ -196,7 +196,7 @@ public class TransactionService {
       spec = spec.and(TransactionSpecs.priceLessThanOrEqualTo(maxPrice));
     }
     if (type != null) {
-      spec = spec.and(TransactionSpecs.inTransactionType(type));
+      spec = spec.and(TransactionSpecs.hasTransactionType(type));
     }
     if (createdBefore != null) {
       spec = spec.and(TransactionSpecs.createdDateBefore(createdBefore));
@@ -205,21 +205,32 @@ public class TransactionService {
       spec = spec.and(TransactionSpecs.createdDateAfter(createdAfter));
     }
 
+    // Create sort object
+    Sort sort = Sort.unsorted();
+    if (sortStr != null) {
+      sort = switch (sortStr.toUpperCase()) {
+        case "ASC" -> Sort.by(Sort.Direction.ASC, Transaction_.AMOUNT);
+        case "DESC" -> Sort.by(Sort.Direction.DESC, Transaction_.AMOUNT);
+        case "DATE-OLDEST" -> Sort.by(Sort.Direction.ASC, Transaction_.CREATED_AT);
+        case "DATE-LATEST" -> Sort.by(Sort.Direction.DESC, Transaction_.CREATED_AT);
+        default -> Sort.unsorted();
+      };
+    }
     Page<Transaction> transactionPage = transactionRepository.findAll(spec,
-        PageRequest.of(pageNumber - 1, 10));
+        PageRequest.of(pageNumber - 1, 10, sort));
     List<Transaction> transactions = transactionPage.getContent();
 
-    List<TransactionResponse> transactionResponses = new ArrayList<>();
-    transactions.forEach(transaction -> {
-      TransactionResponse transactionResponse = transactionMapper.toResponse(transaction);
-      transactionResponse.setCustomerId(transaction.getCustomer().getId());
-      transactionResponse.setAccountId(transaction.getAccount().getId());
-      transactionResponses.add(transactionResponse);
-    });
-    return transactionResponses;
+    return transactions.stream()
+        .map(t -> {
+          TransactionResponse res = transactionMapper.toResponse(t);
+          res.setCustomerId(t.getCustomer().getId());
+          res.setAccountId(t.getAccount().getId());
+          return res;
+        })
+        .toList();
   }
 
-  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  @Transactional(readOnly = true)
   public TransactionResponse getTransaction(Long transactionId) {
     Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
         () -> new IdInvalidException("Transaction with id " + transactionId + " not found"));

@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -76,12 +79,42 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().body(res);
   }
 
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
+    ErrorResponse res = new ErrorResponse();
+    res.setMessage("Bad Request");
+    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+    res.setError(e.getMessage());
+    return ResponseEntity.badRequest().body(res);
+  }
+
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(MissingServletRequestParameterException e) {
+    ErrorResponse res = new ErrorResponse();
+    res.setMessage("Bad Request");
+    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+    res.setError(e.getMessage());
+    return ResponseEntity.badRequest().body(res);
+  }
+
+  @ExceptionHandler(MissingPathVariableException.class)
+  @ResponseBody
+  public ResponseEntity<ErrorResponse> handleMissingPathVariable(MissingPathVariableException e) {
+    ErrorResponse res = new ErrorResponse();
+    res.setMessage("Bad Request");
+    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+    res.setError(e.getMessage());
+    return ResponseEntity.badRequest().body(res);
+  }
+
   @ExceptionHandler(Exception.class)
   @ResponseBody
   public ResponseEntity<ErrorResponse> handleException(Exception e) {
     ErrorResponse res = new ErrorResponse();
-    res.setMessage("Invalid Request");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
+    res.setMessage("Unknown Error");
+    res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
     res.setError("Internal Server Error");
 
     return ResponseEntity.badRequest().body(res);

@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/accounts/{accountId}/")
+@RequestMapping("/api/accounts/{accountId}")
 public class TransactionController {
 
   final private TransactionService transactionService;
@@ -60,11 +60,12 @@ public class TransactionController {
       @RequestParam(name = "created-before", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
       LocalDate createdBefore,
       @RequestParam(name = "created-after", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-      LocalDate createdAfter
+      LocalDate createdAfter,
+      @RequestParam(name = "created-after", required = false) String sort
   ) {
 
     return transactionService.getTransactions(accountId, pageNumber, minPrice, maxPrice,
-        transactionType, createdBefore, createdAfter);
+        transactionType, createdBefore, createdAfter, sort);
   }
 
   @GetMapping("/transactions/{transactionId}")

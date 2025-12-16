@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 import lombok.Getter;
 
 /**
@@ -23,7 +24,7 @@ public class DepositRequest {
    * The ID of the account that will receive the funds.
    */
   @NotBlank(message = "Account ID is mandatory.")
-  private Long accountId;
+  private UUID accountId;
 
   /**
    * The amount of money to deposit. Must be positive and non-zero. Uses BigDecimal for precise

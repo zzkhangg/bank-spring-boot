@@ -7,13 +7,11 @@ import com.example.bankspringboot.dto.account.UpdateAccountRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
 
-  AccountMapper INSTANCE = Mappers.getMapper(AccountMapper.class);
-
+  @Mapping(target = "accountId", expression = "java(account.getId().toString())")
   AccountResponse toResponse(Account account);
 
   @Mapping(target = "customer", ignore = true)

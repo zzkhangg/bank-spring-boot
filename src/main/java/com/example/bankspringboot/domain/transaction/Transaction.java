@@ -6,21 +6,27 @@ import com.example.bankspringboot.domain.account.Account;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.UuidGenerator;
 
 
 @Entity
 @Getter
 @Setter
+@Table(
+    name = "transactions"
+)
 public class Transaction {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue
+  @UuidGenerator
+  private UUID id;
 
   private BigDecimal amount;
   private BigDecimal fee;

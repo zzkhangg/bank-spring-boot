@@ -1,12 +1,13 @@
 package com.example.bankspringboot.dto.statistics;
 
-import com.example.bankspringboot.domain.common.Address;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
-public class AdressStatisticsDto {
+@AllArgsConstructor
+public class AddressStatisticsDto {
 
   private String city;
   private BigDecimal customerNum;

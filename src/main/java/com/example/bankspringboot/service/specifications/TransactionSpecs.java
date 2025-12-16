@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
 public class TransactionSpecs {
@@ -17,7 +18,7 @@ public class TransactionSpecs {
         -> criteriaBuilder.greaterThanOrEqualTo(root.get(Transaction_.AMOUNT), price);
   }
 
-  public static Specification<Transaction> belongsToAccount(Long accountId) {
+  public static Specification<Transaction> belongsToAccount(UUID accountId) {
     return ((root, query, criteriaBuilder)
         -> criteriaBuilder.equal(root.get(Transaction_.account).get(Account_.id), accountId));
   }

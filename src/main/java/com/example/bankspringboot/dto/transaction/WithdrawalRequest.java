@@ -6,6 +6,7 @@ import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.TransactionChannel;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import java.util.UUID;
 import lombok.Getter;
 
 /**
@@ -19,7 +20,7 @@ public class WithdrawalRequest {
    * The ID of the account from which the funds will be deducted.
    */
   @NotBlank(message = "Account ID is mandatory.")
-  private Long accountId;
+  private UUID accountId;
 
   /**
    * The amount of money to withdraw. Must be positive and non-zero.

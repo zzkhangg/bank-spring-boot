@@ -15,8 +15,9 @@ import org.mapstruct.factory.Mappers;
 public interface TransactionMapper {
 
   TransactionMapper INSTANCE = Mappers.getMapper(TransactionMapper.class);
-  @Mapping(source = "id", target = "transactionId")
+
   @Mapping(source = "type", target = "transactionType")
+  @Mapping(target = "transactionId", expression = "java(transaction.getId().toString())")
   TransactionResponse toResponse(Transaction transaction);
 
   List<TransactionResponse> toResponseList(List<Transaction> transactions);

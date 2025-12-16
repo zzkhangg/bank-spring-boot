@@ -19,7 +19,7 @@ public class Address {
   private String city;
 
   @NotBlank(message = "Postal code is required")
-  @Pattern(regexp = "\\d{5}(-\\d{4})?", message = "Postal code must be 5 digits or 5+4 format (12345 or 12345-6789)")
+  @Size(min = 2, max = 12, message = "Postal code length is invalid")
   private String postalCode;
 
   @NotBlank(message = "Country is required")

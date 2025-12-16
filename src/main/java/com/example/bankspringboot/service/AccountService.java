@@ -1,7 +1,5 @@
 package com.example.bankspringboot.service;
 
-import static org.springframework.transaction.annotation.Propagation.SUPPORTS;
-
 import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.account.AccountStatus;
 import com.example.bankspringboot.domain.customer.Customer;
@@ -11,7 +9,8 @@ import com.example.bankspringboot.dto.account.UpdateAccountRequest;
 import com.example.bankspringboot.mapper.AccountMapper;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.CustomerRepository;
-import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import com.example.bankspringboot.exceptions.IdInvalidException;
+import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ import java.util.Random;
 @Service
 public class AccountService {
 
-  final private BigDecimal TRANSACTION_LIMIT = new BigDecimal("100");
+  final private BigDecimal TRANSACTION_LIMIT = new BigDecimal("10000");
   final private AccountRepository accountRepository;
   final private CustomerRepository customerRepository;
   private final AccountMapper accountMapper;
@@ -53,19 +52,17 @@ public class AccountService {
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public AccountResponse getAccount(Long id) {
+  public AccountResponse getAccount(UUID id) {
     Account account = accountRepository.findById(id).orElseThrow(
         () -> new IdInvalidException("No account with id " + id));
 
-    AccountResponse accountResponse = accountMapper.toResponse(account);
-    accountResponse.setAccountId(id);
-    return accountResponse;
+    return accountMapper.toResponse(account);
   }
 
   @Transactional
   public AccountResponse createAccount(CreateAccountRequest req) {
-    Customer customer = customerRepository.findById(req.getCustomerId()).orElseThrow(
-        () -> new IdInvalidException("No Customer found with id " + req.getCustomerId()));
+    Customer customer = customerRepository.findByEmail(req.getEmail()).orElseThrow(
+        () -> new IdInvalidException("No Customer found with email " + req.getEmail()));
     Account account = accountMapper.toAccount(req);
 
     String accountNumber = generateUniqueAccountNumber();
@@ -75,26 +72,22 @@ public class AccountService {
     account.setStatus(AccountStatus.ACTIVE);
     account.setTransactionLimit(TRANSACTION_LIMIT);
     Account saved = accountRepository.save(account);
-    AccountResponse accountResponse = accountMapper.toResponse(saved);
-    accountResponse.setAccountId(saved.getId());
-    return accountResponse;
+    return accountMapper.toResponse(saved);
   }
 
   @Transactional
-  public void deleteAccount(Long id) {
+  public void deleteAccount(UUID id) {
     Account account = accountRepository.findById(id).orElseThrow(
         () -> new IdInvalidException("No account with id " + id));
     accountRepository.delete(account);
   }
 
   @Transactional
-  public AccountResponse updateAccountStatus(Long id, UpdateAccountRequest req) {
+  public AccountResponse updateAccountStatus(UUID id, UpdateAccountRequest req) {
     Account account = accountRepository.findById(id).orElseThrow(
         () -> new IdInvalidException("No account with id " + id));
     accountMapper.updateAccountFromRequest(req, account);
     Account saved = accountRepository.save(account);
-    AccountResponse accountResponse = accountMapper.toResponse(saved);
-    accountResponse.setAccountId(id);
-    return accountResponse;
+    return accountMapper.toResponse(saved);
   }
 }

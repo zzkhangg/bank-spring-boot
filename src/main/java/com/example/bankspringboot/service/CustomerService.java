@@ -6,7 +6,8 @@ import com.example.bankspringboot.dto.customer.CustomerResponse;
 import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
 import com.example.bankspringboot.mapper.CustomerMapper;
 import com.example.bankspringboot.repository.CustomerRepository;
-import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import com.example.bankspringboot.exceptions.IdInvalidException;
+import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +35,12 @@ public class CustomerService {
     Customer customer = customerMapper.toCustomer(req);
 
     customer.setPassword(passwordEncoder.encode(req.getPassword()));
-    Customer saved = customerRepository.save(customer);
-    return customerMapper.toResponse(saved);
+      Customer saved = customerRepository.save(customer);
+      return  customerMapper.toResponse(saved);
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public CustomerResponse getCustomer(Long id) {
+  public CustomerResponse getCustomer(UUID id) {
     Customer cus = customerRepository.findById(id)
         .orElseThrow(() -> new IdInvalidException("Customer with id " + id + " not found"));
     return customerMapper.toResponse(cus);
@@ -52,7 +53,7 @@ public class CustomerService {
   }
 
   @Transactional
-  public CustomerResponse updateCustomer(Long id, UpdateCustomerRequest req) {
+  public CustomerResponse updateCustomer(UUID id, UpdateCustomerRequest req) {
     Customer customer = customerRepository.findById(id)
         .orElseThrow(() -> new IdInvalidException("Customer with id " + id + " not found"));
     customerMapper.updateCustomerFromRequest(req, customer);
@@ -62,7 +63,7 @@ public class CustomerService {
   }
 
   @Transactional
-  public void deleteCustomer(Long id) {
+  public void deleteCustomer(UUID id) {
     Customer customer = customerRepository.findById(id)
         .orElseThrow(() -> new IdInvalidException("Customer with id " + id + " not found"));
     customerRepository.delete(customer);

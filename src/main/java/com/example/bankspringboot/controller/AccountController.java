@@ -7,6 +7,7 @@ import com.example.bankspringboot.dto.account.CreateAccountRequest;
 import com.example.bankspringboot.dto.account.UpdateAccountRequest;
 import com.example.bankspringboot.service.AccountService;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,23 +22,23 @@ public class AccountController {
   }
 
   @GetMapping("/{id}")
-  public AccountResponse getAccount(@PathVariable Long id) {
+  public AccountResponse getAccount(@PathVariable UUID id) {
     return accountService.getAccount(id);
   }
 
-  @PostMapping("/")
+  @PostMapping
   public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest req) {
     return accountService.createAccount(req);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteAccount(@PathVariable UUID id) {
     accountService.deleteAccount(id);
     return ResponseEntity.noContent().build();
   }
 
   @PutMapping("/{id}")
-  public AccountResponse updateAccountStatus(@PathVariable Long id,
+  public AccountResponse updateAccountStatus(@PathVariable UUID id,
       @Valid @RequestBody UpdateAccountRequest req) {
     return accountService.updateAccountStatus(id, req);
   }

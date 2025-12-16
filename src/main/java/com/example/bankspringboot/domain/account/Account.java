@@ -4,14 +4,15 @@ package com.example.bankspringboot.domain.account;
 import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.EntityListeners;
@@ -27,11 +28,16 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE account SET deleted = true WHERE id=?")
 @FilterDef(name = "deletedAccountFilter", parameters = @ParamDef(name = "isDeleted", type = boolean.class))
 @Filter(name = "deletedAccountFilter", condition = "deleted = :isDeleted")
+@Table(
+    name = "accounts",
+    uniqueConstraints = @UniqueConstraint(columnNames = "account_number")
+)
 public class Account {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue
+  @UuidGenerator
+  private UUID id;
 
   @Column(name = "account_number", nullable = false, unique = true)
   @Size(min = 10, max = 10)

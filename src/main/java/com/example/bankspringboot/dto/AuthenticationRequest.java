@@ -1,22 +1,18 @@
-package com.example.bankspringboot.domain.response;
+package com.example.bankspringboot.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Getter
 @Setter
-@Builder
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ErrorResponse {
-
-  String message;
-  int statusCode;
-  Object errors;
+public class AuthenticationRequest {
+  String email;
+  String password;
 }

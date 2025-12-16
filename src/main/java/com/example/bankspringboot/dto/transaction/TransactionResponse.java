@@ -13,9 +13,9 @@ import lombok.Setter;
 @Setter
 public class TransactionResponse {
 
-  private Long transactionId;
-  private Long accountId;
-  private Long customerId;
+  private String transactionId;
+  private String accountId;
+  private String customerId;
   private BigDecimal amount;
   private TransactionStatus status; // SUCCESS, FAILED, PENDING
   private LocalDateTime createdAt;
@@ -24,20 +24,4 @@ public class TransactionResponse {
   private Address address;
   private TransactionType transactionType;
   private String currency;
-
-  public TransactionResponse(Long transactionId, Long accountId, Long customerId, BigDecimal amount,
-      TransactionStatus status, LocalDateTime createdAt, String description, BigDecimal fee,
-      Address address, TransactionType transactionType, String currency) {
-    this.transactionId = transactionId;
-    this.accountId = accountId;
-    this.customerId = customerId;
-    this.amount = amount;
-    this.status = status;
-    this.createdAt = createdAt;
-    this.description = description;
-    this.fee = fee;
-    this.address = address;
-    this.transactionType = transactionType;
-    this.currency = currency;
-  }
 }

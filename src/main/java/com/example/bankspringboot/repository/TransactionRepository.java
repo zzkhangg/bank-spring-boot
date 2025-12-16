@@ -4,6 +4,7 @@ import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -13,7 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.math.BigDecimal;
 
-public interface TransactionRepository extends JpaRepository<Transaction, Long>,
+public interface TransactionRepository extends JpaRepository<Transaction, UUID>,
     JpaSpecificationExecutor<Transaction> {
 
   @Query("""

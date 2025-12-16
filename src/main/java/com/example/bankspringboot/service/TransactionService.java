@@ -13,11 +13,12 @@ import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
 import com.example.bankspringboot.mapper.TransactionMapper;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
-import com.example.bankspringboot.service.exceptions.BusinessException;
-import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import com.example.bankspringboot.exceptions.BusinessException;
+import com.example.bankspringboot.exceptions.IdInvalidException;
 import com.example.bankspringboot.service.specifications.TransactionSpecs;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -46,7 +47,7 @@ public class TransactionService {
 
   @Transactional
   public TransactionResponse deposit(DepositRequest depositRequest) {
-    Long accountId = depositRequest.getAccountId();
+    UUID accountId = depositRequest.getAccountId();
 
     Account account = accountRepository.findByIdWithLock(accountId)
         .orElseThrow(() -> new BusinessException("Account with id " + accountId + " not found"));
@@ -71,14 +72,14 @@ public class TransactionService {
     accountRepository.save(account);
     Transaction saved = transactionRepository.save(transaction);
     TransactionResponse response = transactionMapper.toResponse(saved);
-    response.setCustomerId(transaction.getCustomer().getId());
-    response.setAccountId(accountId);
+    response.setCustomerId(transaction.getCustomer().getId().toString());
+    response.setAccountId(accountId.toString());
     return response;
   }
 
   @Transactional
   public TransactionResponse withdraw(WithdrawalRequest req) {
-    Long accountId = req.getAccountId();
+    UUID accountId = req.getAccountId();
     BigDecimal amount = req.getAmount();
     Account account = accountRepository.findByIdWithLock(accountId).orElseThrow(
         () -> new IdInvalidException("Account with id " + accountId + " not found"));
@@ -112,14 +113,17 @@ public class TransactionService {
 
     // Save transaction after updating balance
     accountRepository.save(account);
-    transactionRepository.save(transaction);
-    return transactionMapper.toResponse(transaction);
+    Transaction saved = transactionRepository.save(transaction);
+    TransactionResponse response = transactionMapper.toResponse(saved);
+    response.setCustomerId(transaction.getCustomer().getId().toString());
+    response.setAccountId(accountId.toString());
+    return response;
   }
 
   @Transactional
   public TransactionResponse transfer(TransferRequest req) {
-    Long fromId = req.getSourceAccountId();
-    Long toId = req.getDestinationAccountId();
+    UUID fromId = req.getSourceAccountId();
+    UUID toId = req.getDestinationAccountId();
     BigDecimal amount = req.getAmount();
 
     if (fromId.equals(toId)) {
@@ -174,15 +178,19 @@ public class TransactionService {
     // Save to database
     accountRepository.save(fromAccount);
     accountRepository.save(toAccount);
-    transactionRepository.save(txSource);
+    Transaction saved = transactionRepository.save(txSource);
     transactionRepository.save(txDest);
 
-    return transactionMapper.toResponse(txSource);
+    TransactionResponse response = transactionMapper.toResponse(saved);
+    response.setCustomerId(fromAccount.getCustomer().getId().toString());
+    response.setAccountId(fromAccount.getId().toString());
+    return response;
   }
 
   @Transactional(readOnly = true)
-  public List<TransactionResponse> getTransactions(Long accountId,
-      int pageNumber, BigDecimal minPrice, BigDecimal maxPrice, TransactionType type, LocalDate createdBefore, LocalDate createdAfter, String sortStr) {
+  public List<TransactionResponse> getTransactions(UUID accountId,
+      int pageNumber, BigDecimal minPrice, BigDecimal maxPrice, TransactionType type,
+      LocalDate createdBefore, LocalDate createdAfter, String sortStr) {
     pageNumber = Math.max(1, pageNumber);
     accountRepository.findById(accountId)
         .orElseThrow(() -> new IdInvalidException("Account not found"));
@@ -223,20 +231,20 @@ public class TransactionService {
     return transactions.stream()
         .map(t -> {
           TransactionResponse res = transactionMapper.toResponse(t);
-          res.setCustomerId(t.getCustomer().getId());
-          res.setAccountId(t.getAccount().getId());
+          res.setCustomerId(t.getCustomer().getId().toString());
+          res.setAccountId(t.getAccount().getId().toString());
           return res;
         })
         .toList();
   }
 
   @Transactional(readOnly = true)
-  public TransactionResponse getTransaction(Long transactionId) {
+  public TransactionResponse getTransaction(UUID transactionId) {
     Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(
         () -> new IdInvalidException("Transaction with id " + transactionId + " not found"));
-    TransactionResponse transactionResponse = transactionMapper.toResponse(transaction);
-    transactionResponse.setCustomerId(transaction.getCustomer().getId());
-    transactionResponse.setAccountId(transaction.getAccount().getId());
-    return transactionResponse;
+    TransactionResponse response = transactionMapper.toResponse(transaction);
+    response.setCustomerId(transaction.getCustomer().getId().toString());
+    response.setAccountId(transaction.getAccount().getId().toString());
+    return response;
   }
 }

@@ -1,7 +1,7 @@
 package com.example.bankspringboot.controller;
 
 import com.example.bankspringboot.dto.statistics.AccountStatisticsDto;
-import com.example.bankspringboot.dto.statistics.AdressStatisticsDto;
+import com.example.bankspringboot.dto.statistics.AddressStatisticsDto;
 import com.example.bankspringboot.service.StatisticsService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +25,7 @@ public class StatisticsController {
   }
 
   @GetMapping("customers-by-city")
-  public List<AdressStatisticsDto> getNumOfCustomersByCity() {
+  public List<AddressStatisticsDto> getNumOfCustomersByCity() {
     return statisticsService.getNumOfCustomersByCity();
   }
 }

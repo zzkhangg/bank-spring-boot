@@ -2,7 +2,7 @@ package com.example.bankspringboot.service;
 
 import com.example.bankspringboot.common.AccountBalanceType;
 import com.example.bankspringboot.dto.statistics.AccountStatisticsDto;
-import com.example.bankspringboot.dto.statistics.AdressStatisticsDto;
+import com.example.bankspringboot.dto.statistics.AddressStatisticsDto;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
@@ -43,7 +43,7 @@ public class StatisticsService {
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public List<AdressStatisticsDto> getNumOfCustomersByCity() {
+  public List<AddressStatisticsDto> getNumOfCustomersByCity() {
     return customerRepository.countCustomersByCity();
   }
 }

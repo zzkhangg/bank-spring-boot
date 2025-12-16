@@ -6,10 +6,11 @@ import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import com.example.bankspringboot.dto.transaction.TransferRequest;
 import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
 import com.example.bankspringboot.service.TransactionService;
-import com.example.bankspringboot.service.exceptions.IdInvalidException;
+import com.example.bankspringboot.exceptions.IdInvalidException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,7 +53,7 @@ public class TransactionController {
   }
 
   @GetMapping("/transactions")
-  public List<TransactionResponse> getTransactions(@PathVariable Long accountId,
+  public List<TransactionResponse> getTransactions(@PathVariable UUID accountId,
       @RequestParam(name = "page", defaultValue = "1") int pageNumber,
       @RequestParam(name = "min-price", required = false) BigDecimal minPrice,
       @RequestParam(name = "max-price", required = false) BigDecimal maxPrice,
@@ -69,7 +70,7 @@ public class TransactionController {
   }
 
   @GetMapping("/transactions/{transactionId}")
-  public TransactionResponse getTransaction(@PathVariable Long transactionId) {
+  public TransactionResponse getTransaction(@PathVariable UUID transactionId) {
     return transactionService.getTransaction(transactionId);
   }
 }

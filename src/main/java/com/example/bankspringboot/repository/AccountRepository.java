@@ -3,6 +3,7 @@ package com.example.bankspringboot.repository;
 import com.example.bankspringboot.domain.account.Account;
 import jakarta.persistence.LockModeType;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -13,11 +14,11 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface AccountRepository extends JpaRepository<Account, UUID> {
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("SELECT a FROM Account a WHERE a.id = :id")
-  Optional<Account> findByIdWithLock(@Param("id") Long id);
+  Optional<Account> findByIdWithLock(@Param("id") UUID id);
 
   @Query("""
       SELECT count(a)

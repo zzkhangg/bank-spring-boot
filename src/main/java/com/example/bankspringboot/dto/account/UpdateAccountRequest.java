@@ -1,16 +1,17 @@
 package com.example.bankspringboot.dto.account;
 
 import com.example.bankspringboot.domain.account.AccountStatus;
-import com.example.bankspringboot.domain.account.AccountType;
-import jakarta.validation.constraints.Size;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateAccountRequest {
 
-  private AccountStatus status; // ACTIVE, FROZEN, CLOSED
-
-  public AccountStatus getStatus() {
-    return status;
-  }
+  AccountStatus status; // ACTIVE, FROZEN, CLOSED
 }

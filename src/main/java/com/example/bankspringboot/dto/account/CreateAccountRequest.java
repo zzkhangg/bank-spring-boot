@@ -5,28 +5,25 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class CreateAccountRequest {
 
   @NotNull
-  private Long customerId;
+  String email;
 
   @NotNull
-  private AccountType accountType;
+  AccountType accountType;
 
   @NotNull
   @DecimalMin(value = "0.00", message = "Initial deposit cannot be negative.")
-  private BigDecimal initialDeposit;
-
-  public Long getCustomerId() {
-    return customerId;
-  }
-
-  public AccountType getAccountType() {
-    return accountType;
-  }
-
-  public BigDecimal getInitialDeposit() {
-    return initialDeposit;
-  }
+  BigDecimal initialDeposit;
 }

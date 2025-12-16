@@ -7,6 +7,7 @@ import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UuidGenerator;
 
 
 @Entity
@@ -23,21 +25,39 @@ import org.hibernate.annotations.SQLDelete;
 @SQLDelete(sql = "UPDATE customer SET deleted = true WHERE id=?")
 @FilterDef(name = "deletedCustomerFilter", parameters = @ParamDef(name = "isDeleted", type = boolean.class))
 @Filter(name = "deletedCustomerFilter", condition = "deleted = :isDeleted")
+@Table(
+    name = "customers",
+    uniqueConstraints = @UniqueConstraint(columnNames = "email")
+)
 public class Customer {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue
+  @UuidGenerator
+  private UUID id;
 
+  @Column(nullable = false)
   private String firstName;
+
+  @Column(nullable = false)
   private String lastName;
+
+  @Column(nullable = false)
   private String email;
+
+  @Column(nullable = false)
   private String phone;
+
+  @Column(nullable = false)
   private LocalDate birthdate;
+
+  @Column(nullable = false)
   private String password;
+
   private boolean deleted = Boolean.FALSE;
 
   @Embedded
+  @Column(nullable = false)
   private Address address;
 
   @OneToMany(mappedBy = "customer")
@@ -46,40 +66,4 @@ public class Customer {
   @OneToMany(mappedBy = "customer")
   private List<Transaction> transactions;
 
-  public Customer() {
-  }
-
-  public Customer(String firstName, String lastName, String email, String phone,
-      LocalDate birthdate, String password, Address address) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.email = email;
-    this.phone = phone;
-    this.birthdate = birthdate;
-    this.password = this.password;
-    this.address = address;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof Customer)) {
-      return false;
-    }
-    Customer customer = (Customer) o;
-    return Objects.equals(this.id, customer.id);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.id);
-  }
-
-  @Override
-  public String toString() {
-    return "Customer{" + "id=" + this.id + ", name='" + this.lastName + this.firstName + '\'' + '}';
-  }
 }

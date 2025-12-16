@@ -1,4 +1,4 @@
-package com.example.bankspringboot.service.exceptions;
+package com.example.bankspringboot.exceptions;
 
 public class BusinessException extends RuntimeException {
 

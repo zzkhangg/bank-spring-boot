@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.UUID;
 import lombok.Getter;
 
 /**
@@ -23,13 +24,13 @@ public class TransferRequest {
    * The ID of the account to deduct the funds from.
    */
   @NotBlank(message = "Source Account ID is mandatory.")
-  private Long sourceAccountId;
+  private UUID sourceAccountId;
 
   /**
    * The ID of the account to deposit the funds into.
    */
   @NotBlank(message = "Destination Account ID is mandatory.")
-  private Long destinationAccountId;
+  private UUID destinationAccountId;
 
   /**
    * The amount of money to transfer. Must be positive and non-zero.

@@ -10,7 +10,14 @@ import com.example.bankspringboot.mapper.AccountMapper;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.exceptions.IdInvalidException;
+import java.util.List;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.stereotype.Service;
@@ -19,19 +26,14 @@ import java.math.BigDecimal;
 import java.util.Random;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class AccountService {
 
-  final private BigDecimal TRANSACTION_LIMIT = new BigDecimal("10000");
-  final private AccountRepository accountRepository;
-  final private CustomerRepository customerRepository;
-  private final AccountMapper accountMapper;
-
-  public AccountService(AccountRepository accountRepository, CustomerRepository customerRepository,
-      AccountMapper accountMapper) {
-    this.accountRepository = accountRepository;
-    this.customerRepository = customerRepository;
-    this.accountMapper = accountMapper;
-  }
+  BigDecimal TRANSACTION_LIMIT = new BigDecimal("10000");
+  AccountRepository accountRepository;
+  CustomerRepository customerRepository;
+  AccountMapper accountMapper;
 
   private static String generateAccountNumber() {
     int LENGTH = 10; // length of the account number
@@ -51,18 +53,20 @@ public class AccountService {
     return number;
   }
 
+  @PreAuthorize(
+      "hasRole('ADMIN') || @accountSecurity.isOwner(#id, authentication)"
+  )
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public AccountResponse getAccount(UUID id) {
-    Account account = accountRepository.findById(id).orElseThrow(
-        () -> new IdInvalidException("No account with id " + id));
-
-    return accountMapper.toResponse(account);
+    return accountMapper.toResponse(accountRepository.findById(id)
+        .orElseThrow(() -> new IdInvalidException("Account not found")));
   }
 
   @Transactional
   public AccountResponse createAccount(CreateAccountRequest req) {
-    Customer customer = customerRepository.findByEmail(req.getEmail()).orElseThrow(
-        () -> new IdInvalidException("No Customer found with email " + req.getEmail()));
+    Customer customer = customerRepository.findByEmail(req.getEmail())
+        .orElseThrow(
+            () -> new IdInvalidException("No Customer found with email " + req.getEmail()));
     Account account = accountMapper.toAccount(req);
 
     String accountNumber = generateUniqueAccountNumber();
@@ -89,5 +93,12 @@ public class AccountService {
     accountMapper.updateAccountFromRequest(req, account);
     Account saved = accountRepository.save(account);
     return accountMapper.toResponse(saved);
+  }
+
+  public List<AccountResponse> getMyAccounts() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    UUID userId = UUID.fromString(authentication.getName());
+    List<Account> accounts = accountRepository.findAllByCustomerId(userId);
+    return accountMapper.toResponseList(accounts);
   }
 }

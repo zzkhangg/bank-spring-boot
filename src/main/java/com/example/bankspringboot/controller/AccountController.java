@@ -7,8 +7,10 @@ import com.example.bankspringboot.dto.account.CreateAccountRequest;
 import com.example.bankspringboot.dto.account.UpdateAccountRequest;
 import com.example.bankspringboot.service.AccountService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,5 +43,10 @@ public class AccountController {
   public AccountResponse updateAccountStatus(@PathVariable UUID id,
       @Valid @RequestBody UpdateAccountRequest req) {
     return accountService.updateAccountStatus(id, req);
+  }
+
+  @GetMapping("/myAccounts")
+  public List<AccountResponse> getMyAccounts() {
+    return accountService.getMyAccounts();
   }
 }

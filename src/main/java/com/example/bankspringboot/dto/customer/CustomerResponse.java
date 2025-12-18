@@ -1,6 +1,9 @@
 package com.example.bankspringboot.dto.customer;
 
+import com.example.bankspringboot.domain.Role;
 import com.example.bankspringboot.domain.common.Address;
+import com.example.bankspringboot.dto.role.RoleResponse;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +18,8 @@ public class CustomerResponse {
   String firstName;
   String lastName;
   String email;
-  String phone;
+  String phoneNumber;
   Address address;
   String customerId;
+  List<RoleResponse> roles;
 }

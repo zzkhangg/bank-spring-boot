@@ -1,6 +1,6 @@
 package com.example.bankspringboot.common;
 
 public enum Role {
-  USER,
+  CUSTOMER,
   ADMIN
 }

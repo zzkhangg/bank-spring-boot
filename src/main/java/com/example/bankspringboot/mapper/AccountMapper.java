@@ -4,6 +4,7 @@ import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.dto.account.AccountResponse;
 import com.example.bankspringboot.dto.account.CreateAccountRequest;
 import com.example.bankspringboot.dto.account.UpdateAccountRequest;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -21,4 +22,6 @@ public interface AccountMapper {
   @Mapping(target = "id", ignore = true)
     // The ID is used for lookup, not for updating the entity's ID field
   void updateAccountFromRequest(UpdateAccountRequest request, @MappingTarget Account account);
+
+  List<AccountResponse> toResponseList(List<Account> accounts);
 }

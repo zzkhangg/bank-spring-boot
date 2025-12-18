@@ -27,4 +27,7 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
       """)
   Long countAccountsInRange(BigDecimal min, BigDecimal max);
   boolean existsByAccountNumber(@Param("accountNumber") String accountNumber);
+
+  boolean existsByIdAndCustomerId(UUID id, UUID customerId);
+  List<Account> findAllByCustomerId(UUID customerId);
 }

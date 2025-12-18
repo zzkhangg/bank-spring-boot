@@ -22,11 +22,11 @@ public class AuthController {
 
   @PostMapping("/customer/login")
   public AuthenticationResponse authenticateUser(@RequestBody AuthenticationRequest request) {
-    return authService.authenticateUser(request);
+    return authService.authenticate(request);
   }
 
   @PostMapping("admin/login")
   public AuthenticationResponse authenticateAdmin(@RequestBody AuthenticationRequest request) {
-    return authService.authenticateAdmin(request);
+    return authService.authenticate(request);
   }
 }

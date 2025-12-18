@@ -1,6 +1,5 @@
 package com.example.bankspringboot.config;
 
-import java.util.List;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -9,9 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -23,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@EnableMethodSecurity
 public class SecurityConfig {
 
   String[] PUBLIC_ENDPOINTS = {"/api/customers", "/api/accounts"};
@@ -42,6 +44,9 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             request -> request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
                 .requestMatchers(HttpMethod.POST, "api/auth/**").permitAll()
+                .requestMatchers("/api/permissions").permitAll()
+                .requestMatchers("/api/roles/**").permitAll()
+                .requestMatchers("/api/roles").permitAll()
                 .anyRequest().authenticated()
         );
     httpSecurity.oauth2ResourceServer(oauth2
@@ -51,6 +56,13 @@ public class SecurityConfig {
     httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
     return httpSecurity.build();
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(
+      AuthenticationConfiguration configuration
+  ) throws Exception {
+    return configuration.getAuthenticationManager();
   }
 
   @Bean

@@ -1,17 +1,24 @@
 package com.example.bankspringboot.domain.customer;
 
+import com.example.bankspringboot.domain.Role;
+import com.example.bankspringboot.domain.User;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Objects;
 
 import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import jakarta.persistence.*;
+import java.util.Set;
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -25,45 +32,31 @@ import org.hibernate.annotations.UuidGenerator;
 @SQLDelete(sql = "UPDATE customer SET deleted = true WHERE id=?")
 @FilterDef(name = "deletedCustomerFilter", parameters = @ParamDef(name = "isDeleted", type = boolean.class))
 @Filter(name = "deletedCustomerFilter", condition = "deleted = :isDeleted")
-@Table(
-    name = "customers",
-    uniqueConstraints = @UniqueConstraint(columnNames = "email")
-)
-public class Customer {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@DiscriminatorValue("CUSTOMER")
+@SuperBuilder
+public class Customer extends User {
+  @NotNull
+  String firstName;
 
-  @Id
-  @GeneratedValue
-  @UuidGenerator
-  private UUID id;
+  @NotNull
+  String lastName;
 
-  @Column(nullable = false)
-  private String firstName;
+  @NotNull
+  String phoneNumber;
 
-  @Column(nullable = false)
-  private String lastName;
+  @NotNull
+  LocalDate birthDate;
 
-  @Column(nullable = false)
-  private String email;
-
-  @Column(nullable = false)
-  private String phone;
-
-  @Column(nullable = false)
-  private LocalDate birthdate;
-
-  @Column(nullable = false)
-  private String password;
-
-  private boolean deleted = Boolean.FALSE;
+  boolean deleted;
 
   @Embedded
-  @Column(nullable = false)
-  private Address address;
+  @NotNull
+  Address address;
 
   @OneToMany(mappedBy = "customer")
-  private List<Account> accounts;
+  List<Account> accounts;
 
   @OneToMany(mappedBy = "customer")
-  private List<Transaction> transactions;
-
+  List<Transaction> transactions;
 }

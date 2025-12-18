@@ -12,8 +12,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import org.hibernate.annotations.UuidGenerator;
-
 
 @Entity
 @Getter
@@ -24,8 +22,7 @@ import org.hibernate.annotations.UuidGenerator;
 public class Transaction {
 
   @Id
-  @GeneratedValue
-  @UuidGenerator
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   private BigDecimal amount;

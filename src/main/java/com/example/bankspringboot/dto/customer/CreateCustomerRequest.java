@@ -30,7 +30,7 @@ public class CreateCustomerRequest {
 
   @NotBlank(message = "Phone is required")
   @Size(min = 10, max = 10, message = "Phone Number must include exact 10 digits")
-  String phone;
+  String phoneNumber;
 
   @NotNull(message = "Birthdate is required")
   @Past(message = "Birthdate must be in the past")

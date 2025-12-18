@@ -17,6 +17,5 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
       GROUP BY c.address.city
       """)
   List<AddressStatisticsDto> countCustomersByCity();
-
   Optional<Customer> findByEmail(String email);
 }

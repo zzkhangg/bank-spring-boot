@@ -25,4 +25,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID>,
   Long countTransactionsInRange(BigDecimal min, BigDecimal max);
   List<Transaction> findByAccountOrderByCreatedAtDesc(Account account);
   Page<Transaction> findAll(Specification<Transaction> specification, Pageable pageable);
+
+  boolean existsByIdAndCustomer_Email(UUID transactionId, String email);
 }

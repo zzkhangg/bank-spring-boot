@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: bank-spring-boot
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/bank
+    username: root
+    password: "Serenawen2104@"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  mvc:
+    format:
+      date: yyyy-MM-dd
+
+jwt:
+  secret: tfLkbF1Qu17X8eqcqdBPOX9Hxazcme2PDQpAL4aIMJ+ztp6UfdRIkfHrelc7goEJlk9Q/Z9YcGn8W0fQhRLcOA==
+  valid-duration: 3600 # in seconds
+  refreshable-duration: 500 # seconds

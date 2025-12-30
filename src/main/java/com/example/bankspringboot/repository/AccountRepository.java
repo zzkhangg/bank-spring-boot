@@ -1,6 +1,7 @@
 package com.example.bankspringboot.repository;
 
 import com.example.bankspringboot.domain.account.Account;
+import com.example.bankspringboot.domain.customer.Customer;
 import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,6 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
   Long countAccountsInRange(BigDecimal min, BigDecimal max);
   boolean existsByAccountNumber(@Param("accountNumber") String accountNumber);
 
-  boolean existsByIdAndCustomerId(UUID id, UUID customerId);
-  List<Account> findAllByCustomerId(UUID customerId);
+  boolean existsByIdAndCustomer_Email(UUID id, String email);
+  List<Account> findAllByCustomer_Email(String email);
 }

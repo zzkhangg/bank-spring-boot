@@ -1,8 +1,9 @@
 package com.example.bankspringboot.controller;
 
-import com.example.bankspringboot.domain.response.RestResponse;
-import com.example.bankspringboot.dto.AuthenticationRequest;
-import com.example.bankspringboot.dto.AuthenticationResponse;
+import com.example.bankspringboot.dto.authentication.AuthenticationRequest;
+import com.example.bankspringboot.dto.authentication.AuthenticationResponse;
+import com.example.bankspringboot.dto.authentication.LogoutRequest;
+import com.example.bankspringboot.dto.authentication.RefreshRequest;
 import com.example.bankspringboot.service.AuthService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,4 +30,15 @@ public class AuthController {
   public AuthenticationResponse authenticateAdmin(@RequestBody AuthenticationRequest request) {
     return authService.authenticate(request);
   }
+
+  @PostMapping("/logout")
+  public void logout(@RequestBody LogoutRequest request) {
+    authService.logout(request);
+  }
+
+  @PostMapping("/refresh")
+  public AuthenticationResponse refreshToken(@RequestBody RefreshRequest request) {
+    return authService.refreshToken(request);
+  }
+
 }

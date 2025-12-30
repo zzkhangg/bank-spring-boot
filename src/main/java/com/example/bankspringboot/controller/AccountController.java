@@ -1,18 +1,19 @@
 package com.example.bankspringboot.controller;
 
-
-import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.dto.account.AccountResponse;
+import com.example.bankspringboot.dto.account.AccountStatusHistoryResponse;
 import com.example.bankspringboot.dto.account.CreateAccountRequest;
 import com.example.bankspringboot.dto.account.UpdateAccountRequest;
 import com.example.bankspringboot.service.AccountService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
@@ -39,10 +40,16 @@ public class AccountController {
     return ResponseEntity.noContent().build();
   }
 
-  @PutMapping("/{id}")
+  @PostMapping("/{id}/status")
   public AccountResponse updateAccountStatus(@PathVariable UUID id,
       @Valid @RequestBody UpdateAccountRequest req) {
-    return accountService.updateAccountStatus(id, req);
+    return accountService.updateAccountStatus(id, req,
+        SecurityContextHolder.getContext().getAuthentication().getName());
+  }
+
+  @GetMapping("/{id}/status/history")
+  public List<AccountStatusHistoryResponse> getAccountStatusHistory(@PathVariable UUID id) {
+    return accountService.getAccountStatusHistory(id);
   }
 
   @GetMapping("/myAccounts")

@@ -1,8 +1,6 @@
 package com.example.bankspringboot.util;
 
-import com.example.bankspringboot.domain.response.ErrorResponse;
 import com.example.bankspringboot.domain.response.RestResponse;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -13,8 +11,6 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
-
-import java.net.http.HttpResponse;
 
 @ControllerAdvice
 public class FormatRestResponse implements ResponseBodyAdvice<Object> {
@@ -44,10 +40,6 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
       return body;
     }
 
-    RestResponse<Object> restResponse = new RestResponse<>();
-    restResponse.setStatusCode(statusCode);
-    restResponse.setMessage("Success");
-    restResponse.setData(body);
-    return restResponse;
+    return RestResponse.success(body);
   }
 }

@@ -29,19 +29,19 @@ public class TransactionSpecs {
   }
 
   public static Specification<Transaction> hasTransactionType(TransactionType type) {
-    return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(Transaction_.type),
-        type);
+    return (root, query, criteriaBuilder)
+        -> criteriaBuilder.equal(root.get(Transaction_.type), type);
   }
 
   public static Specification<Transaction> createdDateAfter(LocalDate date) {
     LocalDateTime startOfDay = date.atStartOfDay();
-    return ((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo( root.get(Transaction_.createdAt),
-        startOfDay));
+    return ((root, query, criteriaBuilder)
+        -> criteriaBuilder.greaterThanOrEqualTo(root.get(Transaction_.createdAt), startOfDay));
   }
 
   public static Specification<Transaction> createdDateBefore(LocalDate date) {
     LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
-    return ((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo( root.get(Transaction_.createdAt),
-        endOfDay));
+    return ((root, query, criteriaBuilder)
+        -> criteriaBuilder.lessThanOrEqualTo(root.get(Transaction_.createdAt), endOfDay));
   }
 }

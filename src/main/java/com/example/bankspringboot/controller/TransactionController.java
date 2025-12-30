@@ -5,56 +5,48 @@ import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import com.example.bankspringboot.dto.transaction.TransferRequest;
 import com.example.bankspringboot.dto.transaction.WithdrawalRequest;
-import com.example.bankspringboot.service.TransactionService;
-import com.example.bankspringboot.exceptions.IdInvalidException;
+import com.example.bankspringboot.service.TransactionFacade;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/accounts/{accountId}")
+@Slf4j
 public class TransactionController {
 
-  final private TransactionService transactionService;
+  final private TransactionFacade transactionFacade;
 
 
-  public TransactionController(TransactionService transactionService) {
-    this.transactionService = transactionService;
+  public TransactionController(TransactionFacade transactionFacade) {
+    this.transactionFacade = transactionFacade;
   }
 
   @PostMapping("/deposit")
-  public TransactionResponse deposit(@PathVariable Long accountId,
+  public TransactionResponse deposit(@PathVariable UUID accountId,
       @RequestBody DepositRequest req) {
-    if (!accountId.equals(req.getAccountId())) {
-      throw new IdInvalidException("Bad account id!");
-    }
-    return transactionService.deposit(req);
+    return transactionFacade.deposit(accountId, req);
   }
 
   @PostMapping("/withdraw")
-  public TransactionResponse withdraw(@PathVariable Long accountId,
+  public TransactionResponse withdraw(@PathVariable UUID accountId,
       @RequestBody WithdrawalRequest req) {
-    if (!accountId.equals(req.getAccountId())) {
-      throw new IdInvalidException("Bad account id!");
-    }
-    return transactionService.withdraw(req);
+    return transactionFacade.withdraw(accountId, req);
   }
 
   @PostMapping("/transfer")
-  public TransactionResponse transfer(@PathVariable Long accountId,
+  public TransactionResponse transfer(@PathVariable UUID accountId,
       @RequestBody TransferRequest req) {
-    if (!accountId.equals(req.getSourceAccountId())) {
-      throw new IdInvalidException("Bad account id!");
-    }
-    return transactionService.transfer(req);
+    return transactionFacade.transfer(accountId, req);
   }
 
   @GetMapping("/transactions")
   public List<TransactionResponse> getTransactions(@PathVariable UUID accountId,
-      @RequestParam(name = "page", defaultValue = "1") int pageNumber,
+      @RequestParam(name = "page", defaultValue = "1", required = false) int pageNumber,
       @RequestParam(name = "min-price", required = false) BigDecimal minPrice,
       @RequestParam(name = "max-price", required = false) BigDecimal maxPrice,
       @RequestParam(name = "transaction-type", required = false) TransactionType transactionType,
@@ -65,12 +57,12 @@ public class TransactionController {
       @RequestParam(name = "created-after", required = false) String sort
   ) {
 
-    return transactionService.getTransactions(accountId, pageNumber, minPrice, maxPrice,
+    return transactionFacade.getTransactions(accountId, pageNumber, minPrice, maxPrice,
         transactionType, createdBefore, createdAfter, sort);
   }
 
   @GetMapping("/transactions/{transactionId}")
-  public TransactionResponse getTransaction(@PathVariable UUID transactionId) {
-    return transactionService.getTransaction(transactionId);
+  public TransactionResponse getTransaction(@PathVariable UUID accountId, @PathVariable UUID transactionId) {
+    return transactionFacade.getTransaction(accountId, transactionId);
   }
 }

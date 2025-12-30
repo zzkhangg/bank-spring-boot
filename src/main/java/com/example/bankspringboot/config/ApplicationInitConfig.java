@@ -25,9 +25,11 @@ public class ApplicationInitConfig {
         PasswordEncoder passwordEncoder) {
         return args -> {
           if (adminRespository.findByEmail(ApplicationInitConfig.ADMIN_USER_NAME).isEmpty()) {
+
             adminRespository.save(Admin.builder()
                     .email(ApplicationInitConfig.ADMIN_USER_NAME)
                     .password(passwordEncoder.encode(ApplicationInitConfig.ADMIN_PASSWORD))
+//                    .roles()
                 .build());
             log.warn("admin user has been created with default password: admin, please change it");
           }

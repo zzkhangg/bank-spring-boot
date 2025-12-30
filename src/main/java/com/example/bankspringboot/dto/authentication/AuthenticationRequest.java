@@ -1,4 +1,4 @@
-package com.example.bankspringboot.dto;
+package com.example.bankspringboot.dto.authentication;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

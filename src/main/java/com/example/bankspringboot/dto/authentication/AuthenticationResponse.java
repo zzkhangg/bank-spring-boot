@@ -1,4 +1,4 @@
-package com.example.bankspringboot.dto;
+package com.example.bankspringboot.dto.authentication;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,5 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AuthenticationResponse {
-  String token;
+  String accessToken;
+  String refreshToken;
 }

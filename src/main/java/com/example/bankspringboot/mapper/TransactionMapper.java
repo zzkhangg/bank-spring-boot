@@ -24,9 +24,12 @@ public interface TransactionMapper {
 
   @Mapping(target = "account", ignore = true)
   Transaction depositReqToTransaction(DepositRequest depositRequest);
+
   Transaction withdrawalReqToTransaction(WithdrawalRequest withdrawalRequest);
+
   @Mapping(target = "account", ignore = true) // Ignore relationship
   @Mapping(target = "customer", ignore = true) // Ignore relationship
+  @Mapping(target = "id", ignore = true)
   Transaction transferReqToTransaction(TransferRequest transferRequest);
 
 

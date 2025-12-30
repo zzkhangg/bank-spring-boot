@@ -6,6 +6,10 @@ import com.example.bankspringboot.dto.statistics.AddressStatisticsDto;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,19 +18,15 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StatisticsService {
 
-  final private AccountRepository accountRepository;
-  final private TransactionRepository transactionRepository;
-  private final CustomerRepository customerRepository;
+  AccountRepository accountRepository;
+  TransactionRepository transactionRepository;
+  CustomerRepository customerRepository;
 
-  public StatisticsService(AccountRepository accountRepository,
-      TransactionRepository transactionRepository, CustomerRepository customerRepository) {
-    this.accountRepository = accountRepository;
-    this.transactionRepository = transactionRepository;
-    this.customerRepository = customerRepository;
-  }
-
+  @PreAuthorize("hasRole('ADMIN')")
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<AccountStatisticsDto> getNumOfAccountsAndTransactionsByBalance() {
     List<AccountStatisticsDto> accountStatisticsDtoList = new ArrayList<>();
@@ -42,6 +42,7 @@ public class StatisticsService {
     return accountStatisticsDtoList;
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<AddressStatisticsDto> getNumOfCustomersByCity() {
     return customerRepository.countCustomersByCity();

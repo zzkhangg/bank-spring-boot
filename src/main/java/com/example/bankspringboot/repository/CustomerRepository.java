@@ -18,4 +18,5 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
       """)
   List<AddressStatisticsDto> countCustomersByCity();
   Optional<Customer> findByEmail(String email);
+  boolean existsByIdAndEmail(UUID id, String email);
 }

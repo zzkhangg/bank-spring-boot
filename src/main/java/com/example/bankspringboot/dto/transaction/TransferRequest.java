@@ -12,20 +12,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Data Transfer Object for a client-initiated Transfer transaction. Represents funds moving from
  * one account to another.
  */
 @Getter
+@Setter
 public class TransferRequest {
-
-  /**
-   * The ID of the account to deduct the funds from.
-   */
-  @NotBlank(message = "Source Account ID is mandatory.")
-  private UUID sourceAccountId;
-
   /**
    * The ID of the account to deposit the funds into.
    */

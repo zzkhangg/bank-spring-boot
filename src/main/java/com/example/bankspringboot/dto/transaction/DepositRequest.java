@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 
 /**
@@ -18,20 +18,15 @@ import lombok.Getter;
  * account.
  */
 @Getter
+@Builder
 public class DepositRequest {
-
-  /**
-   * The ID of the account that will receive the funds.
-   */
-  @NotBlank(message = "Account ID is mandatory.")
-  private UUID accountId;
 
   /**
    * The amount of money to deposit. Must be positive and non-zero. Uses BigDecimal for precise
    * financial calculations.
    */
   @NotNull(message = "Amount is mandatory.")
-  @DecimalMin(value = "0.01", inclusive = true, message = "The deposit amount must be positive.")
+  @DecimalMin(value = "0.01", message = "The deposit amount must be positive.")
   @Digits(integer = 12, fraction = 2, message = "Amount can have at most 12 integer digits and 2 fraction digits.")
   private BigDecimal amount;
 

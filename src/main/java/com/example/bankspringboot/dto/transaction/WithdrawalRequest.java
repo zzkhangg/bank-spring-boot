@@ -17,12 +17,6 @@ import lombok.Getter;
 public class WithdrawalRequest {
 
   /**
-   * The ID of the account from which the funds will be deducted.
-   */
-  @NotBlank(message = "Account ID is mandatory.")
-  private UUID accountId;
-
-  /**
    * The amount of money to withdraw. Must be positive and non-zero.
    */
   @NotNull(message = "Amount is mandatory.")

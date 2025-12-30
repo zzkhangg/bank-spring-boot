@@ -60,4 +60,7 @@ public class Account {
 
   @Enumerated(EnumType.STRING)
   private AccountType accountType;
+
+  @OneToMany(mappedBy = "account")
+  List<AccountStatusHistory> accountStatusHistory;
 }

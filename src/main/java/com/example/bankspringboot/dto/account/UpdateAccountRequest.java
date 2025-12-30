@@ -14,4 +14,6 @@ import lombok.experimental.FieldDefaults;
 public class UpdateAccountRequest {
 
   AccountStatus status; // ACTIVE, FROZEN, CLOSED
+
+  String reason;
 }

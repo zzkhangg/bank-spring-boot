@@ -14,9 +14,7 @@ public class AccountSecurity {
 
   private final AccountRepository accountRepository;
 
-  public boolean isOwner(UUID accountId, Authentication auth) {
-    UUID ownerId = UUID.fromString(auth.getName());
-    log.info("Owner Id: {} and accountID: {}", ownerId, accountId);
-    return accountRepository.existsByIdAndCustomerId(accountId, ownerId);
+  public boolean isOwner(UUID accountId, String email) {
+    return accountRepository.existsByIdAndCustomer_Email(accountId, email);
   }
 }

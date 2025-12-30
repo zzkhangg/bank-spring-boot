@@ -1,141 +1,120 @@
 package com.example.bankspringboot.exceptions;
 
-import com.example.bankspringboot.domain.response.ErrorResponse;
+import com.example.bankspringboot.domain.response.RestResponse;
+import java.nio.file.AccessDeniedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
-import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(value = IdInvalidException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorResponse> handleIdInvalidException(IdInvalidException e) {
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Failure");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    res.setErrors(e.getMessage());
-
-    return ResponseEntity.badRequest().body(res);
-  }
-
   @ExceptionHandler(value = MethodArgumentNotValidException.class)
   @ResponseBody
-  public ResponseEntity<ErrorResponse> handleInvalidArgument(MethodArgumentNotValidException ex) {
-    BindingResult bindingResult = ex.getBindingResult();
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Failure");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    List<String> errors = bindingResult.getFieldErrors()
-        .stream()
-        .map(e -> e.getField() + ": " + e.getDefaultMessage())
-        .toList();
-    res.setErrors(errors);
-    return ResponseEntity.badRequest().body(res);
+  public ResponseEntity<RestResponse<?>> handleInvalidArgument(MethodArgumentNotValidException ex) {
+    String enumKey = ex.getBindingResult().getFieldError().getDefaultMessage();
+    ErrorCode errorCode = ErrorCode.INVALID_KEY;
+
+    try {
+      ErrorCode.valueOf(enumKey);
+    } catch (IllegalArgumentException e) {
+
+    }
+
+    RestResponse<?> response = RestResponse.error(errorCode.getMessage(), errorCode.getCode());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   @ResponseBody
-  public ResponseEntity<ErrorResponse> handleJsonParse(HttpMessageNotReadableException ex) {
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Invalid JSON Format");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    res.setErrors(ex.getMessage());
-
-    return ResponseEntity.badRequest().body(res);
+  public ResponseEntity<RestResponse<?>> handleJsonParse(HttpMessageNotReadableException ex) {
+    RestResponse<?> response = RestResponse.error(ErrorCode.JSON_PARSE_ERROR.getMessage(),
+        ErrorCode.JSON_PARSE_ERROR.getCode());
+    return ResponseEntity.badRequest().body(response);
   }
 
   @ExceptionHandler(BindException.class)
   @ResponseBody
-  public ResponseEntity<ErrorResponse> handleBindException(BindException ex) {
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Invalid Request");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    BindingResult bindingResult = ex.getBindingResult();
-    List<String> errors = bindingResult.getFieldErrors()
-        .stream()
-        .map(e -> e.getField() + ": " + e.getDefaultMessage())
-        .toList();
-    res.setErrors(errors);
+  public ResponseEntity<RestResponse<?>> handleBindException(BindException ex) {
+    RestResponse<?> res = RestResponse
+        .error(ex.getBindingResult().getFieldError().getDefaultMessage(),
+            HttpStatus.BAD_REQUEST.value());
 
     return ResponseEntity.badRequest().body(res);
   }
 
-  @ExceptionHandler(BusinessException.class)
+  @ExceptionHandler(AppException.class)
   @ResponseBody
-  public ResponseEntity<ErrorResponse> handleException(BusinessException e) {
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Bad Request");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    res.setErrors(e.getMessage());
+  public ResponseEntity<RestResponse<?>> handleException(AppException e) {
+    RestResponse<?> res = RestResponse.error(e.getMessage(), e.getErrorCode().getCode());
 
     return ResponseEntity.badRequest().body(res);
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   @ResponseBody
-  public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException e) {
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Bad Request");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    res.setErrors(e.getMessage());
-    return ResponseEntity.badRequest().body(res);
-  }
-
-  @ExceptionHandler(MissingServletRequestParameterException.class)
-  @ResponseBody
-  public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(MissingServletRequestParameterException e) {
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Bad Request");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    res.setErrors(e.getMessage());
+  public ResponseEntity<RestResponse<?>> handleMethodArgumentTypeMismatch(
+      MethodArgumentTypeMismatchException e) {
+    RestResponse<?> res = RestResponse.error(ErrorCode.TYPE_MISMATCH.getMessage(),
+        ErrorCode.TYPE_MISMATCH.getCode());
     return ResponseEntity.badRequest().body(res);
   }
 
   @ExceptionHandler(MissingPathVariableException.class)
   @ResponseBody
-  public ResponseEntity<ErrorResponse> handleMissingPathVariable(MissingPathVariableException e) {
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Bad Request");
-    res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-    res.setErrors(e.getMessage());
+  public ResponseEntity<RestResponse<?>> handleMissingPathVariable(MissingPathVariableException e) {
+    RestResponse<?> res = RestResponse.error(ErrorCode.MISSING_PATH_VARIABLE.getMessage(),
+        ErrorCode.MISSING_PATH_VARIABLE.getCode());
     return ResponseEntity.badRequest().body(res);
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+  @ResponseBody
+  public ResponseEntity<RestResponse<?>> handleDataIntegrityViolation(
+      DataIntegrityViolationException ex) {
 
     if (ex.getMessage().contains("email")) {
-      ErrorResponse res = ErrorResponse.builder()
-          .message("Email already exists")
-          .statusCode(HttpStatus.CONFLICT.value())
-          .errors(ex.getMessage())
-          .build();
+      RestResponse<?> res = RestResponse.error(ErrorCode.DATABASE_ERROR.getMessage(),
+          ErrorCode.DATABASE_ERROR.getCode());
       return ResponseEntity.badRequest().body(res);
     }
 
     return ResponseEntity.internalServerError().build();
   }
 
-  @ExceptionHandler(Exception.class)
+  @ExceptionHandler(AccessDeniedException.class)
   @ResponseBody
-  public ResponseEntity<ErrorResponse> handleException(Exception e) {
-    ErrorResponse res = new ErrorResponse();
-    res.setMessage("Unknown Error");
-    res.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    res.setErrors("Internal Server Error");
+  public ResponseEntity<RestResponse<?>> handleAccessDenied(AccessDeniedException ex) {
+    RestResponse<?> res = RestResponse.error(ErrorCode.UNAUTHORIZED.getMessage(),
+        ErrorCode.UNAUTHORIZED.getCode());
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  @ResponseBody
+  public ResponseEntity<RestResponse<?>> handleAccessDenied(BadCredentialsException ex) {
+    RestResponse<?> res = RestResponse.error(ErrorCode.UNAUTHENTICATED.getMessage(),
+        ErrorCode.UNAUTHENTICATED.getCode());
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+  }
+
+  @ExceptionHandler(RuntimeException.class)
+  @ResponseBody
+  public ResponseEntity<RestResponse<?>> handleException(RuntimeException e) {
+    RestResponse<?> res = RestResponse.error(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage(),
+        ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
 
     return ResponseEntity.badRequest().body(res);
   }

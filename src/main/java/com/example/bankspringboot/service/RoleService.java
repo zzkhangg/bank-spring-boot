@@ -4,13 +4,11 @@ import com.example.bankspringboot.domain.Permission;
 import com.example.bankspringboot.domain.Role;
 import com.example.bankspringboot.dto.role.RoleRequest;
 import com.example.bankspringboot.dto.role.RoleResponse;
-import com.example.bankspringboot.mapper.PermissionMapper;
 import com.example.bankspringboot.mapper.RoleMapper;
 import com.example.bankspringboot.repository.PermissionRepository;
 import com.example.bankspringboot.repository.RoleRepository;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +22,6 @@ public class RoleService {
   RoleRepository roleRepository;
   PermissionRepository permissionRepository;
   RoleMapper roleMapper;
-  private final PermissionMapper permissionMapper;
 
   public RoleResponse createRole(RoleRequest request) {
     if (roleRepository.existsById(request.getName())) {

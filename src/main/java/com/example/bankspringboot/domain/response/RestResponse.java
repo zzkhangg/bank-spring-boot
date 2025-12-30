@@ -21,4 +21,20 @@ public class RestResponse<T> {
   Object message;
   T data;
   int statusCode;
+
+  public static <T> RestResponse<T> success(T data) {
+    return RestResponse.<T>builder()
+        .data(data)
+        .statusCode(200)
+        .build();
+  }
+
+  public static RestResponse<?> error(String message, int status) {
+    return RestResponse.builder()
+        .message(message)
+        .statusCode(status)
+        .build();
+  }
+
+
 }

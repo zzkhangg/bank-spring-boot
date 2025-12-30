@@ -19,9 +19,7 @@ public interface AccountMapper {
   @Mapping(source = "initialDeposit", target = "balance")
   Account toAccount(CreateAccountRequest request);
 
-  @Mapping(target = "id", ignore = true)
-    // The ID is used for lookup, not for updating the entity's ID field
+  @Mapping(target = "accountStatusHistory",  ignore = true)
   void updateAccountFromRequest(UpdateAccountRequest request, @MappingTarget Account account);
 
-  List<AccountResponse> toResponseList(List<Account> accounts);
 }

@@ -35,6 +35,7 @@ import org.hibernate.annotations.UuidGenerator;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @DiscriminatorValue("CUSTOMER")
 @SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Customer extends User {
   @NotNull
   String firstName;

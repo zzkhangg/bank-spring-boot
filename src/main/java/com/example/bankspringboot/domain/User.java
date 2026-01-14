@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -22,10 +24,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(
-    name= "users",
-    uniqueConstraints = @UniqueConstraint(columnNames = "email")
-)
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @DiscriminatorColumn(name = "user_type")
 @Getter
 @Setter
@@ -40,5 +39,10 @@ public class User {
   String password;
 
   @ManyToMany
+      @JoinTable(
+          name = "user_role",
+          joinColumns = @JoinColumn(name= "user_id"),
+          inverseJoinColumns = @JoinColumn(name = "role_id")
+      )
   Set<Role> roles;
 }

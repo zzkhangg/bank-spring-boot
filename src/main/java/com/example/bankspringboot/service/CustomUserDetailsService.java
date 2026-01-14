@@ -8,8 +8,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,16 +25,22 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findByEmail(username)
-        .orElseThrow(() -> new UsernameNotFoundException(username));
+    User user =
+        userRepository
+            .findByEmail(username)
+            .orElseThrow(() -> new UsernameNotFoundException(username));
     List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-    user.getRoles().forEach(role -> {
-      grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
-      role.getPermissions().forEach(permission -> {
-        grantedAuthorities.add(new SimpleGrantedAuthority(permission.getName()));
-      });
-    });
-    return new org.springframework.security.core.userdetails.User(user.getEmail(),
-        user.getPassword(), grantedAuthorities);
+    user.getRoles()
+        .forEach(
+            role -> {
+              grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
+              role.getPermissions()
+                  .forEach(
+                      permission -> {
+                        grantedAuthorities.add(new SimpleGrantedAuthority(permission.getName()));
+                      });
+            });
+    return new org.springframework.security.core.userdetails.User(
+        user.getEmail(), user.getPassword(), grantedAuthorities);
   }
 }

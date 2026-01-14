@@ -3,12 +3,9 @@ package com.example.bankspringboot.domain.scheduledtransaction;
 import com.example.bankspringboot.common.ScheduledStatus;
 import com.example.bankspringboot.common.ScheduledType;
 import com.example.bankspringboot.domain.account.Account;
-import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.common.Auditable;
-import com.example.bankspringboot.domain.transaction.TransactionChannel;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -21,7 +18,6 @@ import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.MonthDay;
 import java.time.ZoneId;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -55,12 +51,6 @@ public class ScheduledTransaction extends Auditable {
   @Column(nullable = false, name = "transaction_type")
   @Enumerated(EnumType.STRING)
   TransactionType transactionType;
-
-  @Embedded
-  Address address;
-
-  @Enumerated(EnumType.STRING)
-  TransactionChannel channel;
 
   @ManyToOne
   @JoinColumn(nullable = false, name = "from_account_id")

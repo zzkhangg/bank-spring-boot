@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ScheduledTransactionRepository extends JpaRepository<ScheduledTransaction, UUID> {
 
-  List<ScheduledTransaction> findAllByNextRunAtBeforeAndStatus(Instant before,
-      ScheduledStatus status);
+  List<ScheduledTransaction> findAllByNextRunAtBeforeAndStatus(
+      Instant before, ScheduledStatus status);
 }

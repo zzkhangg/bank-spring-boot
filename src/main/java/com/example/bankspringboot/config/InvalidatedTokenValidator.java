@@ -1,6 +1,5 @@
 package com.example.bankspringboot.config;
 
-
 import com.example.bankspringboot.service.TokenValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InvalidatedTokenValidator implements OAuth2TokenValidator<Jwt> {
 
-  final private TokenValidationService tokenValidationService;
+  private final TokenValidationService tokenValidationService;
 
   @Override
   public OAuth2TokenValidatorResult validate(Jwt jwt) {
@@ -24,8 +23,7 @@ public class InvalidatedTokenValidator implements OAuth2TokenValidator<Jwt> {
       return OAuth2TokenValidatorResult.success();
     } catch (JwtException e) {
       return OAuth2TokenValidatorResult.failure(
-          new OAuth2Error("invalid_token", "Token has been invalidated",
-              null));
+          new OAuth2Error("invalid_token", "Token has been invalidated", null));
     }
   }
 }

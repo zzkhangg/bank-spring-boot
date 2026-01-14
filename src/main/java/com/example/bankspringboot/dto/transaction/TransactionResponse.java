@@ -3,10 +3,9 @@ package com.example.bankspringboot.dto.transaction;
 import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.TransactionStatus;
 import com.example.bankspringboot.domain.transaction.TransactionType;
-import lombok.Getter;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import lombok.Getter;
 import lombok.Setter;
 
 @Getter

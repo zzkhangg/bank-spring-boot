@@ -40,5 +40,4 @@ public class AuthController {
   public AuthenticationResponse refreshToken(@RequestBody RefreshRequest request) {
     return authService.refreshToken(request);
   }
-
 }

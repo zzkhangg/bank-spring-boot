@@ -23,8 +23,8 @@ public class ScheduledTransactionController {
   ScheduledTransactionService scheduleService;
 
   @PostMapping("/scheduled-transactions")
-  public ScheduledTransactionResponse scheduleTransaction(@PathVariable UUID accountId,
-      @RequestBody ScheduledTransactionRequest req) {
+  public ScheduledTransactionResponse scheduleTransaction(
+      @PathVariable UUID accountId, @RequestBody ScheduledTransactionRequest req) {
     return scheduleService.scheduleTransaction(accountId, req);
   }
 }

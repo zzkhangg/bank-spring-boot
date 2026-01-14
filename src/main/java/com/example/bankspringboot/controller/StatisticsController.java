@@ -3,14 +3,13 @@ package com.example.bankspringboot.controller;
 import com.example.bankspringboot.dto.statistics.AccountStatisticsDto;
 import com.example.bankspringboot.dto.statistics.AddressStatisticsDto;
 import com.example.bankspringboot.service.StatisticsService;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/statistics")

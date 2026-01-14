@@ -9,9 +9,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RoleRequest {
-  @NotNull
-  @NotBlank
-  String name;
+  @NotNull @NotBlank String name;
 
   String description;
 

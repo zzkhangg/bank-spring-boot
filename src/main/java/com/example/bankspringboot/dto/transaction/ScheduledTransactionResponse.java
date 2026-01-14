@@ -4,7 +4,6 @@ import com.example.bankspringboot.common.ScheduledType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.TimeZone;
 import lombok.AccessLevel;

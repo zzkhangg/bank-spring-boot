@@ -13,8 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvalidatedToken {
-  @Id
-  private String id;
+  @Id private String id;
 
   @Column(name = "expiry_date")
   private Instant expiryDate;

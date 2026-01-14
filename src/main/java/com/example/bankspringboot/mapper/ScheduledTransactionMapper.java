@@ -17,13 +17,10 @@ public interface ScheduledTransactionMapper {
   ScheduledTransaction toScheduledTransaction(ScheduledTransactionRequest request);
 
   @Mapping(target = "id", expression = "java(scheduledTransaction.getId().toString())")
-  @Mapping(target = "toAccountId",
-      expression = "java(scheduledTransaction.getToAccount().getId().toString())")
   @Mapping(
-      target = "nextRunAt",
-      source = ".",
-      qualifiedByName = "toLocalDateTime"
-  )
+      target = "toAccountId",
+      expression = "java(scheduledTransaction.getToAccount().getId().toString())")
+  @Mapping(target = "nextRunAt", source = ".", qualifiedByName = "toLocalDateTime")
   ScheduledTransactionResponse toResponse(ScheduledTransaction scheduledTransaction);
 
   DepositRequest toDepositRequest(ScheduledTransaction scheduledTransaction);
@@ -33,8 +30,6 @@ public interface ScheduledTransactionMapper {
 
   @Named(value = "toLocalDateTime")
   default LocalDateTime toLocalDateTime(ScheduledTransaction st) {
-    return st.getNextRunAt()
-        .atZone(st.getZoneId())
-        .toLocalDateTime();
+    return st.getNextRunAt().atZone(st.getZoneId()).toLocalDateTime();
   }
 }

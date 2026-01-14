@@ -5,20 +5,19 @@ import com.example.bankspringboot.dto.customer.CustomerResponse;
 import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
 import com.example.bankspringboot.service.CustomerService;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
 
-  final private CustomerService customerService;
+  private final CustomerService customerService;
 
   public CustomerController(CustomerService customerService) {
     this.customerService = customerService;
@@ -41,8 +40,8 @@ public class CustomerController {
   }
 
   @PutMapping("/{id}")
-  public CustomerResponse updateCustomer(@PathVariable UUID id,
-      @Valid @RequestBody UpdateCustomerRequest req) {
+  public CustomerResponse updateCustomer(
+      @PathVariable UUID id, @Valid @RequestBody UpdateCustomerRequest req) {
     return customerService.updateCustomer(id, req);
   }
 
@@ -50,9 +49,9 @@ public class CustomerController {
   public List<CustomerResponse> getAllCustomers() {
     var authentication = SecurityContextHolder.getContext().getAuthentication();
     log.info("Current User: {}", authentication.getName());
-    authentication.getAuthorities()
-        .forEach(authority
-            -> log.info("Authorities: {}", authority.getAuthority()));
+    authentication
+        .getAuthorities()
+        .forEach(authority -> log.info("Authorities: {}", authority.getAuthority()));
     return customerService.getAllCustomers();
   }
 }

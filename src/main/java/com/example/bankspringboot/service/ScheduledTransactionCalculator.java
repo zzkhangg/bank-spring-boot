@@ -18,20 +18,24 @@ public class ScheduledTransactionCalculator {
     LocalDateTime lastIntendedLocal = scheduledTransaction.getLastIntendedLocal();
     boolean isFirstRun = lastIntendedLocal == null;
     ZoneId zoneId = scheduledTransaction.getZoneId();
-    ZonedDateTime cursor = lastIntendedLocal != null ? lastIntendedLocal.atZone(zoneId)
-        : scheduledTransaction.getStartAtLocal().atZone(zoneId);
+    ZonedDateTime cursor =
+        lastIntendedLocal != null
+            ? lastIntendedLocal.atZone(zoneId)
+            : scheduledTransaction.getStartAtLocal().atZone(zoneId);
     ScheduledType scheduledType = scheduledTransaction.getScheduledType();
     int scheduledValue =
-        scheduledType == ScheduledType.DAILY ? scheduledTransaction.getIntervalDays()
-            : (scheduledType == ScheduledType.WEEKLY ? scheduledTransaction.getDayOfWeek()
-                .getValue()
-                : (scheduledType == ScheduledType.MONTHLY ? scheduledTransaction.getDayOfMonth()
+        scheduledType == ScheduledType.DAILY
+            ? scheduledTransaction.getIntervalDays()
+            : (scheduledType == ScheduledType.WEEKLY
+                ? scheduledTransaction.getDayOfWeek().getValue()
+                : (scheduledType == ScheduledType.MONTHLY
+                    ? scheduledTransaction.getDayOfMonth()
                     : 0));
     return calculateNextSlot(cursor, scheduledType, scheduledValue, isFirstRun).toInstant();
   }
 
-  private ZonedDateTime calculateNextSlot(ZonedDateTime cursor, ScheduledType scheduledType,
-      int scheduledValue, boolean isFirstRun) {
+  private ZonedDateTime calculateNextSlot(
+      ZonedDateTime cursor, ScheduledType scheduledType, int scheduledValue, boolean isFirstRun) {
     ZonedDateTime now = ZonedDateTime.now(cursor.getZone());
     switch (scheduledType) {
       case DAILY:
@@ -54,12 +58,11 @@ public class ScheduledTransactionCalculator {
           int dom = Math.min(ym.lengthOfMonth(), scheduledValue);
           ZonedDateTime candidate = cursor.withDayOfMonth(dom);
           if (now.isAfter(candidate)) {
-            candidate = candidate.plusMonths(1)
-                .withDayOfMonth(
-                    Math.min(
-                        YearMonth.from(candidate).lengthOfMonth(),
-                        scheduledValue
-                    ));
+            candidate =
+                candidate
+                    .plusMonths(1)
+                    .withDayOfMonth(
+                        Math.min(YearMonth.from(candidate).lengthOfMonth(), scheduledValue));
           }
           cursor = candidate;
         } else {

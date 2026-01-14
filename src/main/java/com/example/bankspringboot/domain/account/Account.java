@@ -1,10 +1,13 @@
 package com.example.bankspringboot.domain.account;
 
-
 import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import jakarta.persistence.*;
+import jakarta.persistence.EntityListeners;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,23 +17,17 @@ import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import jakarta.persistence.EntityListeners;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Setter
 @Getter
 @SQLDelete(sql = "UPDATE account SET deleted = true WHERE id=?")
-@FilterDef(name = "deletedAccountFilter", parameters = @ParamDef(name = "isDeleted", type = boolean.class))
+@FilterDef(
+    name = "deletedAccountFilter",
+    parameters = @ParamDef(name = "isDeleted", type = boolean.class))
 @Filter(name = "deletedAccountFilter", condition = "deleted = :isDeleted")
-@Table(
-    name = "accounts",
-    uniqueConstraints = @UniqueConstraint(columnNames = "account_number")
-)
+@Table(name = "accounts", uniqueConstraints = @UniqueConstraint(columnNames = "account_number"))
 public class Account {
 
   @Id
@@ -45,8 +42,7 @@ public class Account {
   private BigDecimal transactionLimit;
   private boolean deleted = Boolean.FALSE;
 
-  @CreatedDate
-  private LocalDateTime createdAt;
+  @CreatedDate private LocalDateTime createdAt;
 
   @ManyToOne
   @JoinColumn(name = "customer_id")

@@ -62,16 +62,17 @@ public class AuthService {
 
   String REFRESH_TOKEN = "refresh";
   String ACCESS_TOKEN = "access";
-
   InvalidatedTokenRepository invalidatedTokenRepository;
 
   TokenValidationService tokenValidationService;
 
   public AuthenticationResponse authenticate(AuthenticationRequest request) {
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+    Authentication authentication =
+        authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
     String accessToken = generateAccessToken(userDetails);
     String refreshToken = generateRefreshToken(userDetails);
     return AuthenticationResponse.builder()
@@ -83,15 +84,16 @@ public class AuthService {
   private String generateToken(UserDetails user, boolean isRefreshToken) {
     JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
     long duration = Long.parseLong(isRefreshToken ? REFRESHABLE_DURATION : VALIDATION_DURATION);
-    JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-        .subject(user.getUsername())
-        .issuer("bankspringboot.example.com")
-        .issueTime(Date.from(Instant.now()))
-        .expirationTime(Date.from(Instant.now().plus(duration, ChronoUnit.SECONDS)))
-        .claim("scope", buildScope(user))
-        .jwtID(UUID.randomUUID().toString())
-        .claim("token_type", isRefreshToken ? REFRESH_TOKEN : ACCESS_TOKEN)
-        .build();
+    JWTClaimsSet jwtClaimsSet =
+        new JWTClaimsSet.Builder()
+            .subject(user.getUsername())
+            .issuer("bankspringboot.example.com")
+            .issueTime(Date.from(Instant.now()))
+            .expirationTime(Date.from(Instant.now().plus(duration, ChronoUnit.SECONDS)))
+            .claim("scope", buildScope(user))
+            .jwtID(UUID.randomUUID().toString())
+            .claim("token_type", isRefreshToken ? REFRESH_TOKEN : ACCESS_TOKEN)
+            .build();
 
     Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
@@ -154,13 +156,14 @@ public class AuthService {
       SignedJWT refresh = verifyToken(req.getRefreshToken(), true);
 
       // Persist invalidated token
-      invalidatedTokenRepository.save(InvalidatedToken.builder()
-          .id(refresh.getJWTClaimsSet().getJWTID())
-          .expiryDate(refresh.getJWTClaimsSet().getExpirationTime().toInstant())
-          .build());
+      invalidatedTokenRepository.save(
+          InvalidatedToken.builder()
+              .id(refresh.getJWTClaimsSet().getJWTID())
+              .expiryDate(refresh.getJWTClaimsSet().getExpirationTime().toInstant())
+              .build());
 
-      UserDetails user = userDetailsService.loadUserByUsername(refresh.getJWTClaimsSet()
-          .getSubject());
+      UserDetails user =
+          userDetailsService.loadUserByUsername(refresh.getJWTClaimsSet().getSubject());
       String accessToken = generateAccessToken(user);
       String refreshToken = generateRefreshToken(user);
 
@@ -178,21 +181,20 @@ public class AuthService {
       SignedJWT refresh = verifyToken(request.getRefreshToken(), true);
 
       // Persist invalidated token
-      invalidatedTokenRepository.save(InvalidatedToken.builder()
-          .id(refresh.getJWTClaimsSet().getJWTID())
-          .expiryDate(refresh.getJWTClaimsSet().getExpirationTime().toInstant())
-          .build());
+      invalidatedTokenRepository.save(
+          InvalidatedToken.builder()
+              .id(refresh.getJWTClaimsSet().getJWTID())
+              .expiryDate(refresh.getJWTClaimsSet().getExpirationTime().toInstant())
+              .build());
     } catch (Exception e) {
       log.info("Logout failed or token already invalidated");
     }
   }
 
-
   private String buildScope(UserDetails user) {
     StringJoiner stringJoiner = new StringJoiner(" ");
     user.getAuthorities()
-        .forEach(grantedAuthority
-            -> stringJoiner.add(grantedAuthority.getAuthority()));
+        .forEach(grantedAuthority -> stringJoiner.add(grantedAuthority.getAuthority()));
     return stringJoiner.toString();
   }
 }

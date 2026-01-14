@@ -2,7 +2,6 @@ package com.example.bankspringboot.dto.account;
 
 import com.example.bankspringboot.domain.account.AccountStatus;
 import com.example.bankspringboot.domain.account.AccountType;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -17,11 +16,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 public class AccountResponse {
 
-  String accountId;      // UUID or String
-  String accountNumber;  // public-facing account number
-  AccountType accountType;    // SAVINGS, CHECKING, etc.
-  BigDecimal balance;    // current balance
+  String accountId; // UUID or String
+  String accountNumber; // public-facing account number
+  AccountType accountType; // SAVINGS, CHECKING, etc.
+  BigDecimal balance; // current balance
   BigDecimal transactionLimit;
-  AccountStatus status;         // ACTIVE, FROZEN, CLOSED
+  AccountStatus status; // ACTIVE, FROZEN, CLOSED
   LocalDateTime createdAt;
 }

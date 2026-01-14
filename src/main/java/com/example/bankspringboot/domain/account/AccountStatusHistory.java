@@ -34,16 +34,16 @@ public class AccountStatusHistory {
   @GeneratedValue(strategy = GenerationType.UUID)
   UUID id;
 
-   @ManyToOne
-   @JoinColumn(name = "account_id", nullable = false)
-   Account account;
+  @ManyToOne
+  @JoinColumn(name = "account_id", nullable = false)
+  Account account;
 
-   @Enumerated(EnumType.STRING)
-   @Column(nullable = false)
-   AccountStatus status;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  AccountStatus status;
 
-   @Column(name = "modified_at", nullable = false,  updatable = false)
-   Instant changedAt;
+  @Column(name = "modified_at", nullable = false, updatable = false)
+  Instant changedAt;
 
   @Column(nullable = false)
   String changedBy;

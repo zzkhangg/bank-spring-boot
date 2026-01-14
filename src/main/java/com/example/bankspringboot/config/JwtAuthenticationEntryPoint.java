@@ -3,32 +3,37 @@ package com.example.bankspringboot.config;
 import com.example.bankspringboot.domain.response.RestResponse;
 import com.example.bankspringboot.exceptions.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+  private final ObjectMapper objectMapper;
+
   @Override
-  public void commence(HttpServletRequest request, HttpServletResponse response,
-      AuthenticationException authException) throws IOException, ServletException {
+  public void commence(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      AuthenticationException authException)
+      throws IOException {
     ErrorCode errorCode = ErrorCode.UNAUTHENTICATED;
 
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setStatus(errorCode.getStatusCode().value());
 
-    RestResponse<?> restResponse = RestResponse.builder()
-        .statusCode(errorCode.getStatusCode().value())
-        .message(errorCode.getMessage())
-        .build();
-
-    ObjectMapper objectMapper = new ObjectMapper();
+    RestResponse<?> restResponse =
+        RestResponse.builder()
+            .statusCode(errorCode.getStatusCode().value())
+            .message(errorCode.getMessage())
+            .build();
 
     response.getWriter().write(objectMapper.writeValueAsString(restResponse));
     response.flushBuffer();

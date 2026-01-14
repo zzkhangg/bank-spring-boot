@@ -8,5 +8,4 @@ import org.mapstruct.Mapper;
 public interface AccountStatusHistoryMapper {
 
   public AccountStatusHistoryResponse toResponse(AccountStatusHistory history);
-
 }

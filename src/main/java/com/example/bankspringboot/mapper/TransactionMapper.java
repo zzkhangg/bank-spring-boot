@@ -1,7 +1,6 @@
 package com.example.bankspringboot.mapper;
 
 import com.example.bankspringboot.domain.transaction.Transaction;
-import com.example.bankspringboot.dto.account.CreateAccountRequest;
 import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import com.example.bankspringboot.dto.transaction.TransferRequest;
@@ -31,6 +30,4 @@ public interface TransactionMapper {
   @Mapping(target = "customer", ignore = true) // Ignore relationship
   @Mapping(target = "id", ignore = true)
   Transaction transferReqToTransaction(TransferRequest transferRequest);
-
-
 }

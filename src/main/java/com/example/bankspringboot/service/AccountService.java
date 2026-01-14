@@ -8,27 +8,31 @@ import com.example.bankspringboot.dto.account.AccountResponse;
 import com.example.bankspringboot.dto.account.AccountStatusHistoryResponse;
 import com.example.bankspringboot.dto.account.CreateAccountRequest;
 import com.example.bankspringboot.dto.account.UpdateAccountRequest;
+import com.example.bankspringboot.events.AccountCreatedEvent;
+import com.example.bankspringboot.events.AccountDeletedEvent;
+import com.example.bankspringboot.events.AccountStatusUpdatedEvent;
+import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.exceptions.ErrorCode;
 import com.example.bankspringboot.mapper.AccountMapper;
 import com.example.bankspringboot.mapper.AccountStatusHistoryMapper;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.AccountStatusHistoryRepository;
 import com.example.bankspringboot.repository.CustomerRepository;
-import com.example.bankspringboot.exceptions.AppException;
+import com.example.bankspringboot.security.CurrentUserProvider;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.util.Random;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -41,7 +45,10 @@ public class AccountService {
   CustomerRepository customerRepository;
   AccountMapper accountMapper;
   AccountStatusHistoryRepository accountStatusHistoryRepository;
-  private final AccountStatusHistoryMapper accountStatusHistoryMapper;
+  AccountStatusHistoryMapper accountStatusHistoryMapper;
+  CurrentUserProvider currentUserProvider;
+  AccountQueryService accountQueryService;
+  ApplicationEventPublisher eventPublisher;
 
   private static String generateAccountNumber() {
     int LENGTH = 10; // length of the account number
@@ -62,19 +69,25 @@ public class AccountService {
   }
 
   @PreAuthorize(
-      "hasRole('ADMIN') || (@accountSecurity.isOwner(#id, authentication.name) && hasAuthority('SEE_PERSONAL_INFO'))"
-  )
+      "hasRole('ADMIN') ||"
+          + " (@accountSecurity.isOwner(#id, authentication.name) && hasAuthority('SEE_PERSONAL_INFO'))")
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public AccountResponse getAccount(UUID id) {
-    return accountMapper.toResponse(accountRepository.findById(id)
-        .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND)));
+    return accountMapper.toResponse(
+        accountRepository
+            .findById(id)
+            .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND)));
   }
 
   @Transactional
+  @PreAuthorize(
+      "hasRole('ADMIN') ||"
+          + " (#req.email == authentication.name)")
   public AccountResponse createAccount(CreateAccountRequest req) {
-    Customer customer = customerRepository.findByEmail(req.getEmail())
-        .orElseThrow(
-            () -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+    Customer customer =
+        customerRepository
+            .findByEmail(req.getEmail())
+            .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
     Account account = accountMapper.toAccount(req);
 
     String accountNumber = generateUniqueAccountNumber();
@@ -84,21 +97,36 @@ public class AccountService {
     account.setStatus(AccountStatus.ACTIVE);
     account.setTransactionLimit(TRANSACTION_LIMIT);
     Account saved = accountRepository.save(account);
+
+    eventPublisher.publishEvent(new AccountCreatedEvent(customer.getId()));
     return accountMapper.toResponse(saved);
   }
 
   @Transactional
+  @PreAuthorize(
+      "hasRole('ADMIN')"
+  )
   public void deleteAccount(UUID id) {
-    Account account = accountRepository.findById(id).orElseThrow(
-        () -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+    Account account =
+        accountRepository
+            .findById(id)
+            .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+
+    UUID customerId = account.getCustomer().getId();
+
     accountRepository.delete(account);
+    eventPublisher.publishEvent(new AccountDeletedEvent(id, customerId));
   }
 
   @Transactional
   @PreAuthorize("hasRole('ADMIN')")
-  public AccountResponse updateAccountStatus(UUID id, UpdateAccountRequest req, String username) {
-    Account account = accountRepository.findById(id).orElseThrow(
-        () -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+  public AccountResponse updateAccountStatus(UUID id, UpdateAccountRequest req) {
+    String changedBy = SecurityContextHolder.getContext().getAuthentication().getName();
+
+    Account account =
+        accountRepository
+            .findById(id)
+            .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
 
     if (account.getStatus() == req.getStatus()) {
       throw new AppException(ErrorCode.UPDATE_ERROR, "Same account status");
@@ -108,31 +136,31 @@ public class AccountService {
     }
 
     accountMapper.updateAccountFromRequest(req, account);
-    AccountStatusHistory history = AccountStatusHistory.builder()
-        .account(account)
-        .status(req.getStatus())
-        .changedBy(username)
-        .reason(req.getReason())
-        .build();
+    AccountStatusHistory history =
+        AccountStatusHistory.builder()
+            .account(account)
+            .status(req.getStatus())
+            .changedBy(changedBy)
+            .reason(req.getReason())
+            .build();
     accountStatusHistoryRepository.save(history);
+    eventPublisher.publishEvent(
+        new AccountStatusUpdatedEvent(account.getId(), account.getCustomer().getId()));
+
     return accountMapper.toResponse(accountRepository.save(account));
   }
 
   @Transactional(readOnly = true)
   @PreAuthorize("hasRole('ADMIN')")
   public List<AccountStatusHistoryResponse> getAccountStatusHistory(UUID id) {
-    return accountStatusHistoryRepository.
-        findAllByAccountIdOrderByChangedAtDesc(id).stream()
+    return accountStatusHistoryRepository.findAllByAccountIdOrderByChangedAtDesc(id).stream()
         .map(accountStatusHistoryMapper::toResponse)
         .toList();
   }
 
-  public List<AccountResponse> getMyAccounts() {
-    String email = SecurityContextHolder.getContext()
-        .getAuthentication()
-        .getName();
-    return accountRepository.findAllByCustomer_Email(email).stream()
-        .map(accountMapper::toResponse)
-        .toList();
+  @Transactional(readOnly = true)
+  public List<AccountResponse> getAccountsForCurrentUser() {
+    UUID userId = currentUserProvider.getUserId();
+    return accountQueryService.getAccounts(userId);
   }
 }

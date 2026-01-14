@@ -23,18 +23,10 @@ public class RestResponse<T> {
   int statusCode;
 
   public static <T> RestResponse<T> success(T data) {
-    return RestResponse.<T>builder()
-        .data(data)
-        .statusCode(200)
-        .build();
+    return RestResponse.<T>builder().data(data).statusCode(200).build();
   }
 
   public static RestResponse<?> error(String message, int status) {
-    return RestResponse.builder()
-        .message(message)
-        .statusCode(status)
-        .build();
+    return RestResponse.builder().message(message).statusCode(status).build();
   }
-
-
 }

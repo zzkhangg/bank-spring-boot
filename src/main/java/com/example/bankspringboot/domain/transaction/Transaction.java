@@ -1,24 +1,21 @@
 package com.example.bankspringboot.domain.transaction;
 
+import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.customer.Customer;
-import com.example.bankspringboot.domain.account.Account;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Setter
-@Table(
-    name = "transactions"
-)
+@Table(name = "transactions")
 public class Transaction {
 
   @Id
@@ -31,8 +28,7 @@ public class Transaction {
 
   private String description;
 
-  @Embedded
-  private Address address;
+  @Embedded private Address address;
 
   @Enumerated(EnumType.STRING)
   private TransactionStatus status;

@@ -4,7 +4,6 @@ import com.example.bankspringboot.common.ScheduledStatus;
 import com.example.bankspringboot.common.ScheduledType;
 import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.scheduledtransaction.ScheduledTransaction;
-import com.example.bankspringboot.domain.transaction.TransactionChannel;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import com.example.bankspringboot.dto.transaction.ScheduledTransactionRequest;
 import com.example.bankspringboot.dto.transaction.ScheduledTransactionResponse;
@@ -30,38 +29,42 @@ public class ScheduledTransactionService {
   ScheduledTransactionMapper scheduledTransactionMapper;
   private final ScheduledTransactionCalculator scheduledTransactionCalculator;
 
-  @PreAuthorize(
-      "hasRole('USER') &&"
-          + "@accountSecurity.isOwner(#fromId, authentication.name)"
-  )
-  public ScheduledTransactionResponse scheduleTransaction(UUID fromId,
-      ScheduledTransactionRequest request) {
+  @PreAuthorize("hasRole('USER') &&" + "@accountSecurity.isOwner(#fromId, authentication.name)")
+  public ScheduledTransactionResponse scheduleTransaction(
+      UUID fromId, ScheduledTransactionRequest request) {
     UUID toId = UUID.fromString(request.getToAccountId());
-    Account fromAccount = accountRepository.findById(fromId)
-        .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found"));
+    Account fromAccount =
+        accountRepository
+            .findById(fromId)
+            .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found"));
 
-    Account toAccount = accountRepository.findById(toId)
-        .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found"));
+    Account toAccount =
+        accountRepository
+            .findById(toId)
+            .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found"));
 
-    ScheduledTransaction scheduledTransaction = scheduledTransactionMapper.toScheduledTransaction(
-        request);
+    ScheduledTransaction scheduledTransaction =
+        scheduledTransactionMapper.toScheduledTransaction(request);
     scheduledTransaction.setFromAccount(fromAccount);
     scheduledTransaction.setToAccount(toAccount);
     scheduledTransaction.setStatus(ScheduledStatus.ACTIVE);
-    scheduledTransaction.setChannel(TransactionChannel.ONLINE);
 
-    if (request.getTransactionType() == TransactionType.WITHDRAW || request.getTransactionType() == TransactionType.TRANSFER_IN) {
-      throw new AppException(ErrorCode.CREATE_ERROR, "Can not schedule transaction for withdrawal and transfer in");
+    if (request.getTransactionType() == TransactionType.WITHDRAW
+        || request.getTransactionType() == TransactionType.TRANSFER_IN) {
+      throw new AppException(
+          ErrorCode.CREATE_ERROR, "Can not schedule transaction for withdrawal and transfer in");
     }
 
     if (fromId.equals(toId)) {
       if (request.getTransactionType() == TransactionType.TRANSFER_OUT) {
-        throw new AppException(ErrorCode.TRANSFER_ERROR,
+        throw new AppException(
+            ErrorCode.TRANSFER_ERROR,
             "Transfer in/out transactions for the same account not allowed");
       }
     } else {
       if (request.getTransactionType() == TransactionType.DEPOSIT) {
-        throw new AppException(ErrorCode.TRANSFER_ERROR,
+        throw new AppException(
+            ErrorCode.TRANSFER_ERROR,
             "Cannot deposit/withdraw transactions for the different account");
       }
     }

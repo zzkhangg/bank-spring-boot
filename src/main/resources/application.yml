@@ -16,8 +16,15 @@ spring:
   mvc:
     format:
       date: yyyy-MM-dd
+  cache:
+    type: caffeine
 
 jwt:
   secret: tfLkbF1Qu17X8eqcqdBPOX9Hxazcme2PDQpAL4aIMJ+ztp6UfdRIkfHrelc7goEJlk9Q/Z9YcGn8W0fQhRLcOA==
   valid-duration: 3600 # in seconds
   refreshable-duration: 500 # seconds
+
+logging:
+  level:
+    org.springframework.cache: TRACE
+    org.springframework.data.redis: DEBUG

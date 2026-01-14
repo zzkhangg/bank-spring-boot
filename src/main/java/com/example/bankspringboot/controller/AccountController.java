@@ -8,21 +8,21 @@ import com.example.bankspringboot.service.AccountService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/accounts")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class AccountController {
 
-  final private AccountService accountService;
-
-  public AccountController(AccountService accountService) {
-    this.accountService = accountService;
-  }
+  AccountService accountService;
 
   @GetMapping("/{id}")
   public AccountResponse getAccount(@PathVariable UUID id) {
@@ -30,7 +30,8 @@ public class AccountController {
   }
 
   @PostMapping
-  public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest req) {
+  public AccountResponse createAccount(
+      @Valid @RequestBody CreateAccountRequest req) {
     return accountService.createAccount(req);
   }
 
@@ -41,10 +42,10 @@ public class AccountController {
   }
 
   @PostMapping("/{id}/status")
-  public AccountResponse updateAccountStatus(@PathVariable UUID id,
-      @Valid @RequestBody UpdateAccountRequest req) {
-    return accountService.updateAccountStatus(id, req,
-        SecurityContextHolder.getContext().getAuthentication().getName());
+  public AccountResponse updateAccountStatus(
+      @PathVariable UUID id, @Valid @RequestBody UpdateAccountRequest req) {
+    return accountService.updateAccountStatus(
+        id, req);
   }
 
   @GetMapping("/{id}/status/history")
@@ -54,6 +55,6 @@ public class AccountController {
 
   @GetMapping("/myAccounts")
   public List<AccountResponse> getMyAccounts() {
-    return accountService.getMyAccounts();
+    return accountService.getAccountsForCurrentUser();
   }
 }

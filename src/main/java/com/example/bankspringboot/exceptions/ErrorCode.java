@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
 public enum ErrorCode {
-
   INVALID_KEY("Invalid key for error code", 1001, HttpStatus.INTERNAL_SERVER_ERROR),
 
   RESOURCE_NOT_FOUND("Resource Found", 1100, HttpStatus.NOT_FOUND),
@@ -28,7 +27,6 @@ public enum ErrorCode {
   TRANSFER_ERROR("Transfer Error", 1600, HttpStatus.BAD_REQUEST),
   UPDATE_ERROR("Update Error", 1601, HttpStatus.BAD_REQUEST),
   CREATE_ERROR("Create Error", 1602, HttpStatus.BAD_REQUEST),
-
 
   UNCATEGORIZED_EXCEPTION("Uncategorized Exception", 9999, HttpStatus.INTERNAL_SERVER_ERROR),
   ;

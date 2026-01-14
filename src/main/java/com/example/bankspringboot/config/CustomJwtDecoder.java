@@ -15,27 +15,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
-  final private NimbusJwtDecoder jwtDecoder;
+  private final NimbusJwtDecoder jwtDecoder;
 
   public CustomJwtDecoder(
       @Value("${jwt.secret}") String secret,
       InvalidatedTokenValidator invalidatedTokenValidator,
-      AccessTokenValidator accessTokenValidator
-  ) {
-    SecretKeySpec key =
-        new SecretKeySpec(Base64.getDecoder().decode(secret), "HmacSHA512");
+      AccessTokenValidator accessTokenValidator) {
+    SecretKeySpec key = new SecretKeySpec(Base64.getDecoder().decode(secret), "HmacSHA512");
 
-    this.jwtDecoder = NimbusJwtDecoder
-        .withSecretKey(key)
-        .macAlgorithm(MacAlgorithm.HS512)
-        .build();
+    this.jwtDecoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
 
     OAuth2TokenValidator<Jwt> combinedValidator =
         new DelegatingOAuth2TokenValidator<>(
-            JwtValidators.createDefault(),
-            accessTokenValidator
-            , invalidatedTokenValidator
-        );
+            JwtValidators.createDefault(), accessTokenValidator, invalidatedTokenValidator);
 
     this.jwtDecoder.setJwtValidator(combinedValidator);
   }

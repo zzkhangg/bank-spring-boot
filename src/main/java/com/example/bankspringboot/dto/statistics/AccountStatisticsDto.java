@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class AccountStatisticsDto {
 
-  final private String balanceType;
-  final private Long accountNum;
-  final private Long transactionNum;
+  private final String balanceType;
+  private final Long accountNum;
+  private final Long transactionNum;
 }

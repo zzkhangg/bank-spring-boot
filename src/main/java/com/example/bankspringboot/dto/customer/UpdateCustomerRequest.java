@@ -4,12 +4,11 @@ import com.example.bankspringboot.domain.common.Address;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 import lombok.experimental.FieldDefaults;
 
 @Setter
@@ -35,6 +34,5 @@ public class UpdateCustomerRequest {
   @Size(min = 8, max = 30, message = "Enter password from 8 up to 30 characters")
   String password;
 
-  @Valid
-  Address address;
+  @Valid Address address;
 }

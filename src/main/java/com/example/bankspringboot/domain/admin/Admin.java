@@ -1,8 +1,8 @@
 package com.example.bankspringboot.domain.admin;
 
 import com.example.bankspringboot.domain.User;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@DiscriminatorValue("ADMIN")
+@PrimaryKeyJoinColumn(name = "user_id")
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Admin extends User {}

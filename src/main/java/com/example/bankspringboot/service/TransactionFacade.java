@@ -57,7 +57,9 @@ public class TransactionFacade {
     return transactionExecutor.transferInternal(fromId, request);
   }
 
-  @PreAuthorize("hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
+  @PreAuthorize(
+      "hasRole('ADMIN') ||" +
+      "hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
   @Cacheable(value = "transactionHistory", key = "#accountId + ':v:' +"
       + " @transactionHistoryVersion.get(#accountId) + ':p:' + #pageNumber")
   @Transactional(readOnly = true)

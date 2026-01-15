@@ -1,5 +1,6 @@
 package com.example.bankspringboot.dto.customer;
 
+import com.example.bankspringboot.common.CustomerTypeCode;
 import com.example.bankspringboot.domain.common.Address;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -41,4 +42,7 @@ public class CreateCustomerRequest {
   String password;
 
   @Valid Address address;
+
+  @NotNull
+  CustomerTypeCode customerType;
 }

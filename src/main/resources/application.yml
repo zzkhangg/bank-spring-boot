@@ -18,6 +18,9 @@ spring:
       date: yyyy-MM-dd
   cache:
     type: caffeine
+  threads:
+    virtual:
+      enabled: true
 
 jwt:
   secret: tfLkbF1Qu17X8eqcqdBPOX9Hxazcme2PDQpAL4aIMJ+ztp6UfdRIkfHrelc7goEJlk9Q/Z9YcGn8W0fQhRLcOA==
@@ -28,3 +31,11 @@ logging:
   level:
     org.springframework.cache: TRACE
     org.springframework.data.redis: DEBUG
+
+
+bank:
+  customer-types:
+    INDIVIDUAL:
+      max-transaction-limit: 50000000
+    BUSINESS:
+      max-transaction-limit: 500000000

@@ -1,6 +1,7 @@
 package com.example.bankspringboot.util;
 
 import com.example.bankspringboot.domain.response.RestResponse;
+import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
@@ -24,13 +25,17 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
   @Override
   public Object beforeBodyWrite(
       Object body,
-      MethodParameter returnType,
-      MediaType selectedContentType,
-      Class<? extends HttpMessageConverter<?>> selectedConverterType,
-      ServerHttpRequest request,
-      ServerHttpResponse response) {
+      @NonNull MethodParameter returnType,
+      @NonNull MediaType selectedContentType,
+      @NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType,
+      @NonNull ServerHttpRequest request,
+      @NonNull ServerHttpResponse response) {
     HttpServletResponse httpServletResponse =
         ((ServletServerHttpResponse) response).getServletResponse();
+
+    if (body instanceof byte[]) {
+      return body;
+    }
 
     if (body == null && httpServletResponse.getStatus() == HttpStatus.NO_CONTENT.value()) {
       return null; // keep 204 No Content

@@ -21,6 +21,7 @@ public interface CustomerMapper {
       expression = "java(request.getEmail().trim().toLowerCase(Locale.ROOT))")
   @Mapping(target = "roles", ignore = true)
   @Mapping(target = "id", ignore = true)
+  @Mapping(target = "customerType", ignore = true)
   Customer toCustomer(CreateCustomerRequest request);
 
   @Mapping(target = "id", ignore = true)

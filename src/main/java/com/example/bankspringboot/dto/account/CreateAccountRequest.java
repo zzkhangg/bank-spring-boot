@@ -27,4 +27,7 @@ public class CreateAccountRequest {
   @NotNull
   @DecimalMin(value = "0.00", message = "Initial deposit cannot be negative.")
   BigDecimal initialDeposit;
+
+  @DecimalMin(value = "0.00", message = "Transaction limit cannot be negative." )
+  BigDecimal transactionLimit;
 }

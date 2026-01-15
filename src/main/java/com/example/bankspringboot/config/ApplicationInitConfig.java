@@ -4,7 +4,9 @@ import com.example.bankspringboot.common.PredefinedPermission;
 import com.example.bankspringboot.common.Role;
 import com.example.bankspringboot.domain.Permission;
 import com.example.bankspringboot.domain.admin.Admin;
+import com.example.bankspringboot.domain.customer.CustomerType;
 import com.example.bankspringboot.repository.AdminRespository;
+import com.example.bankspringboot.repository.CustomerTypeRepository;
 import com.example.bankspringboot.repository.PermissionRepository;
 import com.example.bankspringboot.repository.RoleRepository;
 import java.util.HashSet;
@@ -30,12 +32,15 @@ public class ApplicationInitConfig {
   @NonFinal
   static final String ADMIN_PASSWORD = "admin";
 
+  private final CustomerTypeConfig customerTypeConfig;
+
   @Transactional
   @Bean
   @Profile("!test")
   ApplicationRunner applicationRunner(
       AdminRespository adminRespository, PasswordEncoder passwordEncoder,
-      PermissionRepository permissionRepository, RoleRepository roleRepository) {
+      PermissionRepository permissionRepository, RoleRepository roleRepository,
+      CustomerTypeRepository customerTypeRepository) {
     return args -> {
       for (PredefinedPermission permission : PredefinedPermission.values()) {
         if (!permissionRepository.existsById(permission.toString())) {
@@ -70,7 +75,8 @@ public class ApplicationInitConfig {
       }
 
       if (adminRespository.findByEmail(ApplicationInitConfig.ADMIN_USER_NAME).isEmpty()) {
-        com.example.bankspringboot.domain.Role adminRole = roleRepository.findById(Role.ADMIN.name())
+        com.example.bankspringboot.domain.Role adminRole = roleRepository.findById(
+                Role.ADMIN.name())
             .orElseThrow();
 
         adminRespository.save(
@@ -81,6 +87,18 @@ public class ApplicationInitConfig {
                 .build());
         log.warn("admin user has been created with default password: admin, please change it");
       }
+
+      customerTypeConfig.getCustomerTypes().forEach((type, typeConfig) ->{
+        customerTypeRepository.findByCode(type).orElseGet(() ->
+          customerTypeRepository.save(CustomerType.builder()
+              .maxTransactionLimit(typeConfig.getMaxTransactionLimit())
+              .code(type)
+              .build())
+        );
+
+          }
+      );
+
       log.info("Application initialization completed .....");
     };
   }

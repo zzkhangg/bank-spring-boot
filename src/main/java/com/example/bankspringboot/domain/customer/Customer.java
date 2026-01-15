@@ -28,21 +28,32 @@ import org.hibernate.annotations.SQLDelete;
     parameters = @ParamDef(name = "isDeleted", type = boolean.class))
 @Filter(name = "deletedCustomerFilter", condition = "deleted = :isDeleted")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@DiscriminatorValue("CUSTOMER")
+@PrimaryKeyJoinColumn(name = "user_id")
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Customer extends User {
-  @NotNull String firstName;
 
-  @NotNull String lastName;
+  @NotNull
+  String firstName;
 
-  @NotNull String phoneNumber;
+  @NotNull
+  String lastName;
 
-  @NotNull LocalDate birthDate;
+  @NotNull
+  String phoneNumber;
+
+  @NotNull
+  LocalDate birthDate;
 
   boolean deleted;
 
-  @Embedded @NotNull Address address;
+  @ManyToOne
+  @JoinColumn(name = "customer_type_id", nullable = false)
+  CustomerType customerType;
+
+  @Embedded
+  @NotNull
+  Address address;
 
   @OneToMany(mappedBy = "customer")
   List<Account> accounts;

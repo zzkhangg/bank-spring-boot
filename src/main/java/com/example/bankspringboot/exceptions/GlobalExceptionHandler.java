@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
@@ -96,7 +97,7 @@ public class GlobalExceptionHandler {
     return ResponseEntity.internalServerError().build();
   }
 
-  @ExceptionHandler(AccessDeniedException.class)
+  @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
   @ResponseBody
   public ResponseEntity<RestResponse<?>> handleAccessDenied(AccessDeniedException ex) {
     RestResponse<?> res =
@@ -107,7 +108,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(BadCredentialsException.class)
   @ResponseBody
-  public ResponseEntity<RestResponse<?>> handleAccessDenied(BadCredentialsException ex) {
+  public ResponseEntity<RestResponse<?>> handleBadCredentials(BadCredentialsException ex) {
     RestResponse<?> res =
         RestResponse.error(
             ErrorCode.UNAUTHENTICATED.getMessage(), ErrorCode.UNAUTHENTICATED.getCode());

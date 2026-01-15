@@ -15,7 +15,15 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "transactions")
+@Table(
+    name = "transactions",
+    indexes = {
+        @Index(
+            name = "idx_transaction_created_at",
+            columnList = "created_at"
+        )
+    }
+)
 public class Transaction {
 
   @Id

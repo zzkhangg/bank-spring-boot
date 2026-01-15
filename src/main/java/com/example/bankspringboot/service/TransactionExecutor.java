@@ -35,7 +35,6 @@ public class TransactionExecutor {
   TransactionRepository transactionRepository;
   AccountRepository accountRepository;
   BigDecimal FEE_PERCENTAGE = BigDecimal.valueOf(0.01);
-  BigDecimal TRANSACTION_LIMIT = BigDecimal.valueOf(2000);
   TransactionMapper transactionMapper;
   private final ApplicationEventPublisher eventPublisher;
 
@@ -64,7 +63,7 @@ public class TransactionExecutor {
                     new AppException(
                         ErrorCode.RESOURCE_NOT_FOUND, "Account with id " + toId + " not found"));
 
-    if (amount.compareTo(TRANSACTION_LIMIT) > 0) {
+    if (amount.compareTo(fromAccount.getTransactionLimit()) > 0) {
       throw new AppException(
           ErrorCode.TRANSFER_ERROR,
           "Transfer amount must be less than or equal to TRANSACTION_LIMIT");
@@ -181,7 +180,7 @@ public class TransactionExecutor {
                         ErrorCode.RESOURCE_NOT_FOUND,
                         "Account with id " + accountId + " not found"));
 
-    if (amount.compareTo(TRANSACTION_LIMIT) > 0) {
+    if (amount.compareTo(account.getTransactionLimit()) > 0) {
       throw new AppException(
           ErrorCode.TRANSFER_ERROR,
           "Withdrawal amount must be less than or equal to TRANSACTION_LIMIT");

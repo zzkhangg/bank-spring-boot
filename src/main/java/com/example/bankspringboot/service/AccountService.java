@@ -21,6 +21,7 @@ import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.security.CurrentUserProvider;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -40,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AccountService {
 
-  BigDecimal TRANSACTION_LIMIT = new BigDecimal("10000");
   AccountRepository accountRepository;
   CustomerRepository customerRepository;
   AccountMapper accountMapper;
@@ -88,6 +88,13 @@ public class AccountService {
         customerRepository
             .findByEmail(req.getEmail())
             .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+    BigDecimal maxLimit = customer.getCustomerType().getMaxTransactionLimit();
+
+    BigDecimal transactionLimit =
+        Optional.ofNullable(req.getTransactionLimit())
+            .map(limit -> limit.min(maxLimit))
+            .orElse(maxLimit);
+
     Account account = accountMapper.toAccount(req);
 
     String accountNumber = generateUniqueAccountNumber();
@@ -95,7 +102,7 @@ public class AccountService {
     account.setCustomer(customer);
     account.setAccountNumber(accountNumber);
     account.setStatus(AccountStatus.ACTIVE);
-    account.setTransactionLimit(TRANSACTION_LIMIT);
+    account.setTransactionLimit(transactionLimit);
     Account saved = accountRepository.save(account);
 
     eventPublisher.publishEvent(new AccountCreatedEvent(customer.getId()));

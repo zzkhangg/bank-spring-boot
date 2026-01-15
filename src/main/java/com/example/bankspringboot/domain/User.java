@@ -1,5 +1,6 @@
 package com.example.bankspringboot.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
 @DiscriminatorColumn(name = "user_type")
@@ -35,7 +36,10 @@ public class User {
   @GeneratedValue(strategy = GenerationType.UUID)
   UUID id;
 
+  @Column(nullable = false, unique = true)
   String email;
+
+  @Column(nullable = false)
   String password;
 
   @ManyToMany

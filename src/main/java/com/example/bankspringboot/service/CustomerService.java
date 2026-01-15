@@ -2,6 +2,7 @@ package com.example.bankspringboot.service;
 
 import com.example.bankspringboot.common.Role;
 import com.example.bankspringboot.domain.customer.Customer;
+import com.example.bankspringboot.domain.customer.CustomerType;
 import com.example.bankspringboot.dto.customer.CreateCustomerRequest;
 import com.example.bankspringboot.dto.customer.CustomerResponse;
 import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
@@ -9,6 +10,7 @@ import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.exceptions.ErrorCode;
 import com.example.bankspringboot.mapper.CustomerMapper;
 import com.example.bankspringboot.repository.CustomerRepository;
+import com.example.bankspringboot.repository.CustomerTypeRepository;
 import com.example.bankspringboot.repository.RoleRepository;
 import java.util.List;
 import java.util.Set;
@@ -33,15 +35,19 @@ public class CustomerService {
   RoleRepository roleRepository;
 
   Role DEFAULT_ROLE = Role.CUSTOMER;
+  CustomerTypeRepository customerTypeRepository;
 
   @Transactional
   public CustomerResponse createCustomer(CreateCustomerRequest req) {
     Customer customer = customerMapper.toCustomer(req);
     com.example.bankspringboot.domain.Role role = roleRepository.findById(DEFAULT_ROLE.toString()).orElseThrow();
+    CustomerType customerType = customerTypeRepository.findByCode(req.getCustomerType()).orElseThrow();
     customer.setRoles(Set.of(role));
-
+    customer.setCustomerType(customerType);
     customer.setPassword(passwordEncoder.encode(req.getPassword()));
     customer.setBirthDate(req.getBirthdate());
+
+
     Customer saved = customerRepository.save(customer);
     return customerMapper.toResponse(saved);
   }

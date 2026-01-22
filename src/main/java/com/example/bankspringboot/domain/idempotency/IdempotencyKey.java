@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -35,8 +36,10 @@ public class IdempotencyKey extends Auditable {
   @Column(unique = true, name = "idempotency_key")
   String key;
 
+  @Column(nullable = false)
   String requestHash;
 
+  @Lob
   String responseBody;
 
   @Enumerated(EnumType.STRING)

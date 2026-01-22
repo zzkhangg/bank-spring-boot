@@ -19,18 +19,18 @@ public class TransactionReportService {
   @PreAuthorize("hasRole('ADMIN')")
   @Cacheable("weeklyTransactionReport")
   public List<TransactionReportView> weekly() {
-    return transactionRepository.weeklyReport();
+    return transactionRepository.weeklyTransactionReport();
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @Cacheable("quarterlyTransactionReport")
   public List<TransactionReportView> quarterly() {
-    return transactionRepository.quarterlyReport();
+    return transactionRepository.quarterlyTransactionReport();
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @Cacheable("yearlyTransactionReport")
   public List<TransactionReportView> yearly() {
-    return transactionRepository.yearlyReport();
+    return transactionRepository.yearlyTransactionReport();
   }
 }

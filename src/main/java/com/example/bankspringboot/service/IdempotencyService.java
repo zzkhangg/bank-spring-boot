@@ -11,12 +11,15 @@ import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Slf4j
 public class IdempotencyService {
 
   IdempotencyKeyRepository idempotencyKeyRepository;
@@ -24,10 +27,12 @@ public class IdempotencyService {
   IdempotencyKeyWriter idempotencyKeyWriter;
   ActionExecutor actionExecutor;
 
+  @Transactional
   public <T> T handleIdempotency(
       String key, String requestHash, Class<T> responseType, Supplier<T> action)
       throws JsonProcessingException {
     try {
+      log.error("HANDLE IDEMPOTENCY CALLED - key={}", key);
       IdempotencyKey idempotencyKey =
           IdempotencyKey.builder()
               .key(key)
@@ -37,21 +42,16 @@ public class IdempotencyService {
       idempotencyKeyWriter.write(idempotencyKey);
 
       T response = actionExecutor.execute(action);
-      idempotencyKey.setResponseBody(objectMapper.writeValueAsString(response));
-      idempotencyKey.setStatus(IdempotencyStatus.SUCCESS);
-      idempotencyKeyWriter.write(idempotencyKey);
+      idempotencyKeyWriter.markSuccess(key, objectMapper.writeValueAsString(response));
 
       return response;
     } catch (DataIntegrityViolationException e) {
-      IdempotencyKey idempotencyKey =
-          idempotencyKeyRepository
-              .findByKey(key)
-              .orElseThrow(
-                  () ->
-                      new AppException(
-                          ErrorCode.UNCATEGORIZED_EXCEPTION,
-                          "Database error when fetching idempotency key table"));
-      return objectMapper.readValue(idempotencyKey.getResponseBody(), responseType);
+      IdempotencyKey existing = idempotencyKeyRepository.findByKey(key).orElseThrow();
+
+      if (existing.getStatus() == IdempotencyStatus.PROCESSING) {
+        throw new AppException(ErrorCode.REQUEST_IN_PROGRESS, "Request is still processing");
+      }
+      return objectMapper.readValue(existing.getResponseBody(), responseType);
     }
   }
 }

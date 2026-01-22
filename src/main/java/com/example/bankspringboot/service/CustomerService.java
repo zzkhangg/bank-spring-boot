@@ -18,12 +18,13 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -37,7 +38,7 @@ public class CustomerService {
   Role DEFAULT_ROLE = Role.CUSTOMER;
   CustomerTypeRepository customerTypeRepository;
 
-  @Transactional
+//  @Transactional
   public CustomerResponse createCustomer(CreateCustomerRequest req) {
     Customer customer = customerMapper.toCustomer(req);
     com.example.bankspringboot.domain.Role role = roleRepository.findById(DEFAULT_ROLE.toString()).orElseThrow();
@@ -54,7 +55,7 @@ public class CustomerService {
 
   @PreAuthorize(
       "hasRole('ADMIN') or" + "@customerSecurity.isValidCustomer(authentication.name, #id)")
-  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  @Transactional(readOnly = true)
   public CustomerResponse getCustomer(UUID id) {
     Customer cus =
         customerRepository
@@ -64,7 +65,7 @@ public class CustomerService {
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  @Transactional(readOnly = true)
   public List<CustomerResponse> getAllCustomers() {
     List<Customer> customers = customerRepository.findAll();
     return customers.stream().map(customerMapper::toResponse).toList();

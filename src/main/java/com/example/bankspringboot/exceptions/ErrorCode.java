@@ -27,6 +27,7 @@ public enum ErrorCode {
   TRANSFER_ERROR("Transfer Error", 1600, HttpStatus.BAD_REQUEST),
   UPDATE_ERROR("Update Error", 1601, HttpStatus.BAD_REQUEST),
   CREATE_ERROR("Create Error", 1602, HttpStatus.BAD_REQUEST),
+  REQUEST_IN_PROGRESS("Request In Progress", 1603, HttpStatus.BAD_REQUEST),
 
   UNCATEGORIZED_EXCEPTION("Uncategorized Exception", 9999, HttpStatus.INTERNAL_SERVER_ERROR),
   ;

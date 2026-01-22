@@ -5,9 +5,11 @@ import com.example.bankspringboot.domain.transaction.Transaction;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import com.example.bankspringboot.domain.transaction.Transaction_;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -34,14 +36,14 @@ public class TransactionSpecs {
   }
 
   public static Specification<Transaction> createdDateAfter(LocalDate date) {
-    LocalDateTime startOfDay = date.atStartOfDay();
+    Instant start = date.atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toInstant();
     return ((root, query, criteriaBuilder) ->
-        criteriaBuilder.greaterThanOrEqualTo(root.get(Transaction_.createdAt), startOfDay));
+        criteriaBuilder.greaterThanOrEqualTo(root.get(Transaction_.createdAt), start));
   }
 
   public static Specification<Transaction> createdDateBefore(LocalDate date) {
-    LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+    Instant end = date.atStartOfDay(ZoneId.of("Asia/Ho_Chi_Minh")).toInstant();
     return ((root, query, criteriaBuilder) ->
-        criteriaBuilder.lessThanOrEqualTo(root.get(Transaction_.createdAt), endOfDay));
+        criteriaBuilder.lessThanOrEqualTo(root.get(Transaction_.createdAt), end));
   }
 }

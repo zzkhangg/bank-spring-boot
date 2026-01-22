@@ -9,12 +9,11 @@ import lombok.Setter;
 @Getter
 public class FinancialReportRowDto {
 
-  private LocalDate period;        // "2024-01" or "2024"
+  private LocalDate period; // "2024-01" or "2024"
   private BigDecimal totalDeposit;
   private BigDecimal totalWithdrawal;
   private BigDecimal totalTransfer;
   private BigDecimal transactionFee;
   private BigDecimal netChange;
-  private BigDecimal balance;    // calculated later
-
+  private BigDecimal balance; // calculated later
 }

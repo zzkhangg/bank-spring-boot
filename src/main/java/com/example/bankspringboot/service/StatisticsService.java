@@ -3,7 +3,6 @@ package com.example.bankspringboot.service;
 import com.example.bankspringboot.common.AccountBalanceType;
 import com.example.bankspringboot.dto.statistics.AccountStatisticsDto;
 import com.example.bankspringboot.dto.statistics.AddressStatisticsDto;
-import com.example.bankspringboot.dto.statistics.TransactionReportView;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.repository.TransactionRepository;

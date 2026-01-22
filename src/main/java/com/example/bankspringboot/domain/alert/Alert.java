@@ -17,9 +17,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(
-    name = "alert"
-)
+@Table(name = "alert")
 @Setter
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)

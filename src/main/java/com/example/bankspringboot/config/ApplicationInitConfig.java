@@ -26,11 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class ApplicationInitConfig {
 
-  @NonFinal
-  static final String ADMIN_USER_NAME = "admin";
+  @NonFinal static final String ADMIN_USER_NAME = "admin";
 
-  @NonFinal
-  static final String ADMIN_PASSWORD = "admin";
+  @NonFinal static final String ADMIN_PASSWORD = "admin";
 
   private final CustomerTypeConfig customerTypeConfig;
 
@@ -38,8 +36,10 @@ public class ApplicationInitConfig {
   @Bean
   @Profile("!test")
   ApplicationRunner applicationRunner(
-      AdminRespository adminRespository, PasswordEncoder passwordEncoder,
-      PermissionRepository permissionRepository, RoleRepository roleRepository,
+      AdminRespository adminRespository,
+      PasswordEncoder passwordEncoder,
+      PermissionRepository permissionRepository,
+      RoleRepository roleRepository,
       CustomerTypeRepository customerTypeRepository) {
     return args -> {
       for (PredefinedPermission permission : PredefinedPermission.values()) {
@@ -56,28 +56,31 @@ public class ApplicationInitConfig {
         if (!roleRepository.existsById(role.toString())) {
           Set<Permission> permissions = new HashSet<>();
           for (PredefinedPermission permission : role.getPermissions()) {
-            Permission p = permissionRepository.findById(permission.toString())
-                .orElseGet(() -> permissionRepository.save(
-                    Permission.builder()
-                        .name(permission.toString())
-                        .description(permission.getDescription())
-                        .build()
-                ));
+            Permission p =
+                permissionRepository
+                    .findById(permission.toString())
+                    .orElseGet(
+                        () ->
+                            permissionRepository.save(
+                                Permission.builder()
+                                    .name(permission.toString())
+                                    .description(permission.getDescription())
+                                    .build()));
 
             permissions.add(p);
           }
-          roleRepository.save(com.example.bankspringboot.domain.Role.builder()
-              .name(role.toString())
-              .permissions(permissions)
-              .description(role.getDescription())
-              .build());
+          roleRepository.save(
+              com.example.bankspringboot.domain.Role.builder()
+                  .name(role.toString())
+                  .permissions(permissions)
+                  .description(role.getDescription())
+                  .build());
         }
       }
 
       if (adminRespository.findByEmail(ApplicationInitConfig.ADMIN_USER_NAME).isEmpty()) {
-        com.example.bankspringboot.domain.Role adminRole = roleRepository.findById(
-                Role.ADMIN.name())
-            .orElseThrow();
+        com.example.bankspringboot.domain.Role adminRole =
+            roleRepository.findById(Role.ADMIN.name()).orElseThrow();
 
         adminRespository.save(
             Admin.builder()
@@ -88,16 +91,20 @@ public class ApplicationInitConfig {
         log.warn("admin user has been created with default password: admin, please change it");
       }
 
-      customerTypeConfig.getCustomerTypes().forEach((type, typeConfig) ->{
-        customerTypeRepository.findByCode(type).orElseGet(() ->
-          customerTypeRepository.save(CustomerType.builder()
-              .maxTransactionLimit(typeConfig.getMaxTransactionLimit())
-              .code(type)
-              .build())
-        );
-
-          }
-      );
+      customerTypeConfig
+          .getCustomerTypes()
+          .forEach(
+              (type, typeConfig) -> {
+                customerTypeRepository
+                    .findByCode(type)
+                    .orElseGet(
+                        () ->
+                            customerTypeRepository.save(
+                                CustomerType.builder()
+                                    .maxTransactionLimit(typeConfig.getMaxTransactionLimit())
+                                    .code(type)
+                                    .build()));
+              });
 
       log.info("Application initialization completed .....");
     };

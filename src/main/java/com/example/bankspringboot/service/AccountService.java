@@ -80,9 +80,7 @@ public class AccountService {
   }
 
   @Transactional
-  @PreAuthorize(
-      "hasRole('ADMIN') ||"
-          + " (#req.email == authentication.name)")
+  @PreAuthorize("hasRole('ADMIN') ||" + " (#req.email == authentication.name)")
   public AccountResponse createAccount(CreateAccountRequest req) {
     Customer customer =
         customerRepository
@@ -110,9 +108,7 @@ public class AccountService {
   }
 
   @Transactional
-  @PreAuthorize(
-      "hasRole('ADMIN')"
-  )
+  @PreAuthorize("hasRole('ADMIN')")
   public void deleteAccount(UUID id) {
     Account account =
         accountRepository

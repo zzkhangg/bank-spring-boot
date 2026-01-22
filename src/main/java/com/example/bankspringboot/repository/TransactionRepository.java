@@ -1,6 +1,5 @@
 package com.example.bankspringboot.repository;
 
-import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import com.example.bankspringboot.dto.financialreport.FinancialReportRow;
 import com.example.bankspringboot.dto.statistics.TransactionReportView;
@@ -24,8 +23,9 @@ public interface TransactionRepository
   boolean existsByIdAndCustomer_Email(UUID transactionId, String email);
 
   @Query(
-      value = """
-            SELECT 
+      value =
+          """
+            SELECT
                 YEAR(created_at) as year,
                 WEEK(created_at) as period,
                 AVG(amount) as avg_amount,
@@ -33,12 +33,14 @@ public interface TransactionRepository
                 MIN(amount) as min_amount
             FROM transactions
             GROUP BY YEAR(created_at), WEEK(created_at)
-          """, nativeQuery = true)
+          """,
+      nativeQuery = true)
   List<TransactionReportView> weeklyTransactionReport();
 
   @Query(
-      value = """
-            SELECT 
+      value =
+          """
+            SELECT
                 YEAR(created_at) as year,
                 QUARTER(created_at) as period,
                 AVG(amount) as avg_amount,
@@ -46,24 +48,28 @@ public interface TransactionRepository
                 MIN(amount) as min_amount
             FROM transactions
             GROUP BY YEAR(created_at), QUARTER(created_at)
-          """, nativeQuery = true)
+          """,
+      nativeQuery = true)
   List<TransactionReportView> quarterlyTransactionReport();
 
   @Query(
-      value = """
-            SELECT 
+      value =
+          """
+            SELECT
                 YEAR(created_at) as year,
                 AVG(amount) as avg_amount,
                 MAX(amount) as max_amount,
                 MIN(amount) as min_amount
             FROM transactions
             GROUP BY YEAR(created_at)
-          """, nativeQuery = true)
+          """,
+      nativeQuery = true)
   List<TransactionReportView> yearlyTransactionReport();
 
   @Query(
-      value = """
-    SELECT 
+      value =
+          """
+    SELECT
         DATE(created_at) as period,
         SUM(CASE WHEN type = 'DEPOSIT' THEN amount ELSE 0 END) as total_deposit,
         SUM(CASE WHEN type = 'WITHDRAW' THEN amount ELSE 0 END) as total_withdrawal,
@@ -84,16 +90,14 @@ public interface TransactionRepository
     GROUP BY DATE(created_at)
     ORDER BY period ASC
   """,
-      nativeQuery = true
-  )
+      nativeQuery = true)
   List<FinancialReportRow> financialReportByDay(
-      @Param("from") Instant from,
-      @Param("toExclusive") Instant toExclusive
-  );
+      @Param("from") Instant from, @Param("toExclusive") Instant toExclusive);
 
   @Query(
-      value = """
-            SELECT 
+      value =
+          """
+            SELECT
                 DATE(created_at - INTERVAL DAY(created_at)-1 DAY) AS period,
                 SUM(CASE WHEN type = 'DEPOSIT' THEN amount ELSE 0 END ) as totalDeposit,
                 SUM(CASE WHEN type = 'WITHDRAW' THEN amount ELSE 0 END ) as totalWithdrawal,
@@ -114,13 +118,13 @@ public interface TransactionRepository
             GROUP BY DATE(created_at - INTERVAL DAY(created_at)-1 DAY)
             ORDER BY period asc
           """,
-      nativeQuery = true
-  )
+      nativeQuery = true)
   List<FinancialReportRow> financialReportByMonth(Instant from, Instant to);
 
   @Query(
-      value = """
-            SELECT 
+      value =
+          """
+            SELECT
                 MAKEDATE(YEAR(created_at), 1) AS period,
                 SUM(CASE WHEN type = 'DEPOSIT' THEN amount ELSE 0 END ) as total_deposit,
                 SUM(CASE WHEN type = 'WITHDRAW' THEN amount ELSE 0 END ) as total_withdrawal,
@@ -141,13 +145,12 @@ public interface TransactionRepository
             GROUP BY YEAR(created_at)
             ORDER BY period asc
           """,
-      nativeQuery = true
-  )
+      nativeQuery = true)
   List<FinancialReportRow> financialReportByYear(Instant from, Instant to);
 
-
   @Query(
-      value = """
+      value =
+          """
           SELECT
               SUM(
                   CASE
@@ -161,8 +164,7 @@ public interface TransactionRepository
           FROM transactions
           WHERE created_at < :date;
           """,
-      nativeQuery = true
-  )
+      nativeQuery = true)
   BigDecimal getNetBalance(Instant date);
 
   int countByAccount_IdAndCreatedAtAfter(UUID accountId, Instant date);

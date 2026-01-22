@@ -13,7 +13,6 @@ public enum PredefinedPermission {
 
   private final String description;
 
-
   PredefinedPermission(String description) {
     this.description = description;
   }

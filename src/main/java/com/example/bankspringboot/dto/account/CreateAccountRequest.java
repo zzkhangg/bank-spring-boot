@@ -17,17 +17,14 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 public class CreateAccountRequest {
 
-  @NotNull
-  @Email
-  String email;
+  @NotNull @Email String email;
 
-  @NotNull
-  AccountType accountType;
+  @NotNull AccountType accountType;
 
   @NotNull
   @DecimalMin(value = "0.00", message = "Initial deposit cannot be negative.")
   BigDecimal initialDeposit;
 
-  @DecimalMin(value = "0.00", message = "Transaction limit cannot be negative." )
+  @DecimalMin(value = "0.00", message = "Transaction limit cannot be negative.")
   BigDecimal transactionLimit;
 }

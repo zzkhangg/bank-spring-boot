@@ -43,6 +43,5 @@ public class CreateCustomerRequest {
 
   @Valid Address address;
 
-  @NotNull
-  CustomerTypeCode customerType;
+  @NotNull CustomerTypeCode customerType;
 }

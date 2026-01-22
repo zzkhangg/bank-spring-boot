@@ -39,8 +39,7 @@ public class IdempotencyKey extends Auditable {
   @Column(nullable = false)
   String requestHash;
 
-  @Lob
-  String responseBody;
+  @Lob String responseBody;
 
   @Enumerated(EnumType.STRING)
   IdempotencyStatus status;

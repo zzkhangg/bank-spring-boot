@@ -38,16 +38,17 @@ public class CustomerService {
   Role DEFAULT_ROLE = Role.CUSTOMER;
   CustomerTypeRepository customerTypeRepository;
 
-//  @Transactional
+  //  @Transactional
   public CustomerResponse createCustomer(CreateCustomerRequest req) {
     Customer customer = customerMapper.toCustomer(req);
-    com.example.bankspringboot.domain.Role role = roleRepository.findById(DEFAULT_ROLE.toString()).orElseThrow();
-    CustomerType customerType = customerTypeRepository.findByCode(req.getCustomerType()).orElseThrow();
+    com.example.bankspringboot.domain.Role role =
+        roleRepository.findById(DEFAULT_ROLE.toString()).orElseThrow();
+    CustomerType customerType =
+        customerTypeRepository.findByCode(req.getCustomerType()).orElseThrow();
     customer.setRoles(Set.of(role));
     customer.setCustomerType(customerType);
     customer.setPassword(passwordEncoder.encode(req.getPassword()));
     customer.setBirthDate(req.getBirthdate());
-
 
     Customer saved = customerRepository.save(customer);
     return customerMapper.toResponse(saved);

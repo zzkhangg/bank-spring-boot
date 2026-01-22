@@ -38,8 +38,6 @@ public class TransactionExecutor {
   TransactionMapper transactionMapper;
   ApplicationEventPublisher eventPublisher;
 
-
-
   @Transactional
   public TransactionResponse transferInternal(UUID fromId, TransferRequest request) {
     UUID toId = request.getDestinationAccountId();

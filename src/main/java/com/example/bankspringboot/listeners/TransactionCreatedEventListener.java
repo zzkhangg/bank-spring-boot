@@ -22,7 +22,6 @@ public class TransactionCreatedEventListener {
   FraudDetectionService fraudDetectionService;
   AlertService alertService;
 
-
   @TransactionalEventListener
   public void onTransactionCreated(TransactionCreatedEvent event) {
     Transaction transaction = transactionRepository.findById(event.transactionId()).orElseThrow();

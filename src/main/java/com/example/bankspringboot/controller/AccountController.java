@@ -30,8 +30,7 @@ public class AccountController {
   }
 
   @PostMapping
-  public AccountResponse createAccount(
-      @Valid @RequestBody CreateAccountRequest req) {
+  public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest req) {
     return accountService.createAccount(req);
   }
 
@@ -44,8 +43,7 @@ public class AccountController {
   @PostMapping("/{id}/status")
   public AccountResponse updateAccountStatus(
       @PathVariable UUID id, @Valid @RequestBody UpdateAccountRequest req) {
-    return accountService.updateAccountStatus(
-        id, req);
+    return accountService.updateAccountStatus(id, req);
   }
 
   @GetMapping("/{id}/status/history")

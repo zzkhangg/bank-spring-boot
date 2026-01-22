@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,13 +17,7 @@ import lombok.Setter;
 @Setter
 @Table(
     name = "transactions",
-    indexes = {
-        @Index(
-            name = "idx_transaction_created_at",
-            columnList = "created_at"
-        )
-    }
-)
+    indexes = {@Index(name = "idx_transaction_created_at", columnList = "created_at")})
 public class Transaction {
 
   @Id

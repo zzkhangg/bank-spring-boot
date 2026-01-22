@@ -33,17 +33,13 @@ import org.hibernate.annotations.SQLDelete;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Customer extends User {
 
-  @NotNull
-  String firstName;
+  @NotNull String firstName;
 
-  @NotNull
-  String lastName;
+  @NotNull String lastName;
 
-  @NotNull
-  String phoneNumber;
+  @NotNull String phoneNumber;
 
-  @NotNull
-  LocalDate birthDate;
+  @NotNull LocalDate birthDate;
 
   boolean deleted;
 
@@ -51,9 +47,7 @@ public class Customer extends User {
   @JoinColumn(name = "customer_type_id", nullable = false)
   CustomerType customerType;
 
-  @Embedded
-  @NotNull
-  Address address;
+  @Embedded @NotNull Address address;
 
   @OneToMany(mappedBy = "customer")
   List<Account> accounts;

@@ -14,6 +14,4 @@ public record FinancialReportDTO(
     BigDecimal totalTransfer,
     BigDecimal netBalance,
     BigDecimal totalFee,
-    List<FinancialReportRowDto> rows) {
-
-}
+    List<FinancialReportRowDto> rows) {}

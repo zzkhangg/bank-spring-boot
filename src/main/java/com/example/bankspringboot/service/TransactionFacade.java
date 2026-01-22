@@ -41,13 +41,15 @@ public class TransactionFacade {
   TransactionMapper transactionMapper;
   TransactionExecutor transactionExecutor;
 
-  @PreAuthorize("hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
+  @PreAuthorize(
+      "hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
   @Transactional
   public TransactionResponse deposit(UUID accountId, DepositRequest request) {
     return transactionExecutor.depositInternal(accountId, request);
   }
 
-  @PreAuthorize("hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
+  @PreAuthorize(
+      "hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
   public TransactionResponse withdraw(UUID accountId, WithdrawalRequest request) {
     return transactionExecutor.withdrawInternal(accountId, request);
   }
@@ -58,10 +60,14 @@ public class TransactionFacade {
   }
 
   @PreAuthorize(
-      "hasRole('ADMIN') ||" +
-      "hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
-  @Cacheable(value = "transactionHistory", key = "#accountId + ':v:' +"
-      + " @transactionHistoryVersion.get(#accountId) + ':p:' + #pageNumber")
+      "hasRole('ADMIN') ||"
+          + "hasRole('CUSTOMER') &&"
+          + "@accountSecurity.isOwner(#accountId, authentication.name)")
+  @Cacheable(
+      value = "transactionHistory",
+      key =
+          "#accountId + ':v:' +"
+              + " @transactionHistoryVersion.get(#accountId) + ':p:' + #pageNumber")
   @Transactional(readOnly = true)
   public List<TransactionResponse> getTransactions(
       UUID accountId,

@@ -35,29 +35,26 @@ public class FinancialReportController {
       @RequestParam(required = false) LocalDate from,
       @RequestParam(required = false) LocalDate to,
       @RequestParam(required = false) Integer year,
-      @RequestParam(required = false) Integer month
-  ) throws Exception {
-    FinancialReportDTO financialReportDTO = financialReportService.getFinancialReport(groupBy, from,
-        to, year, month);
-    byte[] file = switch (format) {
-      case EXCEL -> excelExporter.export(financialReportDTO);
-      case PDF -> pdfExporter.export(financialReportDTO);
-    };
+      @RequestParam(required = false) Integer month)
+      throws Exception {
+    FinancialReportDTO financialReportDTO =
+        financialReportService.getFinancialReport(groupBy, from, to, year, month);
+    byte[] file =
+        switch (format) {
+          case EXCEL -> excelExporter.export(financialReportDTO);
+          case PDF -> pdfExporter.export(financialReportDTO);
+        };
     if (format == ReportFormat.EXCEL) {
       return ResponseEntity.ok()
-          .header(HttpHeaders.CONTENT_DISPOSITION,
-              "attachment; filename=financial-report.xlsx")
+          .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=financial-report.xlsx")
           .contentType(
               MediaType.parseMediaType(
-                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              )
-          )
+                  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
           .contentLength(file.length)
           .body(file);
     } else {
       return ResponseEntity.ok()
-          .header(HttpHeaders.CONTENT_DISPOSITION,
-              "attachment; filename=financial-report.pdf")
+          .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=financial-report.pdf")
           .contentType(MediaType.APPLICATION_PDF)
           .contentLength(file.length)
           .body(file);

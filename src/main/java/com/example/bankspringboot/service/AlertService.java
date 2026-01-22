@@ -23,4 +23,5 @@ public class AlertService {
     alert.setCreatedAt(Instant.now());
     alert.setStatus(AlertStatus.NEW);
     return alertRepository.save(alert);
+  }
 }

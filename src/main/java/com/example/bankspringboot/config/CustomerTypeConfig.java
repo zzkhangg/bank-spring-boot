@@ -16,7 +16,8 @@ import org.springframework.stereotype.Component;
 public class CustomerTypeConfig {
   private Map<CustomerTypeCode, TypeConfig> customerTypes = new EnumMap<>(CustomerTypeCode.class);
 
-  @Getter @Setter
+  @Getter
+  @Setter
   public static class TypeConfig {
     private BigDecimal maxTransactionLimit;
   }

@@ -7,8 +7,6 @@ import com.example.bankspringboot.domain.transaction.Transaction_;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;

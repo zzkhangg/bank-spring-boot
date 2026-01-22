@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xddf.usermodel.chart.AxisCrosses;
 import org.apache.poi.xddf.usermodel.chart.AxisPosition;
@@ -48,8 +47,7 @@ public class FinancialReportExcelExporter {
       // ===== Table Header =====
       Row header = sheet.createRow(rowIdx++);
       String[] headers = {
-          "Period", "Deposit", "Withdrawal", "Transfer",
-          "Fee", "Net Change", "Balance"
+        "Period", "Deposit", "Withdrawal", "Transfer", "Fee", "Net Change", "Balance"
       };
       for (int i = 0; i < headers.length; i++) {
         header.createCell(i).setCellValue(headers[i]);
@@ -110,55 +108,37 @@ public class FinancialReportExcelExporter {
     row.createCell(6).setCellValue(r.netBalance().doubleValue());
   }
 
-  private void createTrendChart(
-      Sheet sheet,
-      List<FinancialReportRowDto> rows
-  ) {
+  private void createTrendChart(Sheet sheet, List<FinancialReportRowDto> rows) {
 
     XSSFDrawing drawing = (XSSFDrawing) sheet.createDrawingPatriarch();
 
-    XSSFChart chart = drawing.createChart(
-        drawing.createAnchor(
-            0, 0, 0, 0,
-            0, rows.size() + 8,
-            10, rows.size() + 25
-        )
-    );
+    XSSFChart chart =
+        drawing.createChart(
+            drawing.createAnchor(0, 0, 0, 0, 0, rows.size() + 8, 10, rows.size() + 25));
 
     chart.setTitleText("Balance Trend");
     chart.setTitleOverlay(false);
 
-    XDDFCategoryAxis bottomAxis =
-        chart.createCategoryAxis(AxisPosition.BOTTOM);
+    XDDFCategoryAxis bottomAxis = chart.createCategoryAxis(AxisPosition.BOTTOM);
 
-    XDDFValueAxis leftAxis =
-        chart.createValueAxis(AxisPosition.LEFT);
+    XDDFValueAxis leftAxis = chart.createValueAxis(AxisPosition.LEFT);
 
     leftAxis.setCrosses(AxisCrosses.AUTO_ZERO);
 
     // Period (column A)
     XDDFDataSource<String> periods =
         XDDFDataSourcesFactory.fromStringCellRange(
-            (XSSFSheet) sheet,
-            new CellRangeAddress(4, rows.size() + 3, 0, 0)
-        );
+            (XSSFSheet) sheet, new CellRangeAddress(4, rows.size() + 3, 0, 0));
 
     // Balance (column G)
     XDDFNumericalDataSource<Double> balances =
         XDDFDataSourcesFactory.fromNumericCellRange(
-            (XSSFSheet) sheet,
-            new CellRangeAddress(4, rows.size() + 3, 6, 6)
-        );
+            (XSSFSheet) sheet, new CellRangeAddress(4, rows.size() + 3, 6, 6));
 
     XDDFLineChartData data =
-        (XDDFLineChartData) chart.createData(
-            ChartTypes.LINE,
-            bottomAxis,
-            leftAxis
-        );
+        (XDDFLineChartData) chart.createData(ChartTypes.LINE, bottomAxis, leftAxis);
 
-    XDDFLineChartData.Series series =
-        (XDDFLineChartData.Series) data.addSeries(periods, balances);
+    XDDFLineChartData.Series series = (XDDFLineChartData.Series) data.addSeries(periods, balances);
 
     series.setTitle("Balance", null);
     series.setSmooth(false);

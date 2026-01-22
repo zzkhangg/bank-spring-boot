@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-  public class FinancialReportPdfExporter {
+public class FinancialReportPdfExporter {
 
   public byte[] export(FinancialReportDTO report) throws Exception {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -73,16 +73,10 @@ import org.springframework.stereotype.Component;
       dataset.addValue(r.getBalance(), "Balance", r.getPeriod());
     }
 
-    JFreeChart chart = ChartFactory.createLineChart(
-        "Balance Trend",
-        "Period",
-        "Balance",
-        dataset
-    );
+    JFreeChart chart = ChartFactory.createLineChart("Balance Trend", "Period", "Balance", dataset);
 
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     ChartUtils.writeChartAsPNG(out, chart, 600, 350);
     return out.toByteArray();
   }
-
 }

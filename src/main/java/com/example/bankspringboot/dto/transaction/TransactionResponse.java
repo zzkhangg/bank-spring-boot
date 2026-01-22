@@ -4,7 +4,7 @@ import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.TransactionStatus;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +17,7 @@ public class TransactionResponse {
   private String customerId;
   private BigDecimal amount;
   private TransactionStatus status; // SUCCESS, FAILED, PENDING
-  private LocalDateTime createdAt;
+  private Instant createdAt;
   private String description;
   private BigDecimal fee;
   private Address address;

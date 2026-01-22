@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
@@ -32,7 +33,8 @@ public class Transaction {
 
   private BigDecimal amount;
   private BigDecimal fee;
-  private LocalDateTime createdAt;
+
+  private Instant createdAt;
 
   private String description;
 
@@ -61,6 +63,6 @@ public class Transaction {
 
   @PrePersist
   public void onCreate() {
-    this.createdAt = LocalDateTime.now();
+    this.createdAt = Instant.now();
   }
 }

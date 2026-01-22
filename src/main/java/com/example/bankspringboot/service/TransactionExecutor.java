@@ -36,7 +36,9 @@ public class TransactionExecutor {
   AccountRepository accountRepository;
   BigDecimal FEE_PERCENTAGE = BigDecimal.valueOf(0.01);
   TransactionMapper transactionMapper;
-  private final ApplicationEventPublisher eventPublisher;
+  ApplicationEventPublisher eventPublisher;
+
+
 
   @Transactional
   public TransactionResponse transferInternal(UUID fromId, TransferRequest request) {
@@ -114,9 +116,8 @@ public class TransactionExecutor {
     response.setCustomerId(fromAccount.getCustomer().getId().toString());
     response.setAccountId(fromAccount.getId().toString());
 
-    eventPublisher.publishEvent(new TransactionCreatedEvent(fromId));
-    eventPublisher.publishEvent(new TransactionCreatedEvent(toId));
-
+    eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
+    eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
     return response;
   }
 
@@ -159,8 +160,7 @@ public class TransactionExecutor {
     response.setCustomerId(transaction.getCustomer().getId().toString());
     response.setAccountId(accountId.toString());
 
-    eventPublisher.publishEvent(new TransactionCreatedEvent(accountId));
-
+    eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
     return response;
   }
 
@@ -214,7 +214,7 @@ public class TransactionExecutor {
     response.setCustomerId(transaction.getCustomer().getId().toString());
     response.setAccountId(accountId.toString());
 
-    eventPublisher.publishEvent(new TransactionCreatedEvent(accountId));
+    eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
     return response;
   }
 }

@@ -45,18 +45,19 @@ public class TransactionFacade {
       "hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
   @Transactional
   public TransactionResponse deposit(UUID accountId, DepositRequest request) {
-    return transactionExecutor.depositInternal(accountId, request);
+    return transactionExecutor.executeDeposit(accountId, request);
   }
 
   @PreAuthorize(
       "hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#accountId, authentication.name)")
+  @Transactional
   public TransactionResponse withdraw(UUID accountId, WithdrawalRequest request) {
-    return transactionExecutor.withdrawInternal(accountId, request);
+    return transactionExecutor.executeWithdrawal(accountId, request);
   }
 
   @PreAuthorize("hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#fromId, authentication.name)")
   public TransactionResponse transfer(UUID fromId, TransferRequest request) {
-    return transactionExecutor.transferInternal(fromId, request);
+    return transactionExecutor.executeTransfer(fromId, request);
   }
 
   @PreAuthorize(

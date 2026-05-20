@@ -59,4 +59,12 @@ public class Account {
 
   @OneToMany(mappedBy = "account")
   List<AccountStatusHistory> accountStatusHistory;
+
+  public void withdraw(BigDecimal amount) {
+    balance = balance.subtract(amount);
+  }
+
+  public void deposit(BigDecimal amount) {
+    balance = balance.add(amount);
+  }
 }

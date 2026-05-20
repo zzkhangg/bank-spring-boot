@@ -18,17 +18,17 @@ import lombok.Setter;
 @Builder
 public class Address {
 
-  @NotBlank(message = "Street is required")
+  @NotBlank(message = "Street is required.")
   private String street;
 
-  @NotBlank(message = "City is required")
+  @NotBlank(message = "City is required.")
   private String city;
 
-  @NotBlank(message = "Postal code is required")
-  @Size(min = 2, max = 12, message = "Postal code length is invalid")
+  @NotBlank(message = "Postal code is required.")
+  @Size(min = 2, max = 12, message = "Postal code must be between 2 and 12 characters.")
   private String postalCode;
 
-  @NotBlank(message = "Country is required")
-  @Size(max = 100, message = "Country name must be at most 100 characters")
+  @NotBlank(message = "Country is required.")
+  @Size(max = 100, message = "Country cannot exceed 100 characters.")
   private String country;
 }

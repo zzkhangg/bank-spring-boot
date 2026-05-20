@@ -1,12 +1,12 @@
 package com.example.bankspringboot.config;
 
+import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.service.TokenValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,7 +21,7 @@ public class InvalidatedTokenValidator implements OAuth2TokenValidator<Jwt> {
     try {
       tokenValidationService.verifyInvalidatedToken(jti);
       return OAuth2TokenValidatorResult.success();
-    } catch (JwtException e) {
+    } catch (AppException e) {
       return OAuth2TokenValidatorResult.failure(
           new OAuth2Error("invalid_token", "Token has been invalidated", null));
     }

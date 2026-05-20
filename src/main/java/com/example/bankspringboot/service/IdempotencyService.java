@@ -32,7 +32,6 @@ public class IdempotencyService {
       String key, String requestHash, Class<T> responseType, Supplier<T> action)
       throws JsonProcessingException {
     try {
-      log.error("HANDLE IDEMPOTENCY CALLED - key={}", key);
       IdempotencyKey idempotencyKey =
           IdempotencyKey.builder()
               .key(key)
@@ -48,10 +47,23 @@ public class IdempotencyService {
     } catch (DataIntegrityViolationException e) {
       IdempotencyKey existing = idempotencyKeyRepository.findByKey(key).orElseThrow();
 
+      if (!existing.getRequestHash().equals(requestHash)) {
+        throw new AppException(ErrorCode.IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_REQUEST);
+      }
+
       if (existing.getStatus() == IdempotencyStatus.PROCESSING) {
         throw new AppException(ErrorCode.REQUEST_IN_PROGRESS, "Request is still processing");
       }
+
+      if (existing.getStatus() == IdempotencyStatus.FAILED) {
+        throw new AppException(ErrorCode.REQUEST_FAILED, "Request failed.");
+      }
+
       return objectMapper.readValue(existing.getResponseBody(), responseType);
+    }
+    catch (Exception e) {
+      idempotencyKeyWriter.markFailed(key);
+      throw e;
     }
   }
 }

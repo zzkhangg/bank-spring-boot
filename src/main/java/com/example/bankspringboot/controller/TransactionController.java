@@ -14,6 +14,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -38,13 +40,13 @@ public class TransactionController {
 
   @PostMapping("/deposit")
   public TransactionResponse deposit(
-      @PathVariable UUID accountId, @RequestBody DepositRequest req) {
+      @PathVariable UUID accountId, @Valid @RequestBody DepositRequest req) {
     return transactionFacade.deposit(accountId, req);
   }
 
   @PostMapping("/withdraw")
   public TransactionResponse withdraw(
-      @PathVariable UUID accountId, @RequestBody WithdrawalRequest req) {
+      @PathVariable UUID accountId, @Valid @RequestBody WithdrawalRequest req) {
     return transactionFacade.withdraw(accountId, req);
   }
 
@@ -52,7 +54,7 @@ public class TransactionController {
   public TransactionResponse transfer(
       @PathVariable UUID accountId,
       @RequestHeader("Idempotency-Key") String key,
-      @RequestBody TransferRequest req)
+      @Valid @RequestBody TransferRequest req)
       throws JsonProcessingException {
     String payloadJson = objectMapper.writeValueAsString(req);
     String requestHash = HashUtil.sha256(payloadJson);
@@ -77,7 +79,7 @@ public class TransactionController {
       @RequestParam(name = "created-after", required = false)
           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
           LocalDate createdAfter,
-      @RequestParam(name = "created-after", required = false) String sort) {
+      @RequestParam(name = "sort", required = false) String sort) {
 
     return transactionFacade.getTransactions(
         accountId,

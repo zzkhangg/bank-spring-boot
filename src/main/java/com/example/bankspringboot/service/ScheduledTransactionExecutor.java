@@ -50,14 +50,14 @@ public class ScheduledTransactionExecutor {
           DepositRequest depositRequest =
               scheduledTransactionMapper.toDepositRequest(scheduledTransaction);
           depositRequest.setChannel(TransactionChannel.SCHEDULED);
-          transactionExecutor.depositInternal(accountId, depositRequest);
+          transactionExecutor.executeDeposit(accountId, depositRequest);
           break;
         case TRANSFER_OUT:
           TransferRequest transferRequest =
               scheduledTransactionMapper.toTransferRequest(scheduledTransaction);
           transferRequest.setDestinationAccountId(scheduledTransaction.getToAccount().getId());
           transferRequest.setChannel(TransactionChannel.SCHEDULED);
-          transactionExecutor.transferInternal(accountId, transferRequest);
+          transactionExecutor.executeTransfer(accountId, transferRequest);
           break;
         default:
           break;

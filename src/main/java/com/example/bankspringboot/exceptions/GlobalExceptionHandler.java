@@ -2,8 +2,8 @@ package com.example.bankspringboot.exceptions;
 
 import com.example.bankspringboot.domain.response.RestResponse;
 import java.nio.file.AccessDeniedException;
+import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,17 +22,13 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(value = MethodArgumentNotValidException.class)
   @ResponseBody
   public ResponseEntity<RestResponse<?>> handleInvalidArgument(MethodArgumentNotValidException ex) {
-    String enumKey = ex.getBindingResult().getFieldError().getDefaultMessage();
-    ErrorCode errorCode = ErrorCode.INVALID_KEY;
+    String message =
+        Optional.ofNullable(ex.getBindingResult().getFieldError())
+            .map(error -> error.getDefaultMessage())
+            .orElse(ErrorCode.VALIDATION_ERROR.getMessage());
 
-    try {
-      ErrorCode.valueOf(enumKey);
-    } catch (IllegalArgumentException e) {
-
-    }
-
-    RestResponse<?> response = RestResponse.error(errorCode.getMessage(), errorCode.getCode());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    RestResponse<?> response = RestResponse.error(message, ErrorCode.VALIDATION_ERROR.getCode());
+    return ResponseEntity.status(ErrorCode.VALIDATION_ERROR.getStatusCode()).body(response);
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -41,18 +37,21 @@ public class GlobalExceptionHandler {
     RestResponse<?> response =
         RestResponse.error(
             ErrorCode.JSON_PARSE_ERROR.getMessage(), ErrorCode.JSON_PARSE_ERROR.getCode());
-    return ResponseEntity.badRequest().body(response);
+    return ResponseEntity.status(ErrorCode.JSON_PARSE_ERROR.getStatusCode()).body(response);
   }
 
   @ExceptionHandler(BindException.class)
   @ResponseBody
   public ResponseEntity<RestResponse<?>> handleBindException(BindException ex) {
-    RestResponse<?> res =
-        RestResponse.error(
-            ex.getBindingResult().getFieldError().getDefaultMessage(),
-            HttpStatus.BAD_REQUEST.value());
+    String message =
+        Optional.ofNullable(ex.getBindingResult().getFieldError())
+            .map(error -> error.getDefaultMessage())
+            .orElse(ErrorCode.VALIDATION_ERROR.getMessage());
 
-    return ResponseEntity.badRequest().body(res);
+    RestResponse<?> res =
+        RestResponse.error(message, ErrorCode.VALIDATION_ERROR.getCode());
+
+    return ResponseEntity.status(ErrorCode.VALIDATION_ERROR.getStatusCode()).body(res);
   }
 
   @ExceptionHandler(AppException.class)
@@ -60,7 +59,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<RestResponse<?>> handleException(AppException e) {
     RestResponse<?> res = RestResponse.error(e.getMessage(), e.getErrorCode().getCode());
 
-    return ResponseEntity.badRequest().body(res);
+    return ResponseEntity.status(e.getErrorCode().getStatusCode()).body(res);
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -69,7 +68,7 @@ public class GlobalExceptionHandler {
       MethodArgumentTypeMismatchException e) {
     RestResponse<?> res =
         RestResponse.error(ErrorCode.TYPE_MISMATCH.getMessage(), ErrorCode.TYPE_MISMATCH.getCode());
-    return ResponseEntity.badRequest().body(res);
+    return ResponseEntity.status(ErrorCode.TYPE_MISMATCH.getStatusCode()).body(res);
   }
 
   @ExceptionHandler(MissingPathVariableException.class)
@@ -79,7 +78,7 @@ public class GlobalExceptionHandler {
         RestResponse.error(
             ErrorCode.MISSING_PATH_VARIABLE.getMessage(),
             ErrorCode.MISSING_PATH_VARIABLE.getCode());
-    return ResponseEntity.badRequest().body(res);
+    return ResponseEntity.status(ErrorCode.MISSING_PATH_VARIABLE.getStatusCode()).body(res);
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
@@ -90,11 +89,13 @@ public class GlobalExceptionHandler {
     if (ex.getMessage().contains("email")) {
       RestResponse<?> res =
           RestResponse.error(
-              ErrorCode.DATABASE_ERROR.getMessage(), ErrorCode.DATABASE_ERROR.getCode());
-      return ResponseEntity.badRequest().body(res);
+              ErrorCode.RESOURCE_EXISTED.getMessage(), ErrorCode.RESOURCE_EXISTED.getCode());
+      return ResponseEntity.status(ErrorCode.RESOURCE_EXISTED.getStatusCode()).body(res);
     }
 
-    return ResponseEntity.internalServerError().build();
+    RestResponse<?> res =
+        RestResponse.error(ErrorCode.DATABASE_ERROR.getMessage(), ErrorCode.DATABASE_ERROR.getCode());
+    return ResponseEntity.status(ErrorCode.DATABASE_ERROR.getStatusCode()).body(res);
   }
 
   @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
@@ -103,7 +104,7 @@ public class GlobalExceptionHandler {
     RestResponse<?> res =
         RestResponse.error(ErrorCode.UNAUTHORIZED.getMessage(), ErrorCode.UNAUTHORIZED.getCode());
 
-    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(res);
+    return ResponseEntity.status(ErrorCode.UNAUTHORIZED.getStatusCode()).body(res);
   }
 
   @ExceptionHandler(BadCredentialsException.class)
@@ -113,7 +114,7 @@ public class GlobalExceptionHandler {
         RestResponse.error(
             ErrorCode.UNAUTHENTICATED.getMessage(), ErrorCode.UNAUTHENTICATED.getCode());
 
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(res);
+    return ResponseEntity.status(ErrorCode.UNAUTHENTICATED.getStatusCode()).body(res);
   }
 
   @ExceptionHandler(RuntimeException.class)
@@ -124,6 +125,6 @@ public class GlobalExceptionHandler {
             ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage(),
             ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
 
-    return ResponseEntity.badRequest().body(res);
+    return ResponseEntity.status(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatusCode()).body(res);
   }
 }

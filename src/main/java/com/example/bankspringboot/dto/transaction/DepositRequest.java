@@ -26,28 +26,27 @@ public class DepositRequest {
    * The amount of money to deposit. Must be positive and non-zero. Uses BigDecimal for precise
    * financial calculations.
    */
-  @NotNull(message = "Amount is mandatory.")
-  @DecimalMin(value = "0.01", message = "The deposit amount must be positive.")
+  @NotNull(message = "Amount is required.")
+  @DecimalMin(value = "0.01", message = "Deposit amount must be at least 0.01.")
   @Digits(
       integer = 12,
       fraction = 2,
-      message = "Amount can have at most 12 integer digits and 2 fraction digits.")
+      message = "Amount can have at most 12 integer digits and 2 decimal places.")
   private BigDecimal amount;
 
   /** An optional note or reference from the client. */
-  @Size(max = 255, message = "Reference note cannot exceed 255 characters.")
+  @Size(max = 255, message = "Description cannot exceed 255 characters.")
   private String description;
 
   /** The currency code (e.g., "USD", "EUR"). */
-  @NotBlank(message = "Currency is mandatory.")
-  @Size(min = 3, max = 3, message = "Currency must be a 3-letter code (e.g., USD).")
+  @NotBlank(message = "Currency is required.")
+  @Size(min = 3, max = 3, message = "Currency must be a 3-letter code, such as USD.")
   private String currency;
 
   /** Address */
   @Valid private Address address;
 
   /** The channel through which the deposit is being performed (e.g., "ATM", "Online"). */
-  @NotBlank(message = "Channel is mandatory.")
-  @NotNull
+  @NotNull(message = "Transaction channel is required.")
   private TransactionChannel channel;
 }

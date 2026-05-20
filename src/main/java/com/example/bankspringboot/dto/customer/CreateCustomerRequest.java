@@ -19,29 +19,30 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class CreateCustomerRequest {
 
-  @NotBlank(message = "First name is required")
+  @NotBlank(message = "First name is required.")
   String firstName;
 
-  @NotBlank(message = "Last name is required")
+  @NotBlank(message = "Last name is required.")
   String lastName;
 
-  @NotBlank(message = "Email is required")
-  @Email(message = "Email should be valid")
+  @NotBlank(message = "Email is required.")
+  @Email(message = "Email must be a valid email address.")
   String email;
 
-  @NotBlank(message = "Phone is required")
-  @Size(min = 10, max = 10, message = "Phone Number must include exact 10 digits")
+  @NotBlank(message = "Phone number is required.")
+  @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits.")
   String phoneNumber;
 
-  @NotNull(message = "Birthdate is required")
-  @Past(message = "Birthdate must be in the past")
+  @NotNull(message = "Birthdate is required.")
+  @Past(message = "Birthdate must be in the past.")
   LocalDate birthdate;
 
-  @NotNull
-  @Size(min = 8, max = 30, message = "Enter password from 8 up to 30 characters")
+  @NotNull(message = "Password is required.")
+  @Size(min = 8, max = 30, message = "Password must be between 8 and 30 characters.")
   String password;
 
   @Valid Address address;
 
-  @NotNull CustomerTypeCode customerType;
+  @NotNull(message = "Customer type is required.")
+  CustomerTypeCode customerType;
 }

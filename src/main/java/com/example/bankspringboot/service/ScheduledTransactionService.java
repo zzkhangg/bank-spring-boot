@@ -29,7 +29,7 @@ public class ScheduledTransactionService {
   ScheduledTransactionMapper scheduledTransactionMapper;
   private final ScheduledTransactionCalculator scheduledTransactionCalculator;
 
-  @PreAuthorize("hasRole('USER') &&" + "@accountSecurity.isOwner(#fromId, authentication.name)")
+  @PreAuthorize("hasRole('CUSTOMER') &&" + "@accountSecurity.isOwner(#fromId, authentication.name)")
   public ScheduledTransactionResponse scheduleTransaction(
       UUID fromId, ScheduledTransactionRequest request) {
     UUID toId = UUID.fromString(request.getToAccountId());

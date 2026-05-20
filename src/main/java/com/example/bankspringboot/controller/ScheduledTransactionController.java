@@ -4,6 +4,8 @@ import com.example.bankspringboot.dto.transaction.ScheduledTransactionRequest;
 import com.example.bankspringboot.dto.transaction.ScheduledTransactionResponse;
 import com.example.bankspringboot.service.ScheduledTransactionService;
 import java.util.UUID;
+
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +26,7 @@ public class ScheduledTransactionController {
 
   @PostMapping("/scheduled-transactions")
   public ScheduledTransactionResponse scheduleTransaction(
-      @PathVariable UUID accountId, @RequestBody ScheduledTransactionRequest req) {
+      @PathVariable UUID accountId, @Valid @RequestBody ScheduledTransactionRequest req) {
     return scheduleService.scheduleTransaction(accountId, req);
   }
 }

@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @Getter
 public class RoleRequest {
-  @NotNull @NotBlank String name;
+  @NotNull(message = "Role name is required.")
+  @NotBlank(message = "Role name cannot be blank.")
+  String name;
 
   String description;
 

@@ -21,21 +21,21 @@ import lombok.Setter;
 @Setter
 public class TransferRequest {
   /** The ID of the account to deposit the funds into. */
-  @NotBlank(message = "Destination Account ID is mandatory.")
+  @NotNull(message = "Destination account ID is required.")
   private UUID destinationAccountId;
 
   /** The amount of money to transfer. Must be positive and non-zero. */
-  @NotNull(message = "Amount is mandatory.")
-  @DecimalMin(value = "0.01", inclusive = true, message = "The transfer amount must be positive.")
+  @NotNull(message = "Amount is required.")
+  @DecimalMin(value = "0.01", inclusive = true, message = "Transfer amount must be at least 0.01.")
   @Digits(
       integer = 12,
       fraction = 2,
-      message = "Amount can have at most 12 integer digits and 2 fraction digits.")
+      message = "Amount can have at most 12 integer digits and 2 decimal places.")
   private BigDecimal amount;
 
   /** The currency code (e.g., "USD", "EUR"). */
-  @NotBlank(message = "Currency is mandatory.")
-  @Size(min = 3, max = 3, message = "Currency must be a 3-letter code (e.g., USD).")
+  @NotBlank(message = "Currency is required.")
+  @Size(min = 3, max = 3, message = "Currency must be a 3-letter code, such as USD.")
   private String currency;
 
   /** A description of the transfer. */
@@ -46,7 +46,6 @@ public class TransferRequest {
   @Valid private Address address;
 
   /** The channel through which the withdrawal is being performed (e.g., "ATM", "Online"). */
-  @NotBlank(message = "Channel is mandatory.")
-  @NotNull
+  @NotNull(message = "Transaction channel is required.")
   private TransactionChannel channel;
 }

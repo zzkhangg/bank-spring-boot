@@ -12,6 +12,7 @@ import com.example.bankspringboot.mapper.CustomerMapper;
 import com.example.bankspringboot.repository.CustomerRepository;
 import com.example.bankspringboot.repository.CustomerTypeRepository;
 import com.example.bankspringboot.repository.RoleRepository;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -38,8 +39,8 @@ public class CustomerService {
   Role DEFAULT_ROLE = Role.CUSTOMER;
   CustomerTypeRepository customerTypeRepository;
 
-  //  @Transactional
-  public CustomerResponse createCustomer(CreateCustomerRequest req) {
+  @Transactional
+  public CustomerResponse createCustomer(CreateCustomerRequest req){
     Customer customer = customerMapper.toCustomer(req);
     com.example.bankspringboot.domain.Role role =
         roleRepository.findById(DEFAULT_ROLE.toString()).orElseThrow();

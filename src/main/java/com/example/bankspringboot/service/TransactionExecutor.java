@@ -39,29 +39,47 @@ public class TransactionExecutor {
   ApplicationEventPublisher eventPublisher;
 
   @Transactional
-  public TransactionResponse transferInternal(UUID fromId, TransferRequest request) {
-    UUID toId = request.getDestinationAccountId();
+  public TransactionResponse executeTransfer(UUID fromAccountId, TransferRequest request) {
+    UUID toAccountId = request.getDestinationAccountId();
     BigDecimal amount = request.getAmount();
 
-    if (fromId.equals(toId)) {
+    if (fromAccountId.equals(toAccountId)) {
       throw new AppException(
           ErrorCode.TRANSFER_ERROR, "Cannot transfer funds to the same account.");
     }
 
-    Account fromAccount =
+    UUID firstId = fromAccountId.compareTo(toAccountId) < 0
+            ? fromAccountId
+            : toAccountId;
+
+    UUID secondId = fromAccountId.compareTo(toAccountId) < 0
+            ? toAccountId
+            : fromAccountId;
+
+    Account firstLocked =
         accountRepository
-            .findByIdWithLock(fromId)
+            .findByIdWithPessimisticLock(firstId)
             .orElseThrow(
                 () ->
                     new AppException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "Account with id " + fromId + " not found"));
-    Account toAccount =
+                        ErrorCode.RESOURCE_NOT_FOUND, "Account with id " + firstId + " not found"));
+
+
+    Account secondLocked =
         accountRepository
-            .findByIdWithLock(toId)
+            .findByIdWithPessimisticLock(secondId)
             .orElseThrow(
                 () ->
                     new AppException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "Account with id " + toId + " not found"));
+                        ErrorCode.RESOURCE_NOT_FOUND, "Account with id " + secondId + " not found"));
+
+    Account fromAccount = firstLocked.getId().equals(fromAccountId)
+            ? firstLocked
+            : secondLocked;
+
+    Account toAccount = firstLocked.getId().equals(toAccountId)
+            ? firstLocked
+            : secondLocked;
 
     if (amount.compareTo(fromAccount.getTransactionLimit()) > 0) {
       throw new AppException(
@@ -73,18 +91,22 @@ public class TransactionExecutor {
       throw new AppException(ErrorCode.TRANSFER_ERROR, "Account is not active");
     }
 
+    if (toAccount.getStatus() != AccountStatus.ACTIVE) {
+      throw new AppException(ErrorCode.TRANSFER_ERROR, "Account is not active");
+    }
+
     BigDecimal fee = FEE_PERCENTAGE.multiply(amount);
 
     BigDecimal totalDeduction = amount.add(fee);
-    if (fromAccount.getBalance().compareTo(totalDeduction) <= 0) {
+    if (fromAccount.getBalance().compareTo(totalDeduction) < 0) {
       throw new AppException(ErrorCode.TRANSFER_ERROR, "Insufficient funds");
     }
 
     // Update balance for source customer
-    fromAccount.setBalance(fromAccount.getBalance().subtract(totalDeduction));
+    fromAccount.withdraw(totalDeduction);
 
     // Update balance for destination customer
-    toAccount.setBalance(toAccount.getBalance().add(amount));
+    toAccount.deposit(amount);
 
     // Transaction for source
     Transaction txSource = transactionMapper.transferReqToTransaction(request);
@@ -107,20 +129,20 @@ public class TransactionExecutor {
     // Save to database
     accountRepository.save(fromAccount);
     accountRepository.save(toAccount);
-    Transaction saved = transactionRepository.save(txSource);
-    transactionRepository.save(txDest);
+    Transaction sourceSaved = transactionRepository.save(txSource);
+    Transaction destSaved = transactionRepository.save(txDest);
 
-    TransactionResponse response = transactionMapper.toResponse(saved);
+    TransactionResponse response = transactionMapper.toResponse(sourceSaved);
     response.setCustomerId(fromAccount.getCustomer().getId().toString());
     response.setAccountId(fromAccount.getId().toString());
 
-    eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
-    eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
+    eventPublisher.publishEvent(new TransactionCreatedEvent(sourceSaved.getId()));
+    eventPublisher.publishEvent(new TransactionCreatedEvent(destSaved.getId()));
     return response;
   }
 
   @Transactional
-  public TransactionResponse depositInternal(UUID accountId, DepositRequest request) {
+  public TransactionResponse executeDeposit(UUID accountId, DepositRequest request) {
     if (request.getChannel() == TransactionChannel.ATM
         || request.getChannel() == TransactionChannel.BRANCH) {
       requireNonNull(request.getAddress());
@@ -128,7 +150,7 @@ public class TransactionExecutor {
 
     Account account =
         accountRepository
-            .findByIdWithLock(accountId)
+            .findByIdWithPessimisticLock(accountId)
             .orElseThrow(
                 () ->
                     new AppException(
@@ -140,8 +162,7 @@ public class TransactionExecutor {
     }
 
     // Update balance
-    BigDecimal newBalance = account.getBalance().add(request.getAmount());
-    account.setBalance(newBalance);
+    account.deposit(request.getAmount());
 
     // Build transaction
     Transaction transaction = transactionMapper.depositReqToTransaction(request);
@@ -162,7 +183,8 @@ public class TransactionExecutor {
     return response;
   }
 
-  public TransactionResponse withdrawInternal(UUID accountId, WithdrawalRequest request) {
+  @Transactional
+  public TransactionResponse executeWithdrawal(UUID accountId, WithdrawalRequest request) {
     if (request.getChannel() == TransactionChannel.ATM
         || request.getChannel() == TransactionChannel.BRANCH) {
       requireNonNull(request.getAddress());
@@ -171,7 +193,7 @@ public class TransactionExecutor {
     BigDecimal amount = request.getAmount();
     Account account =
         accountRepository
-            .findByIdWithLock(accountId)
+            .findByIdWithPessimisticLock(accountId)
             .orElseThrow(
                 () ->
                     new AppException(
@@ -190,12 +212,12 @@ public class TransactionExecutor {
 
     BigDecimal fee = FEE_PERCENTAGE.multiply(amount);
     BigDecimal totalDeduction = amount.add(fee);
-    if (account.getBalance().compareTo(totalDeduction) <= 0) {
+    if (account.getBalance().compareTo(totalDeduction) < 0) {
       throw new AppException(ErrorCode.TRANSFER_ERROR, "Insufficient funds");
     }
 
     // Update balance
-    account.setBalance(account.getBalance().subtract(totalDeduction));
+    account.withdraw(totalDeduction);
 
     // Build transaction
     Transaction transaction = transactionMapper.withdrawalReqToTransaction(request);

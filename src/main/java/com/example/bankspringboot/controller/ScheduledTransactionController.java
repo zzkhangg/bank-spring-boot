@@ -3,9 +3,8 @@ package com.example.bankspringboot.controller;
 import com.example.bankspringboot.dto.transaction.ScheduledTransactionRequest;
 import com.example.bankspringboot.dto.transaction.ScheduledTransactionResponse;
 import com.example.bankspringboot.service.ScheduledTransactionService;
-import java.util.UUID;
-
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

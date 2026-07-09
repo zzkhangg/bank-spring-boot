@@ -5,6 +5,7 @@ import com.example.bankspringboot.dto.authentication.AuthenticationResponse;
 import com.example.bankspringboot.dto.authentication.LogoutRequest;
 import com.example.bankspringboot.dto.authentication.RefreshRequest;
 import com.example.bankspringboot.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,22 +23,24 @@ public class AuthController {
   AuthService authService;
 
   @PostMapping("/customer/login")
-  public AuthenticationResponse authenticateUser(@RequestBody AuthenticationRequest request) {
+  public AuthenticationResponse authenticateUser(
+      @Valid @RequestBody AuthenticationRequest request) {
     return authService.authenticate(request);
   }
 
   @PostMapping("admin/login")
-  public AuthenticationResponse authenticateAdmin(@RequestBody AuthenticationRequest request) {
+  public AuthenticationResponse authenticateAdmin(
+      @Valid @RequestBody AuthenticationRequest request) {
     return authService.authenticate(request);
   }
 
   @PostMapping("/logout")
-  public void logout(@RequestBody LogoutRequest request) {
+  public void logout(@Valid @RequestBody LogoutRequest request) {
     authService.logout(request);
   }
 
   @PostMapping("/refresh")
-  public AuthenticationResponse refreshToken(@RequestBody RefreshRequest request) {
+  public AuthenticationResponse refreshToken(@Valid @RequestBody RefreshRequest request) {
     return authService.refreshToken(request);
   }
 }

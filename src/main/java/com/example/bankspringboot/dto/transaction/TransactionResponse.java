@@ -1,10 +1,13 @@
 package com.example.bankspringboot.dto.transaction;
 
 import com.example.bankspringboot.domain.common.Address;
+import com.example.bankspringboot.domain.transaction.TransactionChannel;
 import com.example.bankspringboot.domain.transaction.TransactionStatus;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,9 +15,9 @@ import lombok.Setter;
 @Setter
 public class TransactionResponse {
 
-  private String transactionId;
-  private String accountId;
-  private String customerId;
+  private UUID transactionId;
+  private UUID accountId;
+  private UUID customerId;
   private BigDecimal amount;
   private TransactionStatus status; // SUCCESS, FAILED, PENDING
   private Instant createdAt;
@@ -23,4 +26,5 @@ public class TransactionResponse {
   private Address address;
   private TransactionType transactionType;
   private String currency;
+  private TransactionChannel channel;
 }

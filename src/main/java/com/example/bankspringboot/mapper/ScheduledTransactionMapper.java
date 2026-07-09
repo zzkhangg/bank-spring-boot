@@ -14,6 +14,11 @@ import org.mapstruct.Named;
 public interface ScheduledTransactionMapper {
 
   @Mapping(target = "toAccount", ignore = true)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "fromAccount", ignore = true)
+  @Mapping(target = "nextRunAt", ignore = true)
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "lastIntendedLocal", ignore = true)
   ScheduledTransaction toScheduledTransaction(ScheduledTransactionRequest request);
 
   @Mapping(target = "id", expression = "java(scheduledTransaction.getId().toString())")
@@ -21,11 +26,16 @@ public interface ScheduledTransactionMapper {
       target = "toAccountId",
       expression = "java(scheduledTransaction.getToAccount().getId().toString())")
   @Mapping(target = "nextRunAt", source = ".", qualifiedByName = "toLocalDateTime")
+  @Mapping(target = "timeZone", ignore = true)
   ScheduledTransactionResponse toResponse(ScheduledTransaction scheduledTransaction);
 
+  @Mapping(target = "address", ignore = true)
+  @Mapping(target = "channel", ignore = true)
   DepositRequest toDepositRequest(ScheduledTransaction scheduledTransaction);
 
   @Mapping(target = "destinationAccountId", ignore = true)
+  @Mapping(target = "address", ignore = true)
+  @Mapping(target = "channel", ignore = true)
   TransferRequest toTransferRequest(ScheduledTransaction scheduledTransaction);
 
   @Named(value = "toLocalDateTime")

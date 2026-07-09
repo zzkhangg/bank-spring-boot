@@ -122,8 +122,8 @@ public class TransactionFacade {
         .map(
             t -> {
               TransactionResponse res = transactionMapper.toResponse(t);
-              res.setCustomerId(t.getCustomer().getId().toString());
-              res.setAccountId(t.getAccount().getId().toString());
+              res.setCustomerId(t.getCustomer().getId());
+              res.setAccountId(t.getAccount().getId());
               return res;
             })
         .toList();
@@ -144,8 +144,8 @@ public class TransactionFacade {
                         ErrorCode.RESOURCE_NOT_FOUND,
                         "Transaction with id " + transactionId + " not found"));
     TransactionResponse response = transactionMapper.toResponse(transaction);
-    response.setCustomerId(transaction.getCustomer().getId().toString());
-    response.setAccountId(transaction.getAccount().getId().toString());
+    response.setCustomerId(transaction.getCustomer().getId());
+    response.setAccountId(transaction.getAccount().getId());
     return response;
   }
 }

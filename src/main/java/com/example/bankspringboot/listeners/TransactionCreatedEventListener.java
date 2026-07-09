@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
@@ -22,7 +23,7 @@ public class TransactionCreatedEventListener {
   FraudDetectionService fraudDetectionService;
   AlertService alertService;
 
-  @TransactionalEventListener
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void onTransactionCreated(TransactionCreatedEvent event) {
     Transaction transaction = transactionRepository.findById(event.transactionId()).orElseThrow();
     if (fraudDetectionService.isTooFast(transaction)) {

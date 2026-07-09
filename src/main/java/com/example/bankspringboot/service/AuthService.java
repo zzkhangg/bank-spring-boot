@@ -53,12 +53,12 @@ public class AuthService {
   String SIGNER_KEY;
 
   @NonFinal
-  @Value("${jwt.valid-duration}")
-  String VALIDATION_DURATION;
+  @Value("${jwt.access-token-expiration-minutes}")
+  Integer ACCESS_TOKEN_EXPIRATION_MINUTES;
 
   @NonFinal
-  @Value("${jwt.refreshable-duration}")
-  String REFRESHABLE_DURATION;
+  @Value("${jwt.refresh-token-expiration-days}")
+  Integer REFRESH_TOKEN_EXPIRATION_DAYS;
 
   String REFRESH_TOKEN = "refresh";
   String ACCESS_TOKEN = "access";
@@ -82,14 +82,20 @@ public class AuthService {
   }
 
   private String generateToken(UserDetails user, boolean isRefreshToken) {
+    Instant now = Instant.now();
+
     JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
-    long duration = Long.parseLong(isRefreshToken ? REFRESHABLE_DURATION : VALIDATION_DURATION);
+
+    Instant expirationInstant = isRefreshToken
+            ? now.plus(REFRESH_TOKEN_EXPIRATION_DAYS, ChronoUnit.DAYS)
+            : now.plus(ACCESS_TOKEN_EXPIRATION_MINUTES, ChronoUnit.MINUTES);
+
     JWTClaimsSet jwtClaimsSet =
         new JWTClaimsSet.Builder()
             .subject(user.getUsername())
             .issuer("bankspringboot.example.com")
-            .issueTime(Date.from(Instant.now()))
-            .expirationTime(Date.from(Instant.now().plus(duration, ChronoUnit.SECONDS)))
+            .issueTime(Date.from(now))
+            .expirationTime(Date.from(expirationInstant))
             .claim("scope", buildScope(user))
             .jwtID(UUID.randomUUID().toString())
             .claim("token_type", isRefreshToken ? REFRESH_TOKEN : ACCESS_TOKEN)
@@ -98,12 +104,13 @@ public class AuthService {
     Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
     JWSObject jwsObject = new JWSObject(jwsHeader, payload);
+
     try {
       jwsObject.sign(new MACSigner(Base64.getDecoder().decode(SIGNER_KEY)));
       return jwsObject.serialize();
-    } catch (Exception e) {
+    } catch (JOSEException e) {
       log.error(e.getMessage());
-      throw new RuntimeException(e);
+      throw new AppException(ErrorCode.TOKEN_SIGNING_FAILED);
     }
   }
 

@@ -48,8 +48,7 @@ public class GlobalExceptionHandler {
             .map(error -> error.getDefaultMessage())
             .orElse(ErrorCode.VALIDATION_ERROR.getMessage());
 
-    RestResponse<?> res =
-        RestResponse.error(message, ErrorCode.VALIDATION_ERROR.getCode());
+    RestResponse<?> res = RestResponse.error(message, ErrorCode.VALIDATION_ERROR.getCode());
 
     return ResponseEntity.status(ErrorCode.VALIDATION_ERROR.getStatusCode()).body(res);
   }
@@ -94,7 +93,8 @@ public class GlobalExceptionHandler {
     }
 
     RestResponse<?> res =
-        RestResponse.error(ErrorCode.DATABASE_ERROR.getMessage(), ErrorCode.DATABASE_ERROR.getCode());
+        RestResponse.error(
+            ErrorCode.DATABASE_ERROR.getMessage(), ErrorCode.DATABASE_ERROR.getCode());
     return ResponseEntity.status(ErrorCode.DATABASE_ERROR.getStatusCode()).body(res);
   }
 

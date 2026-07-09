@@ -14,7 +14,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -27,7 +26,6 @@ public class IdempotencyService {
   IdempotencyKeyWriter idempotencyKeyWriter;
   ActionExecutor actionExecutor;
 
-  @Transactional
   public <T> T handleIdempotency(
       String key, String requestHash, Class<T> responseType, Supplier<T> action)
       throws JsonProcessingException {
@@ -60,8 +58,7 @@ public class IdempotencyService {
       }
 
       return objectMapper.readValue(existing.getResponseBody(), responseType);
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       idempotencyKeyWriter.markFailed(key);
       throw e;
     }

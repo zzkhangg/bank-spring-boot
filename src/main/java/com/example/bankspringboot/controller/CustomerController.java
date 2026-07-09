@@ -5,7 +5,6 @@ import com.example.bankspringboot.dto.customer.CustomerResponse;
 import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
 import com.example.bankspringboot.service.CustomerService;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;

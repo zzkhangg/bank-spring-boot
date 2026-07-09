@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/bank}
+    username: ${DB_USERNAME:root}
+    password: ${DB_ROOT_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 10m
+      cache-null-values: false
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-key-change-me}
+
+  admin:
+    username: ${ADMIN_USERNAME}
+    password: ${ADMIN_PASSWORD}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    com.example.bankspringboot: DEBUG
+
+app:
+
+
+bank:
+  customer-types:
+    INDIVIDUAL:
+      max-transaction-limit: 50000000
+    BUSINESS:
+      max-transaction-limit: 500000000

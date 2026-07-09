@@ -47,14 +47,11 @@ public class TransactionExecutor {
       throw new AppException(
           ErrorCode.TRANSFER_ERROR, "Cannot transfer funds to the same account.");
     }
+    boolean fromFirst = fromAccountId.compareTo(toAccountId) < 0;
 
-    UUID firstId = fromAccountId.compareTo(toAccountId) < 0
-            ? fromAccountId
-            : toAccountId;
+    UUID firstId = fromFirst ? fromAccountId : toAccountId;
 
-    UUID secondId = fromAccountId.compareTo(toAccountId) < 0
-            ? toAccountId
-            : fromAccountId;
+    UUID secondId = fromFirst ? toAccountId : fromAccountId;
 
     Account firstLocked =
         accountRepository
@@ -64,22 +61,18 @@ public class TransactionExecutor {
                     new AppException(
                         ErrorCode.RESOURCE_NOT_FOUND, "Account with id " + firstId + " not found"));
 
-
     Account secondLocked =
         accountRepository
             .findByIdWithPessimisticLock(secondId)
             .orElseThrow(
                 () ->
                     new AppException(
-                        ErrorCode.RESOURCE_NOT_FOUND, "Account with id " + secondId + " not found"));
+                        ErrorCode.RESOURCE_NOT_FOUND,
+                        "Account with id " + secondId + " not found"));
 
-    Account fromAccount = firstLocked.getId().equals(fromAccountId)
-            ? firstLocked
-            : secondLocked;
+    Account fromAccount = fromFirst ? firstLocked : secondLocked;
 
-    Account toAccount = firstLocked.getId().equals(toAccountId)
-            ? firstLocked
-            : secondLocked;
+    Account toAccount = fromFirst ? firstLocked : secondLocked;
 
     if (amount.compareTo(fromAccount.getTransactionLimit()) > 0) {
       throw new AppException(
@@ -133,8 +126,8 @@ public class TransactionExecutor {
     Transaction destSaved = transactionRepository.save(txDest);
 
     TransactionResponse response = transactionMapper.toResponse(sourceSaved);
-    response.setCustomerId(fromAccount.getCustomer().getId().toString());
-    response.setAccountId(fromAccount.getId().toString());
+    response.setCustomerId(fromAccount.getCustomer().getId());
+    response.setAccountId(fromAccount.getId());
 
     eventPublisher.publishEvent(new TransactionCreatedEvent(sourceSaved.getId()));
     eventPublisher.publishEvent(new TransactionCreatedEvent(destSaved.getId()));
@@ -176,8 +169,8 @@ public class TransactionExecutor {
     accountRepository.save(account);
     Transaction saved = transactionRepository.save(transaction);
     TransactionResponse response = transactionMapper.toResponse(saved);
-    response.setCustomerId(transaction.getCustomer().getId().toString());
-    response.setAccountId(accountId.toString());
+    response.setCustomerId(transaction.getCustomer().getId());
+    response.setAccountId(accountId);
 
     eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
     return response;
@@ -231,8 +224,8 @@ public class TransactionExecutor {
     accountRepository.save(account);
     Transaction saved = transactionRepository.save(transaction);
     TransactionResponse response = transactionMapper.toResponse(saved);
-    response.setCustomerId(transaction.getCustomer().getId().toString());
-    response.setAccountId(accountId.toString());
+    response.setCustomerId(transaction.getCustomer().getId());
+    response.setAccountId(accountId);
 
     eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
     return response;

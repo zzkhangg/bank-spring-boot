@@ -16,7 +16,10 @@ public class WithdrawalRequest {
 
   /** The amount of money to withdraw. Must be positive and non-zero. */
   @NotNull(message = "Amount is required.")
-  @DecimalMin(value = "0.01", inclusive = true, message = "Withdrawal amount must be at least 0.01.")
+  @DecimalMin(
+      value = "0.01",
+      inclusive = true,
+      message = "Withdrawal amount must be at least 0.01.")
   @Digits(
       integer = 12,
       fraction = 2,

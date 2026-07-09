@@ -6,11 +6,12 @@ import jakarta.persistence.*;
 import jakarta.persistence.EntityListeners;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
+
+import lombok.*;
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
@@ -27,7 +28,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     name = "deletedAccountFilter",
     parameters = @ParamDef(name = "isDeleted", type = boolean.class))
 @Filter(name = "deletedAccountFilter", condition = "deleted = :isDeleted")
+@Builder
 @Table(name = "accounts", uniqueConstraints = @UniqueConstraint(columnNames = "account_number"))
+@NoArgsConstructor
+@AllArgsConstructor
 public class Account {
 
   @Id
@@ -42,13 +46,13 @@ public class Account {
   private BigDecimal transactionLimit;
   private boolean deleted = Boolean.FALSE;
 
-  @CreatedDate private LocalDateTime createdAt;
+  @CreatedDate private Instant createdAt;
 
-  @ManyToOne
-  @JoinColumn(name = "customer_id")
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "customer_id", unique = true)
   private Customer customer;
 
-  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   private List<Transaction> transactions;
 
   @Enumerated(EnumType.STRING)
@@ -57,7 +61,7 @@ public class Account {
   @Enumerated(EnumType.STRING)
   private AccountType accountType;
 
-  @OneToMany(mappedBy = "account")
+  @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
   List<AccountStatusHistory> accountStatusHistory;
 
   public void withdraw(BigDecimal amount) {

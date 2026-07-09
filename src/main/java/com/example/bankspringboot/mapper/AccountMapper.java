@@ -15,9 +15,25 @@ public interface AccountMapper {
   AccountResponse toResponse(Account account);
 
   @Mapping(target = "customer", ignore = true)
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "accountNumber", ignore = true)
+  @Mapping(target = "deleted", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "transactions", ignore = true)
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "accountStatusHistory", ignore = true)
   @Mapping(source = "initialDeposit", target = "balance")
   Account toAccount(CreateAccountRequest request);
 
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "accountNumber", ignore = true)
+  @Mapping(target = "balance", ignore = true)
+  @Mapping(target = "transactionLimit", ignore = true)
+  @Mapping(target = "deleted", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "customer", ignore = true)
+  @Mapping(target = "transactions", ignore = true)
+  @Mapping(target = "accountType", ignore = true)
   @Mapping(target = "accountStatusHistory", ignore = true)
   void updateAccountFromRequest(UpdateAccountRequest request, @MappingTarget Account account);
 }

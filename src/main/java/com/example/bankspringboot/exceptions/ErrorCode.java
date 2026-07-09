@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
   INVALID_KEY("Invalid error code key", 1001, HttpStatus.INTERNAL_SERVER_ERROR),
+  TOKEN_SIGNING_FAILED("Token signing failed", 1002, HttpStatus.INTERNAL_SERVER_ERROR),
 
   RESOURCE_NOT_FOUND("Resource not found", 1100, HttpStatus.NOT_FOUND),
   RESOURCE_EXISTED("Resource already exists", 1101, HttpStatus.CONFLICT),

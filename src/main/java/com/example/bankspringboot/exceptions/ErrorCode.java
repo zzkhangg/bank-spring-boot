@@ -20,6 +20,8 @@ public enum ErrorCode {
 
   UNAUTHORIZED("You do not have permission to access this resource", 1300, HttpStatus.FORBIDDEN),
   UNAUTHENTICATED("Authentication is required", 1301, HttpStatus.UNAUTHORIZED),
+  INVALID_CREDENTIALS("Current password is incorrect", 1302, HttpStatus.BAD_REQUEST),
+  SAME_PASSWORD("New password must be different from the current password", 1303, HttpStatus.BAD_REQUEST),
 
   DATABASE_ERROR("Database error", 1400, HttpStatus.INTERNAL_SERVER_ERROR),
 

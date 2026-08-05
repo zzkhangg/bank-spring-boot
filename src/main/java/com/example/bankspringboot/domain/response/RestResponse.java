@@ -18,9 +18,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class RestResponse<T> {
 
-  Object message;
+  String message;
   T data;
   int statusCode;
+  Object errors;
 
   public static <T> RestResponse<T> success(T data) {
     return RestResponse.<T>builder().data(data).statusCode(200).build();
@@ -28,5 +29,9 @@ public class RestResponse<T> {
 
   public static RestResponse<?> error(String message, int status) {
     return RestResponse.builder().message(message).statusCode(status).build();
+  }
+
+  public static RestResponse<?> error(String message, Object errors, int status) {
+    return RestResponse.builder().message(message).statusCode(status).data(errors).build();
   }
 }

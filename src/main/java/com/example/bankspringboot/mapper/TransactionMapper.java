@@ -17,8 +17,7 @@ public interface TransactionMapper {
 
   @Mapping(source = "type", target = "transactionType")
   @Mapping(target = "transactionId", expression = "java(transaction.getId())")
-  @Mapping(target = "accountId", ignore = true)
-  @Mapping(target = "customerId", ignore = true)
+  @Mapping(target = "customerId", source = "customer.id")
   TransactionResponse toResponse(Transaction transaction);
 
   @Mapping(target = "account", ignore = true)

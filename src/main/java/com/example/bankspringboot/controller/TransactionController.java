@@ -1,6 +1,7 @@
 package com.example.bankspringboot.controller;
 
 import com.example.bankspringboot.domain.transaction.TransactionType;
+import com.example.bankspringboot.dto.common.PageResponse;
 import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import com.example.bankspringboot.dto.transaction.TransferRequest;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -66,7 +68,7 @@ public class TransactionController {
   }
 
   @GetMapping("/transactions")
-  public List<TransactionResponse> getTransactions(
+  public PageResponse<TransactionResponse> getTransactions(
       @PathVariable UUID accountId,
       @RequestParam(name = "page", defaultValue = "1", required = false) int pageNumber,
       @RequestParam(name = "min-price", required = false) BigDecimal minPrice,

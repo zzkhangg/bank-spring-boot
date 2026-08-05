@@ -2,6 +2,8 @@ package com.example.bankspringboot.dto.transaction;
 
 import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.TransactionChannel;
+import com.example.bankspringboot.dto.common.BranchTransaction;
+import com.example.bankspringboot.validation.annotation.RequireAddressForBranch;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
@@ -12,7 +14,8 @@ import lombok.Getter;
  * OF an account.
  */
 @Getter
-public class WithdrawalRequest {
+@RequireAddressForBranch
+public class WithdrawalRequest implements BranchTransaction {
 
   /** The amount of money to withdraw. Must be positive and non-zero. */
   @NotNull(message = "Amount is required.")

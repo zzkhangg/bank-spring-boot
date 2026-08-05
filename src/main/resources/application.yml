@@ -13,15 +13,13 @@ spring:
     virtual:
       enabled: true
 
-  profiles:
-    active: ${PROFILE_ACTIVE}
 server:
   port: 8080
 
 app:
   jwt:
-    issuer: bank-spring-boot
-    access-token-expiration-minutes: 15
+    issuer: bankspringboot.example.com
+    access-token-expiration-minutes: 1000
     refresh-token-expiration-days: 7
 
 bank:

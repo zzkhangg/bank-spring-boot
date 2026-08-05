@@ -23,7 +23,6 @@ public interface CustomerMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "customerType", ignore = true)
   @Mapping(target = "birthDate", ignore = true)
-  @Mapping(target = "deleted", ignore = true)
   @Mapping(target = "accounts", ignore = true)
   @Mapping(target = "transactions", ignore = true)
   Customer toCustomer(CreateCustomerRequest request);
@@ -32,7 +31,6 @@ public interface CustomerMapper {
   @Mapping(target = "roles", ignore = true)
   @Mapping(target = "phoneNumber", ignore = true)
   @Mapping(target = "birthDate", ignore = true)
-  @Mapping(target = "deleted", ignore = true)
   @Mapping(target = "customerType", ignore = true)
   @Mapping(target = "accounts", ignore = true)
   @Mapping(target = "transactions", ignore = true)

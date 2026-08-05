@@ -2,20 +2,17 @@ package com.example.bankspringboot.domain.account;
 
 import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.domain.transaction.Transaction;
+import com.example.bankspringboot.exceptions.AppException;
+import com.example.bankspringboot.exceptions.ErrorCode;
 import jakarta.persistence.*;
 import jakarta.persistence.EntityListeners;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import lombok.*;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
-import org.hibernate.annotations.SQLDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,11 +20,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Setter
 @Getter
-@SQLDelete(sql = "UPDATE account SET deleted = true WHERE id=?")
-@FilterDef(
-    name = "deletedAccountFilter",
-    parameters = @ParamDef(name = "isDeleted", type = boolean.class))
-@Filter(name = "deletedAccountFilter", condition = "deleted = :isDeleted")
 @Builder
 @Table(name = "accounts", uniqueConstraints = @UniqueConstraint(columnNames = "account_number"))
 @NoArgsConstructor
@@ -44,12 +36,11 @@ public class Account {
 
   private BigDecimal balance;
   private BigDecimal transactionLimit;
-  private boolean deleted = Boolean.FALSE;
 
   @CreatedDate private Instant createdAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "customer_id", unique = true)
+  @JoinColumn(name = "customer_id")
   private Customer customer;
 
   @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -65,6 +56,14 @@ public class Account {
   List<AccountStatusHistory> accountStatusHistory;
 
   public void withdraw(BigDecimal amount) {
+    if (amount.signum() <= 0) {
+      throw new IllegalArgumentException("Amount must be positive");
+    }
+
+    if (balance.compareTo(amount) < 0) {
+      throw new AppException(ErrorCode.TRANSFER_ERROR, "Insufficient funds");
+    }
+
     balance = balance.subtract(amount);
   }
 

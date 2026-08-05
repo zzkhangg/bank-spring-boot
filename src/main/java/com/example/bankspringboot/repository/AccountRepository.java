@@ -2,6 +2,7 @@ package com.example.bankspringboot.repository;
 
 import com.example.bankspringboot.common.AccountBalanceType;
 import com.example.bankspringboot.domain.account.Account;
+import com.example.bankspringboot.domain.account.AccountStatus;
 import com.example.bankspringboot.dto.statistics.AccountStatisticsDto;
 import jakarta.persistence.LockModeType;
 import java.math.BigDecimal;
@@ -40,4 +41,6 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
   boolean existsByIdAndCustomer_Email(UUID id, String email);
 
   List<Account> findByCustomer_Id(UUID customerId);
+
+  List<Account> findByStatus(AccountStatus status);
 }

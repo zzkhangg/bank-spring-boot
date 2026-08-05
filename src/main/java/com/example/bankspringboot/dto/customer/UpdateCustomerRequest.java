@@ -21,18 +21,12 @@ public class UpdateCustomerRequest {
 
   String lastName;
 
-  @Email(message = "Email must be a valid email address.")
-  String email;
-
   @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits.")
   String phone;
 
   @Past(message = "Birthdate must be in the past.")
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   LocalDate birthdate;
-
-  @Size(min = 8, max = 30, message = "Password must be between 8 and 30 characters.")
-  String password;
 
   @Valid Address address;
 }

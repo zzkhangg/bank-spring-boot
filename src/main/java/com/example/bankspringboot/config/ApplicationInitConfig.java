@@ -25,19 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class ApplicationInitConfig {
-
-  @Value("${app.admin.username}")
-  private String username;
-
-  @Value("${app.admin.password}")
-  private String password;
-
   private final CustomerTypeConfig customerTypeConfig;
 
   @Transactional
   @Bean
   @Profile("dev")
   ApplicationRunner applicationRunner(
+      @Value("${app.admin.username}") String username,
+      @Value("${app.admin.password}") String password,
       AdminRespository adminRespository,
       PasswordEncoder passwordEncoder,
       PermissionRepository permissionRepository,

@@ -3,6 +3,7 @@ package com.example.bankspringboot.service;
 import com.example.bankspringboot.domain.transaction.Transaction;
 import com.example.bankspringboot.domain.transaction.TransactionType;
 import com.example.bankspringboot.domain.transaction.Transaction_;
+import com.example.bankspringboot.dto.common.PageResponse;
 import com.example.bankspringboot.dto.transaction.DepositRequest;
 import com.example.bankspringboot.dto.transaction.TransactionResponse;
 import com.example.bankspringboot.dto.transaction.TransferRequest;
@@ -70,7 +71,7 @@ public class TransactionFacade {
           "#accountId + ':v:' +"
               + " @transactionHistoryVersion.get(#accountId) + ':p:' + #pageNumber")
   @Transactional(readOnly = true)
-  public List<TransactionResponse> getTransactions(
+  public PageResponse<TransactionResponse> getTransactions(
       UUID accountId,
       int pageNumber,
       BigDecimal minPrice,
@@ -116,17 +117,9 @@ public class TransactionFacade {
     }
     Page<Transaction> transactionPage =
         transactionRepository.findAll(spec, PageRequest.of(pageNumber - 1, 10, sort));
-    List<Transaction> transactions = transactionPage.getContent();
+    List<TransactionResponse> responses = transactionPage.getContent().stream().map(transactionMapper::toResponse).toList();
 
-    return transactions.stream()
-        .map(
-            t -> {
-              TransactionResponse res = transactionMapper.toResponse(t);
-              res.setCustomerId(t.getCustomer().getId());
-              res.setAccountId(t.getAccount().getId());
-              return res;
-            })
-        .toList();
+    return new PageResponse<>(responses, pageNumber, 10, transactionPage.getTotalElements(), transactionPage.getTotalPages(), transactionPage.hasNext(), transactionPage.hasPrevious());
   }
 
   @PreAuthorize(
@@ -143,9 +136,6 @@ public class TransactionFacade {
                     new AppException(
                         ErrorCode.RESOURCE_NOT_FOUND,
                         "Transaction with id " + transactionId + " not found"));
-    TransactionResponse response = transactionMapper.toResponse(transaction);
-    response.setCustomerId(transaction.getCustomer().getId());
-    response.setAccountId(transaction.getAccount().getId());
-    return response;
+    return transactionMapper.toResponse(transaction);
   }
 }

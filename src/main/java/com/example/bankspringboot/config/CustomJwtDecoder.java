@@ -2,7 +2,8 @@ package com.example.bankspringboot.config;
 
 import java.util.Base64;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.beans.factory.annotation.Value;
+
+import com.example.bankspringboot.config.properties.JwtProperties;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -18,16 +19,16 @@ public class CustomJwtDecoder implements JwtDecoder {
   private final NimbusJwtDecoder jwtDecoder;
 
   public CustomJwtDecoder(
-      @Value("${jwt.secret}") String secret,
+      JwtProperties jwtProperties,
       InvalidatedTokenValidator invalidatedTokenValidator,
       AccessTokenValidator accessTokenValidator) {
-    SecretKeySpec key = new SecretKeySpec(Base64.getDecoder().decode(secret), "HmacSHA512");
+    SecretKeySpec key = new SecretKeySpec(Base64.getDecoder().decode(jwtProperties.secret()), "HmacSHA512");
 
     this.jwtDecoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS512).build();
 
     OAuth2TokenValidator<Jwt> combinedValidator =
         new DelegatingOAuth2TokenValidator<>(
-            JwtValidators.createDefault(), accessTokenValidator, invalidatedTokenValidator);
+            JwtValidators.createDefaultWithIssuer(jwtProperties.issuer()), accessTokenValidator, invalidatedTokenValidator);
 
     this.jwtDecoder.setJwtValidator(combinedValidator);
   }

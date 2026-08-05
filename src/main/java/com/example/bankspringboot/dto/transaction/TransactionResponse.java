@@ -16,7 +16,6 @@ import lombok.Setter;
 public class TransactionResponse {
 
   private UUID transactionId;
-  private UUID accountId;
   private UUID customerId;
   private BigDecimal amount;
   private TransactionStatus status; // SUCCESS, FAILED, PENDING

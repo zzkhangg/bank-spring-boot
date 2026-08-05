@@ -1,5 +1,6 @@
 package com.example.bankspringboot.domain.customer;
 
+import com.example.bankspringboot.common.CustomerStatus;
 import com.example.bankspringboot.domain.User;
 import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.common.Address;
@@ -14,34 +15,35 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
-import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
 @Setter
-@SQLDelete(sql = "UPDATE customer SET deleted = true WHERE id=?")
-@FilterDef(
-    name = "deletedCustomerFilter",
-    parameters = @ParamDef(name = "isDeleted", type = boolean.class))
-@Filter(name = "deletedCustomerFilter", condition = "deleted = :isDeleted")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @PrimaryKeyJoinColumn(name = "user_id")
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "customers")
 public class Customer extends User {
 
-  @NotNull String firstName;
+  @NotNull
+  @Column(nullable = false)
+  String firstName;
 
-  @NotNull String lastName;
+  @NotNull
+  @Column(nullable = false)
+  String lastName;
 
-  @NotNull String phoneNumber;
+  @NotNull
+  @Column(nullable = false)
+  String phoneNumber;
 
-  @NotNull LocalDate birthDate;
+  @NotNull
+  @Column(nullable = false)
+  LocalDate birthDate;
 
-  boolean deleted;
+  @Enumerated(EnumType.STRING)
+  CustomerStatus status;
 
   @ManyToOne
   @JoinColumn(name = "customer_type_id", nullable = false)

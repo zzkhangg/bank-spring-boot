@@ -19,6 +19,7 @@ import com.example.bankspringboot.mapper.TransactionMapper;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.TransactionRepository;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +73,8 @@ public class TransactionExecutor {
 
     Account fromAccount = fromFirst ? firstLocked : secondLocked;
 
-    Account toAccount = fromFirst ? firstLocked : secondLocked;
+    Account toAccount =
+            fromFirst ? secondLocked : firstLocked;
 
     if (amount.compareTo(fromAccount.getTransactionLimit()) > 0) {
       throw new AppException(
@@ -88,7 +90,7 @@ public class TransactionExecutor {
       throw new AppException(ErrorCode.TRANSFER_ERROR, "Account is not active");
     }
 
-    BigDecimal fee = FEE_PERCENTAGE.multiply(amount);
+    BigDecimal fee = FEE_PERCENTAGE.multiply(amount).setScale(2, RoundingMode.HALF_UP);
 
     BigDecimal totalDeduction = amount.add(fee);
     if (fromAccount.getBalance().compareTo(totalDeduction) < 0) {
@@ -126,8 +128,6 @@ public class TransactionExecutor {
     Transaction destSaved = transactionRepository.save(txDest);
 
     TransactionResponse response = transactionMapper.toResponse(sourceSaved);
-    response.setCustomerId(fromAccount.getCustomer().getId());
-    response.setAccountId(fromAccount.getId());
 
     eventPublisher.publishEvent(new TransactionCreatedEvent(sourceSaved.getId()));
     eventPublisher.publishEvent(new TransactionCreatedEvent(destSaved.getId()));
@@ -169,8 +169,6 @@ public class TransactionExecutor {
     accountRepository.save(account);
     Transaction saved = transactionRepository.save(transaction);
     TransactionResponse response = transactionMapper.toResponse(saved);
-    response.setCustomerId(transaction.getCustomer().getId());
-    response.setAccountId(accountId);
 
     eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
     return response;
@@ -224,8 +222,6 @@ public class TransactionExecutor {
     accountRepository.save(account);
     Transaction saved = transactionRepository.save(transaction);
     TransactionResponse response = transactionMapper.toResponse(saved);
-    response.setCustomerId(transaction.getCustomer().getId());
-    response.setAccountId(accountId);
 
     eventPublisher.publishEvent(new TransactionCreatedEvent(saved.getId()));
     return response;

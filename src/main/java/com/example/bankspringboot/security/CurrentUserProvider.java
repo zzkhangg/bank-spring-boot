@@ -1,5 +1,6 @@
 package com.example.bankspringboot.security;
 
+import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.exceptions.ErrorCode;
 import com.example.bankspringboot.repository.CustomerRepository;
@@ -20,5 +21,16 @@ public class CurrentUserProvider {
         .findByEmail(email)
         .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND))
         .getId();
+  }
+
+  public String getEmail() {
+    return SecurityContextHolder.getContext().getAuthentication().getName();
+  }
+
+  public Customer getCurrentCustomer() {
+    String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    return customerRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
   }
 }

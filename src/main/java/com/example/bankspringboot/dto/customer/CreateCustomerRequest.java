@@ -2,6 +2,7 @@ package com.example.bankspringboot.dto.customer;
 
 import com.example.bankspringboot.common.CustomerTypeCode;
 import com.example.bankspringboot.domain.common.Address;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
@@ -29,12 +30,15 @@ public class CreateCustomerRequest {
   @Email(message = "Email must be a valid email address.")
   String email;
 
-  @NotBlank(message = "Phone number is required.")
-  @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits.")
+  @Pattern(
+          regexp = "^\\d{10}$",
+          message = "Phone number must contain exactly 10 digits."
+  )
   String phoneNumber;
 
   @NotNull(message = "Birthdate is required.")
   @Past(message = "Birthdate must be in the past.")
+  @JsonProperty("birthDate")
   LocalDate birthdate;
 
   @NotNull(message = "Password is required.")

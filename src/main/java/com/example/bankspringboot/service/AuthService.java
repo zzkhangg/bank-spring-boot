@@ -1,10 +1,8 @@
 package com.example.bankspringboot.service;
 
+import com.example.bankspringboot.config.properties.JwtProperties;
 import com.example.bankspringboot.domain.InvalidatedToken;
-import com.example.bankspringboot.dto.authentication.AuthenticationRequest;
-import com.example.bankspringboot.dto.authentication.AuthenticationResponse;
-import com.example.bankspringboot.dto.authentication.LogoutRequest;
-import com.example.bankspringboot.dto.authentication.RefreshRequest;
+import com.example.bankspringboot.dto.authentication.*;
 import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.exceptions.ErrorCode;
 import com.example.bankspringboot.repository.InvalidatedTokenRepository;
@@ -28,9 +26,7 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,19 +42,8 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
   AuthenticationManager authenticationManager;
-  private final UserDetailsService userDetailsService;
-
-  @NonFinal
-  @Value("${jwt.secret}")
-  String SIGNER_KEY;
-
-  @NonFinal
-  @Value("${jwt.access-token-expiration-minutes}")
-  Integer ACCESS_TOKEN_EXPIRATION_MINUTES;
-
-  @NonFinal
-  @Value("${jwt.refresh-token-expiration-days}")
-  Integer REFRESH_TOKEN_EXPIRATION_DAYS;
+  UserDetailsService userDetailsService;
+  JwtProperties jwtProperties;
 
   String REFRESH_TOKEN = "refresh";
   String ACCESS_TOKEN = "access";
@@ -87,13 +72,13 @@ public class AuthService {
     JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
 
     Instant expirationInstant = isRefreshToken
-            ? now.plus(REFRESH_TOKEN_EXPIRATION_DAYS, ChronoUnit.DAYS)
-            : now.plus(ACCESS_TOKEN_EXPIRATION_MINUTES, ChronoUnit.MINUTES);
+            ? now.plus(jwtProperties.refreshTokenExpirationDays(), ChronoUnit.DAYS)
+            : now.plus(jwtProperties.accessTokenExpirationMinutes(), ChronoUnit.MINUTES);
 
     JWTClaimsSet jwtClaimsSet =
         new JWTClaimsSet.Builder()
             .subject(user.getUsername())
-            .issuer("bankspringboot.example.com")
+            .issuer(jwtProperties.issuer())
             .issueTime(Date.from(now))
             .expirationTime(Date.from(expirationInstant))
             .claim("scope", buildScope(user))
@@ -106,7 +91,7 @@ public class AuthService {
     JWSObject jwsObject = new JWSObject(jwsHeader, payload);
 
     try {
-      jwsObject.sign(new MACSigner(Base64.getDecoder().decode(SIGNER_KEY)));
+      jwsObject.sign(new MACSigner(Base64.getDecoder().decode(jwtProperties.secret())));
       return jwsObject.serialize();
     } catch (JOSEException e) {
       log.error(e.getMessage());
@@ -124,7 +109,7 @@ public class AuthService {
 
   public SignedJWT verifyToken(String token, boolean isRefresh)
       throws JOSEException, ParseException {
-    JWSVerifier jwsVerifier = new MACVerifier(Base64.getDecoder().decode(SIGNER_KEY));
+    JWSVerifier jwsVerifier = new MACVerifier(Base64.getDecoder().decode(jwtProperties.secret()));
 
     SignedJWT signedJWT = SignedJWT.parse(token);
 

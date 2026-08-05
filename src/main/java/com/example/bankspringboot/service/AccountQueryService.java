@@ -1,6 +1,7 @@
 package com.example.bankspringboot.service;
 
 import com.example.bankspringboot.dto.account.AccountResponse;
+import com.example.bankspringboot.dto.account.AccountSummaryResponse;
 import com.example.bankspringboot.mapper.AccountMapper;
 import com.example.bankspringboot.repository.AccountRepository;
 import java.util.List;
@@ -22,9 +23,9 @@ public class AccountQueryService {
   AccountMapper accountMapper;
 
   @Cacheable(value = "accountsByUser", key = "#userId")
-  public List<AccountResponse> getAccounts(UUID userId) {
+  public List<AccountSummaryResponse> getAccounts(UUID userId) {
     return accountRepository.findByCustomer_Id(userId).stream()
-        .map(accountMapper::toResponse)
+        .map(accountMapper::toSummaryResponse)
         .toList();
   }
 }

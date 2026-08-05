@@ -1,9 +1,6 @@
 package com.example.bankspringboot.controller;
 
-import com.example.bankspringboot.dto.authentication.AuthenticationRequest;
-import com.example.bankspringboot.dto.authentication.AuthenticationResponse;
-import com.example.bankspringboot.dto.authentication.LogoutRequest;
-import com.example.bankspringboot.dto.authentication.RefreshRequest;
+import com.example.bankspringboot.dto.authentication.*;
 import com.example.bankspringboot.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

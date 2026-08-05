@@ -2,6 +2,8 @@ package com.example.bankspringboot.dto.transaction;
 
 import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.TransactionChannel;
+import com.example.bankspringboot.dto.common.BranchTransaction;
+import com.example.bankspringboot.validation.annotation.RequireAddressForBranch;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -20,7 +22,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class DepositRequest {
+@RequireAddressForBranch
+public class DepositRequest implements BranchTransaction {
 
   /**
    * The amount of money to deposit. Must be positive and non-zero. Uses BigDecimal for precise

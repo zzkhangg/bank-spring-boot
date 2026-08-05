@@ -4,10 +4,7 @@ import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.account.AccountStatus;
 import com.example.bankspringboot.domain.account.AccountStatusHistory;
 import com.example.bankspringboot.domain.customer.Customer;
-import com.example.bankspringboot.dto.account.AccountResponse;
-import com.example.bankspringboot.dto.account.AccountStatusHistoryResponse;
-import com.example.bankspringboot.dto.account.CreateAccountRequest;
-import com.example.bankspringboot.dto.account.UpdateAccountRequest;
+import com.example.bankspringboot.dto.account.*;
 import com.example.bankspringboot.events.AccountCreatedEvent;
 import com.example.bankspringboot.events.AccountDeletedEvent;
 import com.example.bankspringboot.events.AccountStatusUpdatedEvent;
@@ -22,7 +19,6 @@ import com.example.bankspringboot.security.CurrentUserProvider;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -49,24 +45,7 @@ public class AccountService {
   CurrentUserProvider currentUserProvider;
   AccountQueryService accountQueryService;
   ApplicationEventPublisher eventPublisher;
-
-  private static String generateAccountNumber() {
-    int LENGTH = 10; // length of the account number
-    Random random = new Random();
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < LENGTH; i++) {
-      sb.append(random.nextInt(10)); // append a digit 0-9
-    }
-    return sb.toString();
-  }
-
-  private String generateUniqueAccountNumber() {
-    String number;
-    do {
-      number = generateAccountNumber();
-    } while (accountRepository.existsByAccountNumber(number));
-    return number;
-  }
+  AccountNumberGenerator accountNumberGenerator;
 
   @PreAuthorize(
       "hasRole('ADMIN') ||"
@@ -80,7 +59,7 @@ public class AccountService {
   }
 
   @Transactional
-  @PreAuthorize("hasRole('ADMIN') ||" + " (#req.email == authentication.name)")
+  @PreAuthorize("hasRole('ADMIN')")
   public AccountResponse createAccount(CreateAccountRequest req) {
     Customer customer =
         customerRepository
@@ -95,7 +74,7 @@ public class AccountService {
 
     Account account = accountMapper.toAccount(req);
 
-    String accountNumber = generateUniqueAccountNumber();
+    String accountNumber = accountNumberGenerator.generateUniqueAccountNumber();
 
     account.setCustomer(customer);
     account.setAccountNumber(accountNumber);
@@ -117,7 +96,7 @@ public class AccountService {
 
     UUID customerId = account.getCustomer().getId();
 
-    accountRepository.delete(account);
+    account.setStatus(AccountStatus.CLOSED);
     eventPublisher.publishEvent(new AccountDeletedEvent(id, customerId));
   }
 
@@ -162,8 +141,14 @@ public class AccountService {
   }
 
   @Transactional(readOnly = true)
-  public List<AccountResponse> getAccountsForCurrentUser() {
+  public List<AccountSummaryResponse> getAccountsForCurrentUser() {
     UUID userId = currentUserProvider.getUserId();
     return accountQueryService.getAccounts(userId);
+  }
+
+  @Transactional(readOnly = true)
+  @PreAuthorize("hasRole('ADMIN')")
+  public List<AccountResponse> getAccounts(AccountStatus status) {
+    return accountRepository.findByStatus(status).stream().map(accountMapper::toResponse).toList();
   }
 }

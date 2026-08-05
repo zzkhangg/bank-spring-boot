@@ -1,10 +1,12 @@
 package com.example.bankspringboot.service;
 
+import com.example.bankspringboot.common.CustomerStatus;
 import com.example.bankspringboot.common.Role;
 import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.domain.customer.CustomerType;
 import com.example.bankspringboot.dto.customer.CreateCustomerRequest;
 import com.example.bankspringboot.dto.customer.CustomerResponse;
+import com.example.bankspringboot.dto.customer.UpdateCustomerPasswordRequest;
 import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
 import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.exceptions.ErrorCode;
@@ -15,6 +17,8 @@ import com.example.bankspringboot.repository.RoleRepository;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import com.example.bankspringboot.security.CurrentUserProvider;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -37,6 +41,7 @@ public class CustomerService {
 
   Role DEFAULT_ROLE = Role.CUSTOMER;
   CustomerTypeRepository customerTypeRepository;
+  CurrentUserProvider currentUserProvider;
 
   @Transactional
   public CustomerResponse createCustomer(CreateCustomerRequest req) {
@@ -49,6 +54,7 @@ public class CustomerService {
     customer.setCustomerType(customerType);
     customer.setPassword(passwordEncoder.encode(req.getPassword()));
     customer.setBirthDate(req.getBirthdate());
+
 
     Customer saved = customerRepository.save(customer);
     return customerMapper.toResponse(saved);
@@ -72,7 +78,6 @@ public class CustomerService {
     return customers.stream().map(customerMapper::toResponse).toList();
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
   @Transactional
   public CustomerResponse updateCustomer(UUID id, UpdateCustomerRequest req) {
     Customer customer =
@@ -92,6 +97,29 @@ public class CustomerService {
         customerRepository
             .findById(id)
             .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
-    customerRepository.delete(customer);
+    customer.setStatus(CustomerStatus.CLOSED);
+  }
+
+  @Transactional
+  public CustomerResponse updatePassword(UpdateCustomerPasswordRequest request) {
+    Customer customer = currentUserProvider.getCurrentCustomer();
+
+    if (!passwordEncoder.matches(request.getOldPassword(), customer.getPassword())) {
+      throw new AppException(
+              ErrorCode.INVALID_CREDENTIALS,
+              "Current password is incorrect"
+      );
+    }
+
+    if (passwordEncoder.matches(
+            request.getNewPassword(),
+            customer.getPassword())) {
+
+      throw new AppException(
+              ErrorCode.SAME_PASSWORD);
+    }
+
+    customer.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    return customerMapper.toResponse(customer);
   }
 }

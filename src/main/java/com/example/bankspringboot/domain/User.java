@@ -15,6 +15,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.util.Set;
 import java.util.UUID;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,9 +38,11 @@ public class User {
   @GeneratedValue(strategy = GenerationType.UUID)
   UUID id;
 
+  @NotNull
   @Column(nullable = false, unique = true)
   String email;
 
+  @NotNull
   @Column(nullable = false)
   String password;
 

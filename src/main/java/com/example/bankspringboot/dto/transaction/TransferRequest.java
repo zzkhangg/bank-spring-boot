@@ -2,6 +2,8 @@ package com.example.bankspringboot.dto.transaction;
 
 import com.example.bankspringboot.domain.common.Address;
 import com.example.bankspringboot.domain.transaction.TransactionChannel;
+import com.example.bankspringboot.dto.common.BranchTransaction;
+import com.example.bankspringboot.validation.annotation.RequireAddressForBranch;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -10,6 +12,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +23,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class TransferRequest {
+@Builder
+@RequireAddressForBranch
+public class TransferRequest implements BranchTransaction {
   /** The ID of the account to deposit the funds into. */
   @NotNull(message = "Destination account ID is required.")
   private UUID destinationAccountId;

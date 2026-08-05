@@ -2,13 +2,18 @@ package com.example.bankspringboot.exceptions;
 
 import com.example.bankspringboot.domain.response.RestResponse;
 import java.nio.file.AccessDeniedException;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,17 +22,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(value = MethodArgumentNotValidException.class)
   @ResponseBody
   public ResponseEntity<RestResponse<?>> handleInvalidArgument(MethodArgumentNotValidException ex) {
-    String message =
-        Optional.ofNullable(ex.getBindingResult().getFieldError())
-            .map(error -> error.getDefaultMessage())
-            .orElse(ErrorCode.VALIDATION_ERROR.getMessage());
+      Map<String, String> fieldErrors = ex.getBindingResult()
+              .getFieldErrors()
+              .stream()
+              .collect(Collectors.toMap(
+                      FieldError::getField,
+                      FieldError::getDefaultMessage,
+                      (first, second) -> first
+              ));
 
-    RestResponse<?> response = RestResponse.error(message, ErrorCode.VALIDATION_ERROR.getCode());
+    RestResponse<?> response = RestResponse.error(ErrorCode.VALIDATION_ERROR.getMessage(), fieldErrors, ErrorCode.VALIDATION_ERROR.getCode());
     return ResponseEntity.status(ErrorCode.VALIDATION_ERROR.getStatusCode()).body(response);
   }
 
@@ -55,10 +65,14 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(AppException.class)
   @ResponseBody
-  public ResponseEntity<RestResponse<?>> handleException(AppException e) {
-    RestResponse<?> res = RestResponse.error(e.getMessage(), e.getErrorCode().getCode());
+  public ResponseEntity<RestResponse<?>> handleException(AppException ex) {
+    log.warn("Business exception: code={}, message={}",
+            ex.getErrorCode().getCode(),
+            ex.getMessage());
 
-    return ResponseEntity.status(e.getErrorCode().getStatusCode()).body(res);
+    RestResponse<?> res = RestResponse.error(ex.getMessage(), ex.getErrorCode().getCode());
+
+    return ResponseEntity.status(ex.getErrorCode().getStatusCode()).body(res);
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -119,7 +133,15 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(RuntimeException.class)
   @ResponseBody
-  public ResponseEntity<RestResponse<?>> handleException(RuntimeException e) {
+  public ResponseEntity<RestResponse<?>> handleException(RuntimeException ex) {
+
+    log.error(
+            "Unhandled exception: type={}, message={}",
+            ex.getClass().getSimpleName(),
+            ex.getMessage(),
+            ex
+    );
+
     RestResponse<?> res =
         RestResponse.error(
             ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage(),

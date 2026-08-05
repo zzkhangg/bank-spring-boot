@@ -2,6 +2,7 @@ package com.example.bankspringboot.mapper;
 
 import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.dto.account.AccountResponse;
+import com.example.bankspringboot.dto.account.AccountSummaryResponse;
 import com.example.bankspringboot.dto.account.CreateAccountRequest;
 import com.example.bankspringboot.dto.account.UpdateAccountRequest;
 import org.mapstruct.Mapper;
@@ -11,13 +12,15 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
 
-  @Mapping(target = "accountId", expression = "java(account.getId().toString())")
+  @Mapping(target = "accountId", source = "id")
   AccountResponse toResponse(Account account);
+
+  @Mapping(target = "accountId", source = "id")
+  AccountSummaryResponse toSummaryResponse(Account account);
 
   @Mapping(target = "customer", ignore = true)
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "accountNumber", ignore = true)
-  @Mapping(target = "deleted", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "transactions", ignore = true)
   @Mapping(target = "status", ignore = true)
@@ -29,7 +32,6 @@ public interface AccountMapper {
   @Mapping(target = "accountNumber", ignore = true)
   @Mapping(target = "balance", ignore = true)
   @Mapping(target = "transactionLimit", ignore = true)
-  @Mapping(target = "deleted", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "customer", ignore = true)
   @Mapping(target = "transactions", ignore = true)

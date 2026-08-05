@@ -25,7 +25,7 @@ import lombok.experimental.FieldDefaults;
 @Table(
     name = "scheduled_tx_execution",
     uniqueConstraints = {
-      @UniqueConstraint(columnNames = {"scheduled_tx_id", " execution_time", " attempt_no"})
+      @UniqueConstraint(columnNames = {"scheduled_tx_id", "intended_run_at", "attempt_no"})
     })
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

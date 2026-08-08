@@ -27,6 +27,15 @@ public class SecurityConfig {
 
   String[] PUBLIC_ENDPOINTS = {"/api/customers", "/api/auth/**"};
 
+  /**
+   * The generated API description and its UI. Public so the docs can be browsed without a token —
+   * the endpoints they describe are still authenticated. Consider restricting these in a real
+   * deployment.
+   */
+  String[] DOCS_ENDPOINTS = {
+    "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**"
+  };
+
   CustomJwtDecoder customJwtDecoder;
 
   @Bean
@@ -42,6 +51,8 @@ public class SecurityConfig {
         request ->
             request
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll()
+                .requestMatchers(DOCS_ENDPOINTS)
                 .permitAll()
                 .anyRequest()
                 .authenticated());

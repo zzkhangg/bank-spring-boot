@@ -2,6 +2,7 @@ package com.example.bankspringboot.service;
 
 import static java.util.Objects.requireNonNull;
 
+import com.example.bankspringboot.config.properties.TransactionProperties;
 import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.account.AccountStatus;
 import com.example.bankspringboot.domain.transaction.Transaction;
@@ -35,7 +36,7 @@ public class TransactionExecutor {
 
   TransactionRepository transactionRepository;
   AccountRepository accountRepository;
-  BigDecimal FEE_PERCENTAGE = BigDecimal.valueOf(0.01);
+  TransactionProperties transactionProperties;
   TransactionMapper transactionMapper;
   ApplicationEventPublisher eventPublisher;
 
@@ -90,7 +91,7 @@ public class TransactionExecutor {
       throw new AppException(ErrorCode.TRANSFER_ERROR, "Account is not active");
     }
 
-    BigDecimal fee = FEE_PERCENTAGE.multiply(amount).setScale(2, RoundingMode.HALF_UP);
+    BigDecimal fee = transactionProperties.feePercentage().multiply(amount).setScale(2, RoundingMode.HALF_UP);
 
     BigDecimal totalDeduction = amount.add(fee);
     if (fromAccount.getBalance().compareTo(totalDeduction) < 0) {
@@ -201,7 +202,7 @@ public class TransactionExecutor {
       throw new AppException(ErrorCode.TRANSFER_ERROR, "Account is not active");
     }
 
-    BigDecimal fee = FEE_PERCENTAGE.multiply(amount);
+    BigDecimal fee = transactionProperties.feePercentage().multiply(amount).setScale(2, RoundingMode.HALF_UP);
     BigDecimal totalDeduction = amount.add(fee);
     if (account.getBalance().compareTo(totalDeduction) < 0) {
       throw new AppException(ErrorCode.TRANSFER_ERROR, "Insufficient funds");

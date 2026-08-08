@@ -66,10 +66,16 @@ public class TransactionFacade {
           + "hasRole('CUSTOMER') &&"
           + "@accountSecurity.isOwner(#accountId, authentication.name)")
   @Cacheable(
-      value = "transactionHistory",
-      key =
-          "#accountId + ':v:' +"
-              + " @transactionHistoryVersion.get(#accountId) + ':p:' + #pageNumber")
+          value = "transactionHistory",
+          key = "#accountId + ':v:' + @transactionHistoryVersion.get(#accountId)"
+                  + " + ':p:' + #pageNumber"
+                  + " + ':min:' + #minPrice"
+                  + " + ':max:' + #maxPrice"
+                  + " + ':type:' + #type"
+                  + " + ':before:' + #createdBefore"
+                  + " + ':after:' + #createdAfter"
+                  + " + ':sort:' + #sortStr"
+  )
   @Transactional(readOnly = true)
   public PageResponse<TransactionResponse> getTransactions(
       UUID accountId,

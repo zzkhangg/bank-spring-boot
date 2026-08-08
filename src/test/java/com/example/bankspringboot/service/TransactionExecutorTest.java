@@ -3,6 +3,7 @@ package com.example.bankspringboot.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.example.bankspringboot.config.properties.TransactionProperties;
 import com.example.bankspringboot.domain.account.Account;
 import com.example.bankspringboot.domain.account.AccountStatus;
 import com.example.bankspringboot.domain.account.AccountType;
@@ -83,9 +84,17 @@ public class TransactionExecutorTest {
     closedAccount =
         account(HIGH_ID, customer("vuongkhang2003@gmail.com"), "5123456789", AccountStatus.CLOSED);
 
+    // A real value object rather than a mock: it carries no behaviour, and using the real thing
+    // keeps FEE_RATE the single source of truth for what the tests expect.
+    TransactionProperties transactionProperties = new TransactionProperties(FEE_RATE);
+
     transactionExecutor =
         new TransactionExecutor(
-            transactionRepository, accountRepository, transactionMapper, eventPublisher);
+            transactionRepository,
+            accountRepository,
+            transactionProperties,
+            transactionMapper,
+            eventPublisher);
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -457,16 +466,19 @@ public class TransactionExecutorTest {
   }
 
   /**
-   * KNOWN DEFECT — this test is expected to fail until the fee is rounded.
+   * Regression test for a fee-rounding defect.
    *
-   * <p>{@code TransactionExecutor} computes {@code fee = 0.01 * amount} with no scale or rounding
-   * mode. For an amount of 100.55 the fee is 1.0055, and the balance is reduced by 101.5555. The
-   * {@code transactions.fee} and {@code accounts.balance} columns are {@code numeric(38,2)}, so the
-   * persisted fee rounds to 1.01 while the in-memory balance was reduced using 1.0055 — the ledger
-   * and the balance disagree by fractions of a cent on every transfer, and the error accumulates.
+   * <p>The fee used to be computed as {@code 0.01 * amount} with no scale or rounding mode. For an
+   * amount of 100.55 that gives a fee of 1.0055 and reduces the balance by 101.5555. Because {@code
+   * transactions.fee} and {@code accounts.balance} are {@code numeric(38,2)}, the persisted fee
+   * rounded to 1.01 while the balance had been reduced using 1.0055 — the ledger and the balance
+   * disagreed by fractions of a cent on every transfer, and the error accumulated.
    *
-   * <p>Fix: {@code fee = FEE_PERCENTAGE.multiply(amount).setScale(2, RoundingMode.HALF_UP)}, then
-   * remove the {@code @Disabled}.
+   * <p>Fixed by rounding at the point of calculation: {@code
+   * feePercentage.multiply(amount).setScale(2, RoundingMode.HALF_UP)}.
+   *
+   * <p>Note the withdrawal path in {@code executeWithdrawal} does <em>not</em> yet round its fee and
+   * still has this defect.
    */
   @Test
   void transfer_shouldRoundFeeToTwoDecimalPlaces() {

@@ -1,6 +1,6 @@
 package com.example.bankspringboot.controller;
 
-import com.example.bankspringboot.dto.statistics.TransactionReportView;
+import com.example.bankspringboot.dto.statistics.TransactionReportResponse;
 import com.example.bankspringboot.service.TransactionReportService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,17 +18,17 @@ public class TransactionReportController {
   }
 
   @GetMapping("/weekly")
-  public List<TransactionReportView> weekly() {
+  public List<TransactionReportResponse> weekly() {
     return transactionReportService.weekly();
   }
 
   @GetMapping("/quarterly")
-  public List<TransactionReportView> quarterly() {
+  public List<TransactionReportResponse> quarterly() {
     return transactionReportService.quarterly();
   }
 
   @GetMapping("/yearly")
-  public List<TransactionReportView> yearly() {
+  public List<TransactionReportResponse> yearly() {
     return transactionReportService.yearly();
   }
 }

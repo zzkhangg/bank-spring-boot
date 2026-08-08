@@ -21,6 +21,8 @@ app:
     issuer: bankspringboot.example.com
     access-token-expiration-minutes: 1000
     refresh-token-expiration-days: 7
+  transaction:
+    fee-percentage: 0.01
 
 bank:
   customer-types:

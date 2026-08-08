@@ -15,11 +15,11 @@ public class TransactionHistoryVersion {
 
   public long get(UUID accountId) {
     Long version = cache.get(accountId, Long.class);
-    return version == null ? 0 : version;
+    return version == null ? 0L : version;
   }
 
   public void bump(UUID accountId) {
     Long version = cache.get(accountId, Long.class);
-    cache.put(accountId, version == null ? 0 : version + 1);
+    cache.put(accountId, version == null ? 1 : version + 1);
   }
 }

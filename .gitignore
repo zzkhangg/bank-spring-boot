@@ -33,7 +33,6 @@ build/
 .vscode/
 
 ### Environment variables ###
-.env
-.env.dev
-.env.prod
+.env*
+!.env.example
 replacement.txt

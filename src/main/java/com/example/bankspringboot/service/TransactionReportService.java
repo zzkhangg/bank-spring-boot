@@ -1,6 +1,6 @@
 package com.example.bankspringboot.service;
 
-import com.example.bankspringboot.dto.statistics.TransactionReportView;
+import com.example.bankspringboot.dto.statistics.TransactionReportResponse;
 import com.example.bankspringboot.repository.TransactionRepository;
 import java.util.List;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,19 +18,25 @@ public class TransactionReportService {
 
   @PreAuthorize("hasRole('ADMIN')")
   @Cacheable("weeklyTransactionReport")
-  public List<TransactionReportView> weekly() {
-    return transactionRepository.weeklyTransactionReport();
+  public List<TransactionReportResponse> weekly() {
+    return transactionRepository.weeklyTransactionReport().stream()
+        .map(TransactionReportResponse::from)
+        .toList();
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @Cacheable("quarterlyTransactionReport")
-  public List<TransactionReportView> quarterly() {
-    return transactionRepository.quarterlyTransactionReport();
+  public List<TransactionReportResponse> quarterly() {
+    return transactionRepository.quarterlyTransactionReport().stream()
+        .map(TransactionReportResponse::from)
+        .toList();
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @Cacheable("yearlyTransactionReport")
-  public List<TransactionReportView> yearly() {
-    return transactionRepository.yearlyTransactionReport();
+  public List<TransactionReportResponse> yearly() {
+    return transactionRepository.yearlyTransactionReport().stream()
+        .map(TransactionReportResponse::from)
+        .toList();
   }
 }

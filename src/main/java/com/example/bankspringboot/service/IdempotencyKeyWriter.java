@@ -30,7 +30,7 @@ public class IdempotencyKeyWriter {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void markSuccess(String key, String responseBody) {
     IdempotencyKey managed = idempotencyKeyRepository.findByKey(key).orElseThrow();
-    log.info("dskdmakdak");
+
     managed.setStatus(IdempotencyStatus.SUCCESS);
     managed.setResponseBody(responseBody);
   }

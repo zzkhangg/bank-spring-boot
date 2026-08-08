@@ -1,13 +1,11 @@
 package com.example.bankspringboot.service;
 
 import com.example.bankspringboot.common.CustomerStatus;
+import com.example.bankspringboot.common.CustomerTypeCode;
 import com.example.bankspringboot.common.Role;
 import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.domain.customer.CustomerType;
-import com.example.bankspringboot.dto.customer.CreateCustomerRequest;
-import com.example.bankspringboot.dto.customer.CustomerResponse;
-import com.example.bankspringboot.dto.customer.UpdateCustomerPasswordRequest;
-import com.example.bankspringboot.dto.customer.UpdateCustomerRequest;
+import com.example.bankspringboot.dto.customer.*;
 import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.exceptions.ErrorCode;
 import com.example.bankspringboot.mapper.CustomerMapper;
@@ -49,7 +47,7 @@ public class CustomerService {
     com.example.bankspringboot.domain.Role role =
         roleRepository.findById(DEFAULT_ROLE.toString()).orElseThrow();
     CustomerType customerType =
-        customerTypeRepository.findByCode(req.getCustomerType()).orElseThrow();
+        customerTypeRepository.findByCode(CustomerTypeCode.INDIVIDUAL).orElseThrow();
     customer.setRoles(Set.of(role));
     customer.setCustomerType(customerType);
     customer.setPassword(passwordEncoder.encode(req.getPassword()));
@@ -60,8 +58,6 @@ public class CustomerService {
     return customerMapper.toResponse(saved);
   }
 
-  @PreAuthorize(
-      "hasRole('ADMIN') or" + "@customerSecurity.isValidCustomer(authentication.name, #id)")
   @Transactional(readOnly = true)
   public CustomerResponse getCustomer(UUID id) {
     Customer cus =
@@ -69,6 +65,11 @@ public class CustomerService {
             .findById(id)
             .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
     return customerMapper.toResponse(cus);
+  }
+
+  @Transactional(readOnly = true)
+  public CustomerResponse getCurrentCustomer() {
+    return getCustomer(currentUserProvider.getUserId());
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -90,6 +91,11 @@ public class CustomerService {
     return customerMapper.toResponse(updated);
   }
 
+  @Transactional
+  public CustomerResponse updateCurrentCustomer(UpdateCustomerRequest req) {
+    return updateCustomer(currentUserProvider.getUserId(), req);
+  }
+
   @PreAuthorize("hasRole('ADMIN')")
   @Transactional
   public void deleteCustomer(UUID id) {
@@ -98,6 +104,20 @@ public class CustomerService {
             .findById(id)
             .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
     customer.setStatus(CustomerStatus.CLOSED);
+  }
+
+  @Transactional
+  public CustomerResponse updateCustomerType(UUID id, UpdateCustomerTypeRequest request) {
+    CustomerType customerType = customerTypeRepository.findByCode(request.getCustomerType()).orElseThrow();
+
+    Customer customer =
+            customerRepository
+                    .findById(id)
+                    .orElseThrow(() -> new AppException(ErrorCode.RESOURCE_NOT_FOUND));
+
+    customer.setCustomerType(customerType);
+
+    return customerMapper.toResponse(customer);
   }
 
   @Transactional

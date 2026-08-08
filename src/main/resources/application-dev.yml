@@ -1,8 +1,11 @@
+# Defaults target a developer running the app on the host against Dockerised
+# datastores. The env-var overrides let the same profile run *inside* Compose,
+# where the hosts are the service names rather than localhost.
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/bank
-    username: root
-    password: REDACTED_PASSWORD
+    url: ${DB_URL:jdbc:mysql://localhost:3306/bank}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -11,8 +14,8 @@ spring:
     show-sql: true
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   cache:
     type: redis
@@ -21,12 +24,14 @@ spring:
       cache-null-values: false
 
 app:
+  # Dev-only fallbacks so the app starts with no setup. Anything real comes from the
+  # environment. These values must never be reused outside local development.
   jwt:
-    secret: G966Ckr+2LIimGPgFFQDljiZ8Y7yKrGafzmNY4d13bYCm3VI7y1skWKhulXXzKvh5bEkLKB3mP4+Z5/a6I8tOw==
+    secret: ${JWT_SECRET:G966Ckr+2LIimGPgFFQDljiZ8Y7yKrGafzmNY4d13bYCm3VI7y1skWKhulXXzKvh5bEkLKB3mP4+Z5/a6I8tOw==}
 
   admin:
-    username: admin@example.com
-    password: admin123@
+    username: ${APP_ADMIN_USERNAME:admin@example.com}
+    password: ${APP_ADMIN_PASSWORD:admin123@}
 
 bank:
   customer-types:

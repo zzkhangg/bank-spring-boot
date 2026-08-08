@@ -5,13 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@RestController
 @EnableJpaAuditing
 @ConfigurationPropertiesScan
-// @EnableScheduling
+@EnableScheduling
 @EnableCaching
 public class BankSpringBootApplication {
 

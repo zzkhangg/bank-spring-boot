@@ -19,6 +19,21 @@ services:
       retries: 10
       start_period: 30s
 
+  redis:
+    image: redis:7.4-alpine
+    container_name: bank-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
   app:
     build: .
     image: bank-spring-boot:local
@@ -31,6 +46,9 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   mysql-data:
+  redis-data:

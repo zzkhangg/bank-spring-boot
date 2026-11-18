@@ -5,7 +5,6 @@ import com.example.bankspringboot.domain.transaction.Transaction;
 import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.exceptions.ErrorCode;
 import jakarta.persistence.*;
-import jakarta.persistence.EntityListeners;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -21,7 +20,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @Getter
 @Builder
-@Table(name = "accounts", uniqueConstraints = @UniqueConstraint(columnNames = "account_number"))
+@Table(
+  name = "accounts",
+  uniqueConstraints = @UniqueConstraint(columnNames = "account_number")
+)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account {

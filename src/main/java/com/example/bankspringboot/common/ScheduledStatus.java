@@ -4,5 +4,6 @@ public enum ScheduledStatus {
   ACTIVE,
   PAUSED,
   CANCELLED,
-  FAILED
+  FAILED,
+  COMPLETED
 }

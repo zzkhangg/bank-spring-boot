@@ -1,7 +1,6 @@
 package com.example.bankspringboot.domain;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,7 +27,6 @@ import lombok.experimental.SuperBuilder;
 @Inheritance(strategy = InheritanceType.JOINED)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-@DiscriminatorColumn(name = "user_type")
 @Getter
 @Setter
 @NoArgsConstructor

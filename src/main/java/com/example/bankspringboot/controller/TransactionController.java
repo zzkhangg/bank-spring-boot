@@ -14,30 +14,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/accounts/{accountId}")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 @Slf4j
 public class TransactionController {
 
   private final TransactionFacade transactionFacade;
   private final IdempotencyService idempotencyService;
   private final ObjectMapper objectMapper;
-
-  public TransactionController(
-      TransactionFacade transactionFacade,
-      IdempotencyService idempotencyService,
-      ObjectMapper objectMapper) {
-    this.transactionFacade = transactionFacade;
-    this.idempotencyService = idempotencyService;
-    this.objectMapper = objectMapper;
-  }
 
   @PostMapping("/deposit")
   public TransactionResponse deposit(

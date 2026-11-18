@@ -1,14 +1,17 @@
 package com.example.bankspringboot.service;
 
-import com.example.bankspringboot.common.ScheduledType;
-import com.example.bankspringboot.domain.scheduledtransaction.ScheduledTransaction;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
+
+import com.example.bankspringboot.common.ScheduledType;
+import com.example.bankspringboot.domain.scheduledtransaction.ScheduledTransaction;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -39,7 +42,9 @@ public class ScheduledTransactionCalculator {
     ZonedDateTime now = ZonedDateTime.now(cursor.getZone());
     switch (scheduledType) {
       case DAILY:
-        cursor = cursor.plusDays(scheduledValue);
+        if (!isFirstRun) {
+          cursor = cursor.plusDays(scheduledValue);
+        }
         break;
       case WEEKLY:
         if (isFirstRun) {

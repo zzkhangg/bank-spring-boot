@@ -82,7 +82,6 @@ public class FinancialReportService {
 
     BigDecimal initialBalance =
         Optional.ofNullable(transactionRepository.getNetBalance(instantFrom))
-            .map(netBalance -> netBalance.min(BigDecimal.ZERO))
             .orElse(BigDecimal.ZERO);
     BigDecimal runningBalance = initialBalance;
     for (FinancialReportRowDto dto : rowDtos) {

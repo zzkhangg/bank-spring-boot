@@ -116,12 +116,12 @@ public interface TransactionRepository
                 ) - SUM(fee) AS netChange
             FROM transactions
             WHERE created_at >= :from
-                AND created_at < DATE_ADD(:to, INTERVAL 1 DAY)
+                AND created_at < :toExclusive
             GROUP BY DATE(created_at - INTERVAL DAY(created_at)-1 DAY)
             ORDER BY period asc
           """,
       nativeQuery = true)
-  List<FinancialReportRow> financialReportByMonth(Instant from, Instant to);
+  List<FinancialReportRow> financialReportByMonth(Instant from, Instant toExclusive);
 
   @Query(
       value =
@@ -143,12 +143,12 @@ public interface TransactionRepository
                 ) - SUM(fee) AS net_change
             FROM transactions
             WHERE created_at >= :from
-                AND created_at < DATE_ADD(:to, INTERVAL 1 DAY)
+                AND created_at < :toExclusive
             GROUP BY YEAR(created_at)
             ORDER BY period asc
           """,
       nativeQuery = true)
-  List<FinancialReportRow> financialReportByYear(Instant from, Instant to);
+  List<FinancialReportRow> financialReportByYear(Instant from, Instant toExclusive);
 
   @Query(
       value =

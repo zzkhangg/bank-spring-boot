@@ -1,6 +1,8 @@
 package com.example.bankspringboot.service;
 
+import com.example.bankspringboot.common.CustomerStatus;
 import com.example.bankspringboot.domain.User;
+import com.example.bankspringboot.domain.customer.Customer;
 import com.example.bankspringboot.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +32,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         userRepository
             .findByEmail(username)
             .orElseThrow(() -> new UsernameNotFoundException(username));
+
+    if (user instanceof Customer customer
+            && customer.getStatus() != CustomerStatus.ACTIVE) {
+        throw new DisabledException("Customer is not active");
+    }
+
     List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
     user.getRoles()
         .forEach(

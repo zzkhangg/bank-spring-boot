@@ -37,6 +37,7 @@ public class SecurityConfig {
   };
 
   CustomJwtDecoder customJwtDecoder;
+  JwtAuthenticationConverter jwtAuthenticationConverter;
 
   @Bean
   PasswordEncoder passwordEncoder() {
@@ -63,7 +64,7 @@ public class SecurityConfig {
                     jwtConfigurer ->
                         jwtConfigurer
                             .decoder(customJwtDecoder)
-                            .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                            .jwtAuthenticationConverter(jwtAuthenticationConverter))
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint));
     httpSecurity.csrf(AbstractHttpConfigurer::disable);
 

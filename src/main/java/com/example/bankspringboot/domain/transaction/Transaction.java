@@ -17,7 +17,10 @@ import lombok.Setter;
 @Setter
 @Table(
     name = "transactions",
-    indexes = {@Index(name = "idx_transaction_created_at", columnList = "created_at")})
+    indexes = {
+      @Index(name = "idx_transaction_created_at", columnList = "created_at"),
+      @Index(name = "idx_account_id_created_at", columnList = "account_id, created_at")
+    })
 public class Transaction {
 
   @Id

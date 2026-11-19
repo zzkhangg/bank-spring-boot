@@ -36,3 +36,7 @@ build/
 .env*
 !.env.example
 replacement.txt
+threads.txt
+test.log
+errors.log
+surefire-threads.txt

@@ -1,9 +1,6 @@
 package com.example.bankspringboot;
 
-import com.example.bankspringboot.repository.AccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.MySQLContainer;
@@ -14,7 +11,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 // @DataJpaTest only auto-enables schema generation for embedded databases. Against the
 // MySQL container it defaults to "none", so the schema has to be requested explicitly.
-@TestPropertySource(properties = "spring.jpa.hibernate.ddl-auto=create-drop")
+@TestPropertySource(properties = {
+    "spring.jpa.hibernate.ddl-auto=create-drop",
+    "spring.cache.type=simple"
+})
 public class BaseIntegrationTest {
 
   @Container
@@ -24,8 +24,4 @@ public class BaseIntegrationTest {
           .withDatabaseName("bank")
           .withUsername("test")
           .withPassword("test");
-
-  @Autowired AccountRepository accountRepository;
-
-  @Autowired TestEntityManager entityManager;
 }

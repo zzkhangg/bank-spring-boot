@@ -1,8 +1,5 @@
 package com.example.bankspringboot.config;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,11 +15,15 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor()
+@RequiredArgsConstructor
 public class SecurityConfig {
 
   String[] PUBLIC_ENDPOINTS = {"/api/customers", "/api/auth/**"};
@@ -36,9 +37,6 @@ public class SecurityConfig {
     "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**"
   };
 
-  CustomJwtDecoder customJwtDecoder;
-  JwtAuthenticationConverter jwtAuthenticationConverter;
-
   @Bean
   PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
@@ -46,8 +44,11 @@ public class SecurityConfig {
 
   @Bean
   SecurityFilterChain filterChain(
-      HttpSecurity httpSecurity, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint)
-      throws Exception {
+        HttpSecurity httpSecurity,
+        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+        CustomJwtDecoder customJwtDecoder,
+        JwtAuthenticationConverter jwtAuthenticationConverter)
+        throws Exception {
     httpSecurity.authorizeHttpRequests(
         request ->
             request

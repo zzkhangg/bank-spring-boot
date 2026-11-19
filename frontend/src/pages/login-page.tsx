@@ -1,7 +1,7 @@
-import { Navigate } from "react-router-dom";
-import { Landmark, LockKeyhole } from "lucide-react";
 import { LoginForm } from "@/features/auth/components/login-form";
 import { useSession } from "@/features/auth/model/use-session";
+import { Landmark, LockKeyhole } from "lucide-react";
+import { Link, Navigate } from "react-router-dom";
 
 export function LoginPage() {
   const tokens = useSession();
@@ -27,6 +27,9 @@ export function LoginPage() {
             <p className="mt-2 text-muted-foreground">Sign in with your customer credentials.</p>
           </div>
           <LoginForm />
+
+          <Link to="/register">Create an account</Link>
+          
           <p className="mt-8 text-center text-xs leading-5 text-muted-foreground">Your session is kept in memory and clears when this tab closes or reloads.</p>
         </div>
       </section>

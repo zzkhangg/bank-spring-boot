@@ -1,20 +1,22 @@
 package com.example.bankspringboot.service;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.example.bankspringboot.common.AccountBalanceType;
 import com.example.bankspringboot.dto.statistics.AccountStatisticsDto;
 import com.example.bankspringboot.dto.statistics.AddressStatisticsDto;
 import com.example.bankspringboot.repository.AccountRepository;
 import com.example.bankspringboot.repository.CustomerRepository;
-import com.example.bankspringboot.repository.TransactionRepository;
-import java.util.Arrays;
-import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +25,6 @@ public class StatisticsService {
 
   AccountRepository accountRepository;
   CustomerRepository customerRepository;
-  private final TransactionRepository transactionRepository;
 
   @PreAuthorize("hasRole('ADMIN')")
   @Transactional(readOnly = true)

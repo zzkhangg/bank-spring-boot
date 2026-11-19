@@ -1,13 +1,14 @@
 package com.example.bankspringboot.service;
 
+import java.security.SecureRandom;
+
+import org.springframework.stereotype.Component;
+
 import com.example.bankspringboot.repository.AccountRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.stereotype.Component;
-
-import java.security.SecureRandom;
-import java.util.Random;
 
 @Component
 @RequiredArgsConstructor

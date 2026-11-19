@@ -1,14 +1,13 @@
 package com.example.bankspringboot.repository;
 
-import com.example.bankspringboot.domain.User;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import com.example.bankspringboot.domain.User;
+
 public interface UserRepository extends JpaRepository<User, UUID> {
   @EntityGraph(attributePaths = {
           "roles",

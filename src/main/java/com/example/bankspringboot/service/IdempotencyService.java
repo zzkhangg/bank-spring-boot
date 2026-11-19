@@ -1,20 +1,22 @@
 package com.example.bankspringboot.service;
 
+import java.util.function.Supplier;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+
 import com.example.bankspringboot.domain.idempotency.IdempotencyKey;
 import com.example.bankspringboot.domain.idempotency.IdempotencyStatus;
 import com.example.bankspringboot.exceptions.AppException;
 import com.example.bankspringboot.exceptions.ErrorCode;
 import com.example.bankspringboot.repository.IdempotencyKeyRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.function.Supplier;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ink: var(--ink);
+  --font-sans: "Source Sans 3", "Segoe UI", sans-serif;
+}
+
+:root {
+  --background: #f4f6f2;
+  --foreground: #102a2b;
+  --primary: #0e766e;
+  --primary-foreground: #ffffff;
+  --muted: #e8ece7;
+  --muted-foreground: #62706d;
+  --accent: #dcedea;
+  --accent-foreground: #14544f;
+  --destructive: #a53f35;
+  --border: #ccd5d0;
+  --input: #b8c5bf;
+  --ring: #0e766e;
+  --ink: #102a2b;
+}
+
+* { border-color: var(--border); }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--background); font-family: var(--font-sans); }
+button, a, input { -webkit-tap-highlight-color: transparent; }
+.number { font-variant-numeric: tabular-nums lining-nums; }
+.statement-lines { background: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(220, 237, 234, .5) 31px 32px); }
+
+@media (max-width: 1023px) { .ledger-rail { max-width: 38rem; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
